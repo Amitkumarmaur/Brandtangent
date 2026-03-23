@@ -1,7 +1,7 @@
 import Header from "@/components/header"
 import HeroSection from "@/components/hero-section"
 import TrustIndicators from "@/components/trust-indicators"
-import InteractiveShowcase from "@/components/interactive-showcase"
+import AboutUs from "@/components/about-us"
 import ServicesGrid from "@/components/services-grid"
 import IndustryFocus from "@/components/industry-focus"
 import InnovationLab from "@/components/innovation-lab"
@@ -18,7 +18,7 @@ export default function Home() {
       <Header />
       <HeroSection />
       <TrustIndicators />
-      <InteractiveShowcase />
+      <AboutUs />
       <ServicesGrid />
       <IndustryFocus />
       <InnovationLab />
