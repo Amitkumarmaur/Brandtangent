@@ -41,21 +41,21 @@ export default function TestimonialSection() {
   const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials]
 
   return (
-    <section className="py-24 bg-white overflow-hidden relative">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-16 relative z-10">
+    <section className="py-12 lg:py-16 bg-white overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-8 relative z-10">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#A800FF]" />
-            <span className="text-[#A800FF] font-medium tracking-wide text-sm">Client Testimonials & Reviews</span>
+            <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
+            <span className="text-[#FF5722] font-medium tracking-wide text-sm uppercase">Client Testimonials & Reviews</span>
           </div>
           
           <div className="relative inline-block mt-2">
-            <h2 className="text-4xl md:text-6xl font-light text-[#0A0A0A] tracking-tight leading-tight max-w-2xl relative z-10">
+            <h2 className="text-3xl md:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight max-w-2xl relative z-10">
               What Our Happy Clients <br /><span className="font-normal">Say About Us</span>
             </h2>
             {/* The watermark effect from the image */}
-            <div className="absolute -top-10 lg:-top-16 -left-4 lg:-left-8 text-[#F4F4F4]/80 text-7xl lg:text-9xl font-black uppercase tracking-tighter z-[-1] pointer-events-none select-none">
-              digital<br />gravity
+            <div className="absolute -top-6 lg:-top-10 -left-4 lg:-left-6 text-[#F4F4F4]/80 text-6xl lg:text-8xl font-black uppercase tracking-tighter z-[-1] pointer-events-none select-none">
+              digii<br />mark
             </div>
           </div>
         </div>
@@ -73,8 +73,8 @@ export default function TestimonialSection() {
           style={{ width: "max-content" }}
         >
           {duplicatedTestimonials.map((testimonial, idx) => (
-            <div key={`${testimonial.id}-${idx}`} className="flex flex-col gap-4 w-[280px] lg:w-[320px] flex-shrink-0">
-              <div className="relative w-full h-[480px] lg:h-[540px] rounded-[2rem] overflow-hidden bg-gray-100 border border-gray-100">
+            <div key={`${testimonial.id}-${idx}`} className="flex flex-col gap-3 w-[240px] lg:w-[280px] flex-shrink-0">
+              <div className="relative w-full h-[320px] lg:h-[380px] rounded-[1.5rem] overflow-hidden bg-gray-100 border border-gray-100">
                 <img
                   src={testimonial.image}
                   alt={testimonial.name}
@@ -83,8 +83,8 @@ export default function TestimonialSection() {
                 />
                 
                 {/* Mute Button */}
-                <button className="absolute bottom-5 left-5 w-12 h-12 bg-[#A800FF] hover:bg-[#9100DB] transition-colors rounded-full flex items-center justify-center text-white shadow-lg z-10">
-                  <VolumeX className="w-5 h-5" />
+                <button className="absolute bottom-5 left-5 w-12 h-12 bg-[#FF5722] hover:bg-[#E64A19] transition-colors rounded-full flex items-center justify-center text-white shadow-lg z-10 group">
+                  <VolumeX className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 </button>
               </div>
               

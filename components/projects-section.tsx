@@ -48,7 +48,7 @@ function TiltCard({ image, title }: { image: string, title: string }) {
       onMouseLeave={handleMouseLeave}
       animate={{ rotateX, rotateY, scale: rotateX === 0 && rotateY === 0 ? 1 : 1.05 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="relative w-[85vw] sm:w-[320px] md:w-[400px] flex-shrink-0 h-[400px] md:h-[500px] rounded-[2rem] overflow-hidden cursor-pointer shadow-xl group border border-[#E5E5E5] bg-[#F8F8F8]"
+      className="relative w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[360px] flex-shrink-0 h-[300px] md:h-[360px] lg:h-[400px] rounded-[1.5rem] overflow-hidden cursor-pointer shadow-xl group border border-[#E5E5E5] bg-[#F8F8F8]"
       style={{ transformStyle: "preserve-3d", perspective: 1200 }}
     >
       <img
@@ -75,18 +75,18 @@ export default function ProjectsSection() {
   const displayProjects = filteredProjects.length > 0 ? filteredProjects : projects.slice(0, 3)
 
   return (
-    <section className="bg-[#F8F8F8] relative py-20 md:py-24 overflow-hidden border-t border-[#E5E5E5]">
+    <section className="bg-[#F8F8F8] relative py-12 md:py-16 overflow-hidden border-t border-[#E5E5E5]">
       
       {/* Header Section (Contained) */}
-      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-10 md:mb-12">
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 md:gap-12">
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-8 md:mb-10">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 md:gap-8">
           
           <div className="flex-1 xl:flex-shrink-0 pr-4">
             <div className="flex items-center gap-2 mb-4 md:mb-6 mt-2 md:mt-4">
               <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
               <span className="text-[#FF5722] font-medium tracking-wide uppercase text-xs md:text-sm">Our Work</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-[#0A0A0A] tracking-tight leading-tight max-w-3xl">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight max-w-3xl">
               10+ Years Exp but <br className="hidden md:block"/>
               <span className="font-medium tracking-tight text-[#0A0A0A]">Countless Innovations</span>
             </h2>
@@ -130,7 +130,7 @@ export default function ProjectsSection() {
 
       {/* Projects Cards Horizontal Scroll (Full Bleed) */}
       <div className="w-full pl-6 lg:pl-8 xl:pl-[calc((100vw-80rem)/2+2rem)] relative z-10">
-        <div className="flex gap-6 md:gap-8 overflow-x-auto pb-12 pt-4 pr-6 lg:pr-8 xl:pr-[calc((100vw-80rem)/2+2rem)] scroll-smooth snap-x snap-mandatory hide-scroll">
+        <div className="flex gap-4 md:gap-6 lg:gap-8 overflow-x-auto pb-8 pt-2 pr-6 lg:pr-8 xl:pr-[calc((100vw-80rem)/2+2rem)] scroll-smooth snap-x snap-mandatory hide-scroll">
           <AnimatePresence mode="popLayout">
             {displayProjects.map((project, idx) => (
               <motion.div 

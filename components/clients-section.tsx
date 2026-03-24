@@ -26,18 +26,18 @@ const logosRow2 = [
 
 export default function ClientsSection() {
   return (
-    <section className="relative w-full bg-[#0A0A0A] py-24 overflow-hidden border-t border-white/10 font-sans">
+    <section className="relative w-full bg-[#0A0A0A] py-16 overflow-hidden border-t border-white/10 font-sans">
       
       {/* Subtle Grid Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:40px_40px] mix-blend-screen pointer-events-none"></div>
 
       {/* Lighting Accents */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#FF5722]/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#FF5722]/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-      <div className="relative z-10 container mx-auto px-4 md:px-6 mb-16 flex flex-col items-center text-center">
+      <div className="relative z-10 container mx-auto px-4 md:px-6 mb-10 flex flex-col items-center text-center">
         
         {/* Pre-heading with Animated Dot */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5722] opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FF5722]"></span>
@@ -46,13 +46,13 @@ export default function ClientsSection() {
         </div>
 
         {/* Main Heading */}
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white text-balance leading-tight max-w-3xl">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-white text-balance leading-tight max-w-3xl">
           5-Star Rated, Works <br className="hidden md:block" /> with GCC Giants
         </h2>
       </div>
 
       {/* Marquee Section */}
-      <div className="relative z-10 w-full flex flex-col gap-12 sm:gap-16 pt-8">
+      <div className="relative z-10 w-full flex flex-col gap-8 sm:gap-12 pt-4">
         
         {/* Row 1: Left to Right */}
         <div className="group relative flex overflow-hidden w-full mask-edges">

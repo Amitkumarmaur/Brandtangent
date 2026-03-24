@@ -51,7 +51,7 @@ export default function ServicesScroll() {
   const [activeIndex, setActiveIndex] = useState(0)
 
   return (
-    <section className="bg-[#0A0A0A] relative min-h-screen py-24 flex items-center overflow-hidden">
+    <section className="bg-[#0A0A0A] relative min-h-[500px] lg:min-h-[550px] py-16 flex items-center overflow-hidden">
       
       {/* Background Effects (Dark Theme) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -71,12 +71,12 @@ export default function ServicesScroll() {
         
         {/* Left Side: Categories */}
         <div className="flex-1 w-full pl-6 md:pl-16">
-          <div className="flex items-center gap-2 mb-8 md:mb-12">
+          <div className="flex items-center gap-2 mb-6 md:mb-8 mt-4 md:mt-0">
             <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
             <span className="text-white font-medium tracking-wide text-sm">Our Services</span>
           </div>
           
-          <div className="flex flex-col gap-6 md:gap-10">
+          <div className="flex flex-col gap-4 md:gap-6">
             {servicesData.map((service, idx) => {
               const isActive = activeIndex === idx;
               return (
@@ -103,7 +103,7 @@ export default function ServicesScroll() {
                   </div>
                   
                   <motion.h3 
-                    className={`text-3xl md:text-5xl lg:text-6xl tracking-tight transition-colors duration-500 font-light ${isActive ? "text-white" : "text-white/30 hover:text-white/60"}`}
+                    className={`text-2xl md:text-4xl lg:text-5xl tracking-tight transition-colors duration-500 font-light ${isActive ? "text-white" : "text-white/30 hover:text-white/60"}`}
                   >
                     {service.title}
                   </motion.h3>
@@ -114,9 +114,9 @@ export default function ServicesScroll() {
         </div>
         
         {/* Right Side: Active Sub-services */}
-        <div className="flex-1 w-full mt-8 md:mt-0 pr-0 md:pr-8 lg:pr-16">
+        <div className="flex-1 w-full mt-6 md:mt-0 pr-0 md:pr-8 lg:pr-16">
           {/* Transparent border box resembling user reference */}
-          <div className="border border-white/30 bg-transparent rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden h-[350px] md:h-[450px] flex flex-col justify-center">
+          <div className="border border-white/30 bg-transparent rounded-[2rem] p-6 lg:p-10 relative overflow-hidden h-[300px] md:h-[360px] flex flex-col justify-center">
             
             <AnimatePresence mode="popLayout">
               <motion.div
@@ -125,7 +125,7 @@ export default function ServicesScroll() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
-                className="flex flex-col gap-4 md:gap-6"
+                className="flex flex-col gap-3 md:gap-4"
               >
                 {servicesData[activeIndex].items.map((item, index) => (
                   <motion.div 

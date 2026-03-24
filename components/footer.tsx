@@ -55,21 +55,21 @@ const footerColumns = [
 
 // The massive 5-column Digital Gravity menu
 const DigitalGravityMenu = () => (
-  <div className="bg-[#0A0A0A] text-white pt-20 md:pt-24 pb-16 w-full mx-auto pointer-events-auto rounded-[2rem] md:rounded-[3rem] shadow-2xl relative">
+  <div className="bg-[#0A0A0A] text-white pt-12 md:pt-16 pb-12 w-full mx-auto pointer-events-auto rounded-[2rem] md:rounded-[3rem] shadow-2xl relative">
     <div className="max-w-[1240px] mx-auto px-6 md:px-12 flex flex-col items-center">
       
       {/* Top centered logo */}
-      <div className="mb-8">
+      <div className="mb-6">
         <Link href="/" className="flex flex-col items-center gap-2">
-          <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-1">
-            <span className="text-[#0A0A0A] font-black text-3xl">D</span>
+          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-1">
+            <span className="text-[#0A0A0A] font-black text-2xl">D</span>
           </div>
-          <span className="text-4xl font-light tracking-tight">digii<strong className="font-bold">mark</strong></span>
+          <span className="text-3xl font-light tracking-tight">digii<strong className="font-bold">mark</strong></span>
         </Link>
       </div>
 
       {/* Social Links */}
-      <div className="flex gap-6 mb-12">
+      <div className="flex gap-4 mb-8">
         {socialLinks.map((social) => (
           <a key={social.label} href={social.href} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#FF5722] hover:text-white transition-colors">
             <social.icon className="w-5 h-5" />
@@ -78,10 +78,10 @@ const DigitalGravityMenu = () => (
       </div>
 
       {/* Separator */}
-      <div className="w-full h-px bg-white/10 mb-16"></div>
+      <div className="w-full h-px bg-white/10 mb-10"></div>
 
       {/* 5-Column Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6 w-full">
         
         {/* Column 1: Contact Us */}
         <div className="flex flex-col">

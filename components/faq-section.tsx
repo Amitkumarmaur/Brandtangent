@@ -83,7 +83,7 @@ export default function FAQSection() {
   const [openId, setOpenId] = useState<number | null>(2)
 
   return (
-    <section className="bg-white relative py-20 md:py-28 overflow-hidden border-t border-[#E5E5E5]">
+    <section className="bg-white relative py-16 md:py-20 overflow-hidden border-t border-[#E5E5E5]">
       
       {/* Background Subtle Grid Pattern */}
       <div 
@@ -98,16 +98,16 @@ export default function FAQSection() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
           
           {/* Left Column: Sticky Header */}
-          <div className="lg:w-5/12 lg:sticky lg:top-32 h-max">
-            <div className="flex items-center gap-2 mb-6">
+          <div className="lg:w-5/12 lg:sticky lg:top-24 h-max">
+            <div className="flex items-center gap-2 mb-4">
               <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
               <span className="text-[#FF5722] font-medium tracking-wide uppercase text-sm">FAQs</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight mb-8">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight mb-6">
               Transformation with <br className="hidden lg:block"/>
               <span className="font-medium tracking-tight">Smart UX & Scalable Tech</span>
             </h2>
-            <p className="text-[#7D7D7D] text-lg font-light leading-relaxed max-w-lg mb-8">
+            <p className="text-[#7D7D7D] text-base md:text-lg font-light leading-relaxed max-w-lg mb-6">
               You have the vision—we engineer for the future. At DigiiMark, we embrace modern technology with creativity to provide AI-powered multilingual support, predictive UX, and intelligent UI/UX design. No matter if you are looking for AI-powered hosting or AI-driven A/B testing, our teams have the expertise to build scalable digital products that think, adapt, and grow with your audience.
             </p>
           </div>

@@ -30,7 +30,7 @@ export default function TrustIndicators() {
   )
 
   return (
-    <section className="relative w-full py-24 sm:py-32 bg-[#F5F7F9] overflow-hidden flex flex-col items-center border-t border-b border-[#E5E5E5]/50">
+    <section className="relative w-full py-10 lg:py-12 bg-[#F5F7F9] overflow-hidden flex flex-col items-center border-t border-b border-[#E5E5E5]/50">
       
       {/* Global CSS for the Marquee Slider */}
       <style>{`
@@ -47,25 +47,25 @@ export default function TrustIndicators() {
       `}</style>
       
       {/* Small top label */}
-      <div className="flex items-center gap-3 mb-8 sm:mb-12 relative z-20">
+      <div className="flex items-center gap-2 mb-4 relative z-20">
         <div className="w-2.5 h-2.5 rounded-full bg-[#FF5722] animate-pulse" />
         <span className="text-sm font-semibold tracking-wider text-[#0A0A0A] uppercase letter-spacing-[0.2em]">Our Tech Stack</span>
       </div>
 
       {/* Main Headline */}
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#0A0A0A] text-center max-w-5xl tracking-[-0.02em] z-20 leading-[1.1] px-4">
+      <h2 className="text-3xl md:text-4xl lg:text-4xl font-bold text-[#0A0A0A] text-center max-w-4xl tracking-[-0.02em] z-20 leading-[1.1] px-4">
         Fueled Up 500+ Brands to Roar with Next-Gen AI & Tech
       </h2>
 
       {/* 3D Earth Globe Container */}
-      <div className="relative w-full h-[350px] sm:h-[450px] md:h-[550px] mt-12 mb-12 flex justify-center items-end">
-         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] md:w-[1000px] md:h-[1000px] z-0 pointer-events-none rounded-full overflow-hidden" 
+      <div className="relative w-full h-[220px] sm:h-[280px] md:h-[300px] lg:h-[340px] mt-6 mb-6 flex justify-center items-end">
+         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-[450px] h-[450px] sm:w-[600px] sm:h-[600px] md:w-[650px] md:h-[650px] lg:w-[750px] lg:h-[750px] z-0 pointer-events-none rounded-full overflow-hidden" 
               style={{ maskImage: "linear-gradient(to bottom, black 40%, transparent 80%)", WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 80%)" }}>
              <TechGlobe />
          </div>
 
          {/* Full-width Logo Slider cutting horizontally across the globe */}
-         <div className="w-full relative overflow-hidden flex whitespace-nowrap py-12 z-10 w-screen ml-[calc(-50vw+50%)]">
+         <div className="w-full relative overflow-hidden flex whitespace-nowrap py-6 z-10 w-screen ml-[calc(-50vw+50%)]">
             <div className="animate-marquee flex items-center w-max">
                {/* Print the set of logos twice for seamless infinite loop */}
                <LogosSet />
@@ -75,14 +75,14 @@ export default function TrustIndicators() {
       </div>
       
       {/* Bottom Global Presence Pill */}
-      <div className="relative z-30 bg-white border border-[#E5E5E5] rounded-[2rem] px-6 sm:px-10 py-5 flex items-center gap-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] transition-shadow overflow-x-auto max-w-[95vw]">
-        <span className="text-[#0A0A0A] font-semibold whitespace-nowrap hidden sm:block text-sm sm:text-base">Our Global Presence</span>
-        <div className="h-6 w-px bg-[#E5E5E5] hidden sm:block shrink-0" />
-        <div className="flex gap-6 sm:gap-8 text-sm sm:text-base text-[#7D7D7D] font-medium whitespace-nowrap">
-          <span className="flex items-center gap-2.5 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-2 h-2 rounded-full bg-[#FF5722]"/> USA</span>
-          <span className="flex items-center gap-2.5 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-2 h-2 rounded-full bg-[#FF5722]"/> Canada</span>
-          <span className="flex items-center gap-2.5 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-2 h-2 rounded-full bg-[#FF5722]"/> Saudi Arabia</span>
-          <span className="flex items-center gap-2.5 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-2 h-2 rounded-full bg-[#FF5722]"/> Europe</span>
+      <div className="relative z-30 bg-white border border-[#E5E5E5] rounded-[2rem] px-5 sm:px-8 py-3.5 sm:py-4 flex items-center gap-5 sm:gap-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] transition-shadow overflow-x-auto max-w-[95vw]">
+        <span className="text-[#0A0A0A] font-medium whitespace-nowrap hidden sm:block text-[0.85rem] sm:text-sm">Our Global Presence</span>
+        <div className="h-5 w-px bg-[#E5E5E5] hidden sm:block shrink-0" />
+        <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm text-[#7D7D7D] font-medium whitespace-nowrap">
+          <span className="flex items-center gap-2 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"/> USA</span>
+          <span className="flex items-center gap-2 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"/> Canada</span>
+          <span className="flex items-center gap-2 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"/> Saudi Arabia</span>
+          <span className="flex items-center gap-2 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"/> Europe</span>
         </div>
       </div>
       

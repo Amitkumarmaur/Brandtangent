@@ -12,14 +12,14 @@ const blogPosts = [
 
 function BlogCard({ title, image, date, category }: { title: string, image: string, date: string, category: string }) {
   return (
-    <div className="w-[85vw] sm:w-[350px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-[2rem] overflow-hidden group cursor-pointer relative shadow-xl border border-[#E5E5E5]">
+    <div className="w-[85vw] sm:w-[320px] md:w-[400px] h-[300px] md:h-[360px] flex-shrink-0 rounded-[2rem] overflow-hidden group cursor-pointer relative shadow-xl border border-[#E5E5E5]">
       <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-8 opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-90 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex items-center gap-3 mb-4">
           <span className="bg-[#FF5722] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{category}</span>
           <span className="text-[#E5E5E5] text-sm font-medium">{date}</span>
         </div>
-        <h3 className="text-white text-2xl md:text-3xl font-bold tracking-tight leading-snug group-hover:-translate-y-2 transition-transform duration-300">{title}</h3>
+        <h3 className="text-white text-xl md:text-2xl font-bold tracking-tight leading-snug group-hover:-translate-y-1 transition-transform duration-300">{title}</h3>
       </div>
     </div>
   )
@@ -27,18 +27,18 @@ function BlogCard({ title, image, date, category }: { title: string, image: stri
 
 export default function BlogSection() {
   return (
-    <section className="bg-[#F8F8F8] relative py-20 md:py-24 overflow-hidden border-t border-[#E5E5E5]">
+    <section className="bg-[#F8F8F8] relative py-12 md:py-16 overflow-hidden border-t border-[#E5E5E5]">
       
       {/* Header Section */}
-      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-10 md:mb-16">
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 md:gap-12">
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-8 md:mb-12">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 md:gap-8">
           
           <div className="flex-1 xl:flex-shrink-0 pr-4">
             <div className="flex items-center gap-2 mb-4 md:mb-6 mt-2 md:mt-4">
               <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
               <span className="text-[#FF5722] font-medium tracking-wide uppercase text-xs md:text-sm">Our Blog</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-[#0A0A0A] tracking-tight leading-tight max-w-3xl">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight max-w-3xl">
               What's Happening in <br className="hidden md:block"/>
               <span className="font-medium tracking-tight text-[#0A0A0A]">The Industry?</span>
             </h2>
