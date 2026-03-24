@@ -55,8 +55,8 @@ export default function ServicesScroll() {
       
       {/* Background Effects (Dark Theme) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-[#A800FF]/15 rounded-full blur-[150px] mix-blend-screen -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-[#A800FF]/5 rounded-full blur-[100px] mix-blend-screen translate-y-1/2 -translate-x-1/4" />
+        <div className="absolute top-0 right-0 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-[#FF5722]/15 rounded-full blur-[150px] mix-blend-screen -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-[#FF5722]/5 rounded-full blur-[100px] mix-blend-screen translate-y-1/2 -translate-x-1/4" />
         
         <div 
           className="absolute inset-0 opacity-[0.03]" 
@@ -72,7 +72,7 @@ export default function ServicesScroll() {
         {/* Left Side: Categories */}
         <div className="flex-1 w-full pl-6 md:pl-16">
           <div className="flex items-center gap-2 mb-8 md:mb-12">
-            <div className="w-2 h-2 rounded-full bg-[#A800FF]" />
+            <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
             <span className="text-white font-medium tracking-wide text-sm">Our Services</span>
           </div>
           
