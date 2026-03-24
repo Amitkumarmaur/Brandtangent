@@ -8,6 +8,7 @@ import ProjectsSection from "@/components/projects-section"
 import PartnersSection from "@/components/partners-section"
 import MetricsDashboard from "@/components/metrics-dashboard"
 import BlogSection from "@/components/blog-section"
+import ClientsSection from "@/components/clients-section"
 import FAQSection from "@/components/faq-section"
 import Footer from "@/components/footer"
 
@@ -24,6 +25,7 @@ export default function Home() {
       <PartnersSection />
       <MetricsDashboard />
       <BlogSection />
+      <ClientsSection />
       <FAQSection />
       <Footer />
     </main>
