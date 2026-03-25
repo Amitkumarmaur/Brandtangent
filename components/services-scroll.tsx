@@ -51,12 +51,12 @@ export default function ServicesScroll() {
   const [activeIndex, setActiveIndex] = useState(0)
 
   return (
-    <section className="bg-[#0A0A0A] relative min-h-[500px] lg:min-h-[550px] py-16 flex items-center overflow-hidden">
+    <section className="bg-foreground relative min-h-[500px] lg:min-h-[550px] py-16 md:py-20 flex items-center overflow-hidden">
       
       {/* Background Effects (Dark Theme) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-[#FF5722]/15 rounded-full blur-[150px] mix-blend-screen -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-[#FF5722]/5 rounded-full blur-[100px] mix-blend-screen translate-y-1/2 -translate-x-1/4" />
+        <div className="absolute top-0 right-0 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-ignite-orange/15 rounded-full blur-[150px] mix-blend-screen -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-ignite-orange/5 rounded-full blur-[100px] mix-blend-screen translate-y-1/2 -translate-x-1/4" />
         
         <div 
           className="absolute inset-0 opacity-[0.03]" 
@@ -72,7 +72,7 @@ export default function ServicesScroll() {
         {/* Left Side: Categories */}
         <div className="flex-1 w-full pl-6 md:pl-16">
           <div className="flex items-center gap-2 mb-6 md:mb-8 mt-4 md:mt-0">
-            <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
+            <div className="w-2 h-2 rounded-full bg-ignite-orange" />
             <span className="text-white font-medium tracking-wide text-sm">Our Services</span>
           </div>
           

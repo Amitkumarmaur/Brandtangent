@@ -26,23 +26,23 @@ const logosRow2 = [
 
 export default function ClientsSection() {
   return (
-    <section className="relative w-full bg-[#0A0A0A] py-16 overflow-hidden border-t border-white/10 font-sans">
+    <section className="relative w-full bg-foreground py-16 lg:py-20 overflow-hidden border-t border-white/10 font-sans">
       
       {/* Subtle Grid Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:40px_40px] mix-blend-screen pointer-events-none"></div>
 
       {/* Lighting Accents */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#FF5722]/5 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-ignite-orange/5 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="relative z-10 container mx-auto px-4 md:px-6 mb-10 flex flex-col items-center text-center">
         
         {/* Pre-heading with Animated Dot */}
         <div className="flex items-center gap-3 mb-4">
           <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5722] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FF5722]"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ignite-orange opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-ignite-orange"></span>
           </span>
-          <span className="uppercase tracking-widest text-[#FF5722] text-sm font-semibold">Our Clients</span>
+          <span className="uppercase tracking-widest text-ignite-orange text-sm font-semibold">Our Clients</span>
         </div>
 
         {/* Main Heading */}

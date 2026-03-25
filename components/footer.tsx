@@ -55,14 +55,14 @@ const footerColumns = [
 
 // The massive 5-column Digital Gravity menu
 const DigitalGravityMenu = () => (
-  <div className="bg-[#0A0A0A] text-white pt-12 md:pt-16 pb-12 w-full mx-auto pointer-events-auto rounded-[2rem] md:rounded-[3rem] shadow-2xl relative">
+  <div className="bg-foreground text-white pt-12 md:pt-16 pb-12 w-full mx-auto pointer-events-auto rounded-[2rem] md:rounded-[3rem] shadow-2xl relative">
     <div className="max-w-[1240px] mx-auto px-6 md:px-12 flex flex-col items-center">
       
       {/* Top centered logo */}
       <div className="mb-6">
         <Link href="/" className="flex flex-col items-center gap-2">
           <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-1">
-            <span className="text-[#0A0A0A] font-black text-2xl">D</span>
+            <span className="text-foreground font-black text-2xl">D</span>
           </div>
           <span className="text-3xl font-light tracking-tight">digii<strong className="font-bold">mark</strong></span>
         </Link>
@@ -71,7 +71,7 @@ const DigitalGravityMenu = () => (
       {/* Social Links */}
       <div className="flex gap-4 mb-8">
         {socialLinks.map((social) => (
-          <a key={social.label} href={social.href} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#FF5722] hover:text-white transition-colors">
+          <a key={social.label} href={social.href} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-ignite-orange hover:text-white transition-colors">
             <social.icon className="w-5 h-5" />
           </a>
         ))}
@@ -86,7 +86,7 @@ const DigitalGravityMenu = () => (
         {/* Column 1: Contact Us */}
         <div className="flex flex-col">
           <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
-            <span className="w-0.5 h-6 bg-[#FF5722]"></span>
+            <span className="w-0.5 h-6 bg-ignite-orange"></span>
             Contact Us
           </h3>
           <div className="text-sm text-gray-400 space-y-6">
@@ -218,13 +218,13 @@ export default function Footer() {
               }}
               className="bg-white/60 backdrop-blur-xl rounded-full pl-2.5 pr-5 py-2.5 flex items-center justify-between w-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/40 hover:bg-white/70 transition-all duration-300 cursor-pointer"
             >
-              <div className="w-9 h-9 bg-[#0A0A0A] text-white rounded-full flex items-center justify-center shadow-inner">
+              <div className="w-9 h-9 bg-foreground text-white rounded-full flex items-center justify-center shadow-inner">
                 <span className="font-bold text-sm">D</span>
               </div>
               
               <div className="flex flex-col gap-[5px]">
-                <div className="w-5 h-[1.5px] bg-[#0A0A0A] rounded-full opacity-90"></div>
-                <div className="w-5 h-[1.5px] bg-[#0A0A0A] rounded-full opacity-90"></div>
+                <div className="w-5 h-[1.5px] bg-foreground rounded-full opacity-90"></div>
+                <div className="w-5 h-[1.5px] bg-foreground rounded-full opacity-90"></div>
               </div>
             </button>
           </motion.div>

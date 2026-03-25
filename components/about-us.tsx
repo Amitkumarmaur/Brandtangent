@@ -3,7 +3,7 @@ import { Award, Medal, Star, CheckCircle, ShieldCheck } from "lucide-react"
 
 export default function AboutUs() {
   return (
-    <section className="bg-[#FF5722] text-white py-16 lg:py-20 px-6 lg:px-12 w-full overflow-hidden">
+    <section className="bg-ignite-orange text-white py-16 lg:py-20 px-6 lg:px-12 w-full overflow-hidden">
       <div className="max-w-[1500px] mx-auto w-full">
         
         {/* Top Header Section */}
@@ -12,14 +12,14 @@ export default function AboutUs() {
           {/* Left: Founders Info */}
           <div className="flex flex-col shrink-0 pt-2">
             <div className="flex -space-x-4 mb-5">
-              <div className="w-16 h-16 rounded-full border-[3px] border-[#FF5722] overflow-hidden bg-white shadow-lg isolate">
+              <div className="w-16 h-16 rounded-full border-[3px] border-ignite-orange overflow-hidden bg-white shadow-lg isolate">
                  {/* Fallback to placeholder since professional headshots exist in public folder */}
                 <Image src="/professional-headshot-man-ceo.jpg" alt="Founder 1" width={64} height={64} className="object-cover w-full h-full" />
               </div>
-              <div className="w-16 h-16 rounded-full border-[3px] border-[#FF5722] overflow-hidden bg-white shadow-lg z-10 isolate">
+              <div className="w-16 h-16 rounded-full border-[3px] border-ignite-orange overflow-hidden bg-white shadow-lg z-10 isolate">
                 <Image src="/professional-headshot-woman-marketing-executive.jpg" alt="Founder 2" width={64} height={64} className="object-cover w-full h-full" />
               </div>
-              <div className="w-16 h-16 rounded-full border-[3px] border-[#FF5722] overflow-hidden bg-white shadow-lg z-20 isolate">
+              <div className="w-16 h-16 rounded-full border-[3px] border-ignite-orange overflow-hidden bg-white shadow-lg z-20 isolate">
                 <Image src="/professional-headshot-man-software-engineer.jpg" alt="Founder 3" width={64} height={64} className="object-cover w-full h-full" />
               </div>
             </div>

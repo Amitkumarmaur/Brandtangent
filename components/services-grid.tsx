@@ -48,7 +48,7 @@ export default function ServicesGrid() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section ref={ref} id="services" className="py-24 bg-[#F8F8F8]">
+    <section ref={ref} id="services" className="py-16 md:py-20 bg-grey-100">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -56,8 +56,8 @@ export default function ServicesGrid() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-5xl font-bold text-[#0A0A0A] text-balance">Automation That Delivers</h2>
-          <p className="mt-4 text-lg text-[#7D7D7D] max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground text-balance">Automation That Delivers</h2>
+          <p className="mt-4 text-lg text-grey-400 max-w-2xl mx-auto">
             Comprehensive AI-powered solutions designed to scale your marketing
           </p>
         </motion.div>
@@ -70,28 +70,28 @@ export default function ServicesGrid() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               whileHover={{ y: -8 }}
-              className="group relative bg-white rounded-2xl p-8 border border-[#E5E5E5] hover:border-[#FF5722]/30 transition-all duration-300 cursor-pointer overflow-hidden"
+              className="group relative bg-white rounded-2xl p-8 border border-grey-200 hover:border-ignite-orange/30 transition-all duration-300 cursor-pointer overflow-hidden"
             >
-              {/* Orange accent line on top */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF5722] to-[#FF5722]/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                {/* Orange accent line on top */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ignite-orange to-ignite-orange/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
-              <div className="relative z-10">
-                <div className="w-14 h-14 bg-[#F8F8F8] rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#FF5722]/10 transition-colors">
-                  <service.icon className="w-7 h-7 text-[#0A0A0A] group-hover:text-[#FF5722] transition-colors" />
+                <div className="relative z-10">
+                  <div className="w-14 h-14 bg-grey-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-ignite-orange/10 transition-colors">
+                    <service.icon className="w-7 h-7 text-foreground group-hover:text-ignite-orange transition-colors" />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-foreground mb-3">{service.title}</h3>
+                  <p className="text-grey-400 mb-6">{service.description}</p>
+
+                  <a
+                    href={service.link}
+                    className="inline-flex items-center text-sm font-medium text-ignite-orange group-hover:gap-2 transition-all"
+                  >
+                    Explore
+                    <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </a>
                 </div>
-
-                <h3 className="text-xl font-bold text-[#0A0A0A] mb-3">{service.title}</h3>
-                <p className="text-[#7D7D7D] mb-6">{service.description}</p>
-
-                <a
-                  href={service.link}
-                  className="inline-flex items-center text-sm font-medium text-[#FF5722] group-hover:gap-2 transition-all"
-                >
-                  Explore
-                  <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </a>
-              </div>
-            </motion.div>
+              </motion.div>
           ))}
         </div>
       </div>

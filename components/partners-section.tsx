@@ -11,22 +11,22 @@ const partnersRow2 = [
 ]
 
 const MarqueeItem = ({ text }: { text: string }) => (
-  <div className="w-[180px] h-[90px] md:w-[220px] md:h-[110px] rounded-2xl border border-[#E5E5E5] bg-[#F8F8F8] flex items-center justify-center flex-shrink-0 hover:border-[#FF5722]/30 hover:shadow-lg transition-all duration-300 group cursor-default">
-    <span className="text-[#A0A0A0] font-semibold text-lg md:text-xl tracking-tight group-hover:text-[#0A0A0A] transition-colors">{text}</span>
+  <div className="w-[180px] h-[90px] md:w-[220px] md:h-[110px] rounded-2xl border border-grey-200 bg-grey-100 flex items-center justify-center flex-shrink-0 hover:border-ignite-orange/30 hover:shadow-lg transition-all duration-300 group cursor-default">
+    <span className="text-grey-400 font-semibold text-lg md:text-xl tracking-tight group-hover:text-foreground transition-colors">{text}</span>
   </div>
 )
 
 export default function PartnersSection() {
   return (
-    <section className="bg-white relative py-20 md:py-24 overflow-hidden border-t border-[#E5E5E5]">
+    <section className="bg-background relative py-16 md:py-20 overflow-hidden border-t border-grey-200">
       <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-12 flex flex-col items-center">
         
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
-          <span className="text-[#FF5722] font-medium tracking-wide uppercase text-xs md:text-sm">Partners & Recognition</span>
+          <div className="w-2 h-2 rounded-full bg-ignite-orange" />
+          <span className="text-ignite-orange font-medium tracking-wide uppercase text-xs md:text-sm">Partners & Recognition</span>
         </div>
         
-        <h2 className="text-3xl md:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight text-center">
+        <h2 className="text-3xl md:text-5xl font-light text-foreground tracking-tight leading-tight text-center">
           Trusted by the <span className="font-medium">Best in Business</span>
         </h2>
         

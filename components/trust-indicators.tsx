@@ -30,7 +30,7 @@ export default function TrustIndicators() {
   )
 
   return (
-    <section className="relative w-full py-10 lg:py-12 bg-[#F5F7F9] overflow-hidden flex flex-col items-center border-t border-b border-[#E5E5E5]/50">
+    <section className="relative w-full py-12 lg:py-16 bg-grey-100 overflow-hidden flex flex-col items-center border-t border-b border-grey-200/50">
       
       {/* Global CSS for the Marquee Slider */}
       <style>{`
@@ -48,12 +48,12 @@ export default function TrustIndicators() {
       
       {/* Small top label */}
       <div className="flex items-center gap-2 mb-4 relative z-20">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#FF5722] animate-pulse" />
-        <span className="text-sm font-semibold tracking-wider text-[#0A0A0A] uppercase letter-spacing-[0.2em]">Our Tech Stack</span>
+        <div className="w-2.5 h-2.5 rounded-full bg-ignite-orange animate-pulse" />
+        <span className="text-sm font-semibold tracking-wider text-foreground uppercase letter-spacing-[0.2em]">Our Tech Stack</span>
       </div>
 
       {/* Main Headline */}
-      <h2 className="text-3xl md:text-4xl lg:text-4xl font-bold text-[#0A0A0A] text-center max-w-4xl tracking-[-0.02em] z-20 leading-[1.1] px-4">
+      <h2 className="text-3xl md:text-4xl lg:text-4xl font-bold text-foreground text-center max-w-4xl tracking-[-0.02em] z-20 leading-[1.1] px-4">
         Fueled Up 500+ Brands to Roar with Next-Gen AI & Tech
       </h2>
 
@@ -75,14 +75,14 @@ export default function TrustIndicators() {
       </div>
       
       {/* Bottom Global Presence Pill */}
-      <div className="relative z-30 bg-white border border-[#E5E5E5] rounded-[2rem] px-5 sm:px-8 py-3.5 sm:py-4 flex items-center gap-5 sm:gap-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] transition-shadow overflow-x-auto max-w-[95vw]">
-        <span className="text-[#0A0A0A] font-medium whitespace-nowrap hidden sm:block text-[0.85rem] sm:text-sm">Our Global Presence</span>
-        <div className="h-5 w-px bg-[#E5E5E5] hidden sm:block shrink-0" />
-        <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm text-[#7D7D7D] font-medium whitespace-nowrap">
-          <span className="flex items-center gap-2 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"/> USA</span>
-          <span className="flex items-center gap-2 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"/> Canada</span>
-          <span className="flex items-center gap-2 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"/> Saudi Arabia</span>
-          <span className="flex items-center gap-2 transition-colors hover:text-[#0A0A0A] cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"/> Europe</span>
+      <div className="relative z-30 bg-background border border-grey-200 rounded-[2rem] px-5 sm:px-8 py-3.5 sm:py-4 flex items-center gap-5 sm:gap-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] transition-shadow overflow-x-auto max-w-[95vw]">
+        <span className="text-foreground font-medium whitespace-nowrap hidden sm:block text-[0.85rem] sm:text-sm">Our Global Presence</span>
+        <div className="h-5 w-px bg-grey-200 hidden sm:block shrink-0" />
+        <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm text-grey-400 font-medium whitespace-nowrap">
+          <span className="flex items-center gap-2 transition-colors hover:text-foreground cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-ignite-orange"/> USA</span>
+          <span className="flex items-center gap-2 transition-colors hover:text-foreground cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-ignite-orange"/> Canada</span>
+          <span className="flex items-center gap-2 transition-colors hover:text-foreground cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-ignite-orange"/> Saudi Arabia</span>
+          <span className="flex items-center gap-2 transition-colors hover:text-foreground cursor-default"><div className="w-1.5 h-1.5 rounded-full bg-ignite-orange"/> Europe</span>
         </div>
       </div>
       

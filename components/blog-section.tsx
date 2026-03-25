@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 
 const blogPosts = [
   { id: 1, title: "The Future of Cloud Infrastructure", category: "Technology", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800&h=800", date: "Oct 12, 2026" },
@@ -12,12 +13,12 @@ const blogPosts = [
 
 function BlogCard({ title, image, date, category }: { title: string, image: string, date: string, category: string }) {
   return (
-    <div className="w-[85vw] sm:w-[320px] md:w-[400px] h-[300px] md:h-[360px] flex-shrink-0 rounded-[2rem] overflow-hidden group cursor-pointer relative shadow-xl border border-[#E5E5E5]">
-      <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none" />
+    <div className="w-[85vw] sm:w-[320px] md:w-[400px] h-[300px] md:h-[360px] flex-shrink-0 rounded-[2rem] overflow-hidden group cursor-pointer relative shadow-xl border border-grey-200">
+      <Image src={image} alt={title} fill sizes="(max-width: 768px) 85vw, 400px" className="object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-90 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex items-center gap-3 mb-4">
-          <span className="bg-[#FF5722] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{category}</span>
-          <span className="text-[#E5E5E5] text-sm font-medium">{date}</span>
+          <span className="bg-ignite-orange text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{category}</span>
+          <span className="text-grey-200 text-sm font-medium">{date}</span>
         </div>
         <h3 className="text-white text-xl md:text-2xl font-bold tracking-tight leading-snug group-hover:-translate-y-1 transition-transform duration-300">{title}</h3>
       </div>
@@ -27,7 +28,7 @@ function BlogCard({ title, image, date, category }: { title: string, image: stri
 
 export default function BlogSection() {
   return (
-    <section className="bg-[#F8F8F8] relative py-12 md:py-16 overflow-hidden border-t border-[#E5E5E5]">
+    <section className="bg-grey-100 relative py-16 md:py-20 overflow-hidden border-t border-grey-200">
       
       {/* Header Section */}
       <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-8 md:mb-12">
@@ -35,17 +36,17 @@ export default function BlogSection() {
           
           <div className="flex-1 xl:flex-shrink-0 pr-4">
             <div className="flex items-center gap-2 mb-4 md:mb-6 mt-2 md:mt-4">
-              <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
-              <span className="text-[#FF5722] font-medium tracking-wide uppercase text-xs md:text-sm">Our Blog</span>
+              <div className="w-2 h-2 rounded-full bg-ignite-orange" />
+              <span className="text-ignite-orange font-medium tracking-wide uppercase text-xs md:text-sm">Our Blog</span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight max-w-3xl">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-foreground tracking-tight leading-tight max-w-3xl">
               What's Happening in <br className="hidden md:block"/>
-              <span className="font-medium tracking-tight text-[#0A0A0A]">The Industry?</span>
+              <span className="font-medium tracking-tight text-foreground">The Industry?</span>
             </h2>
           </div>
 
           <div className="flex justify-start xl:justify-end w-full xl:w-auto mt-2 md:mt-0 xl:mb-2">
-            <button className="bg-[#0A0A0A] hover:bg-[#333333] transition-colors text-white font-medium tracking-wide text-sm md:text-base py-3 px-8 rounded-full shadow-lg">
+            <button className="bg-foreground hover:bg-grey-800 transition-colors text-white font-medium tracking-wide text-sm md:text-base py-3 px-8 rounded-full shadow-lg">
               View All Blogs
             </button>
           </div>
@@ -56,8 +57,8 @@ export default function BlogSection() {
       {/* Blog Cards Horizontal Infinite Scroll */}
       <div className="relative w-full flex overflow-hidden pt-4 pb-8">
         {/* Gradients for smooth fade at edges */}
-        <div className="absolute top-0 bottom-0 left-0 w-12 md:w-32 bg-gradient-to-r from-[#F8F8F8] to-transparent z-10 pointer-events-none" />
-        <div className="absolute top-0 bottom-0 right-0 w-12 md:w-32 bg-gradient-to-l from-[#F8F8F8] to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 left-0 w-12 md:w-32 bg-gradient-to-r from-grey-100 to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-0 w-12 md:w-32 bg-gradient-to-l from-grey-100 to-transparent z-10 pointer-events-none" />
         
         {/* Right-to-Left Marquee */}
         <motion.div

@@ -25,26 +25,26 @@ export default function HeroSection() {
             {/* Main Folder Box */}
             <div className="flex-1 bg-[#FFD2B8] rounded-b-[2rem] rounded-tr-[2rem] sm:rounded-tl-none rounded-tl-[2rem] p-5 sm:p-8 lg:p-8 flex flex-col justify-between relative z-20 w-full shadow-md text-left transition-all">
               <div className="w-full mt-1 lg:mt-2">
-                <h1 className="text-3xl sm:text-4xl lg:text-[3.2rem] xl:text-[3.5rem] leading-[1.0] font-bold tracking-[-0.03em] uppercase text-[#0A0A0A]">
+                <h1 className="text-3xl sm:text-4xl lg:text-[3.2rem] xl:text-[3.5rem] leading-[1.0] font-bold tracking-[-0.03em] uppercase text-foreground">
                   <span className="block mb-1 sm:mb-[6px]">AI-FIRST</span>
                   <span className="block mb-1 sm:mb-[6px]">MARKETING</span>
                   <span className="block mb-1 sm:mb-[6px]">AGENCY HELPING</span>
                   <span className="block mb-1 sm:mb-[6px]">BRANDS BECOME</span>
-                  <span className="inline-block text-white bg-[#FF5722] px-4 sm:px-6 py-1 sm:py-2 rounded-[2rem] mt-1 lg:mt-2 align-middle border-none">TOP 1%</span>
+                  <span className="inline-block text-white bg-ignite-orange px-4 sm:px-6 py-1 sm:py-2 rounded-[2rem] mt-1 lg:mt-2 align-middle border-none">TOP 1%</span>
                 </h1>
               </div>
 
-              <div className="mt-6 lg:mt-8 w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-[#0A0A0A]/10 pt-4 sm:pt-5">
+              <div className="mt-6 lg:mt-8 w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-foreground/10 pt-4 sm:pt-5">
                 
                 <div className="flex items-center gap-2 max-w-[280px]">
                   <div className="text-2xl sm:text-2xl">🔥</div>
-                  <p className="text-[#0A0A0A]/80 text-xs sm:text-[0.85rem] font-medium leading-[1.2] text-balance">
+                  <p className="text-foreground/80 text-xs sm:text-[0.85rem] font-medium leading-[1.2] text-balance">
                     12 years of design-driven development for B2B products
                   </p>
                 </div>
 
-                <button className="flex items-center gap-2.5 bg-[#0A0A0A] text-white hover:bg-white hover:text-[#0A0A0A] transition-colors py-2 sm:py-3 px-5 sm:px-6 rounded-full font-bold uppercase tracking-wider text-xs sm:text-sm whitespace-nowrap shadow-md group">
-                  <div className="bg-white rounded-full p-1 text-[#0A0A0A] flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 transition-colors group-hover:bg-[#FF5722] group-hover:text-white group-hover:shadow-[0_0_15px_rgba(255,87,34,0.5)]">
+                <button className="flex items-center gap-2.5 bg-foreground text-white hover:bg-white hover:text-foreground transition-colors py-2 sm:py-3 px-5 sm:px-6 rounded-full font-bold uppercase tracking-wider text-xs sm:text-sm whitespace-nowrap shadow-md group">
+                  <div className="bg-white rounded-full p-1 text-foreground flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 transition-colors group-hover:bg-ignite-orange group-hover:text-white group-hover:shadow-[0_0_15px_rgba(255,87,34,0.5)]">
                     <Zap className="w-3.5 h-3.5 fill-current text-current" />
                   </div>
                   Book A Call
@@ -55,14 +55,14 @@ export default function HeroSection() {
 
           {/* Right Panel (Video Player Placeholder) */}
           {/* h-full forces it to stretch perfectly to match the exact height of the Left Panel (including its tab) */}
-          <div className="w-full h-full bg-[#f0f0f0] rounded-[2rem] relative overflow-hidden min-h-[250px] flex items-center justify-center group cursor-pointer border border-black/5">
+          <div className="w-full h-full bg-grey-100 rounded-[2rem] relative overflow-hidden min-h-[250px] flex items-center justify-center group cursor-pointer border border-black/5">
             
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-[0_8px_20px_rgb(0,0,0,0.1)] z-20 group-hover:scale-110 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.15)] transition-all duration-300 pointer-events-none">
-              <Play className="w-6 h-6 fill-[#0A0A0A] text-[#0A0A0A] ml-1.5" />
+              <Play className="w-6 h-6 fill-foreground text-foreground ml-1.5" />
             </div>
 
             {/* Subtle animated background gradient effect for the "video" */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#e5e5e5] to-[#f8f8f8]">
+            <div className="absolute inset-0 bg-gradient-to-tr from-grey-200 to-grey-100">
                {/* Simulating some very faint video imagery / depth */}
                <div className="absolute inset-0 bg-black opacity-[0.02] mix-blend-overlay"></div>
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[radial-gradient(circle,rgba(255,255,255,0.6)_0%,transparent_60%)]"></div>

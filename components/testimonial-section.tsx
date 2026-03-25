@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { VolumeX } from "lucide-react"
+import Image from "next/image"
 
 const testimonials = [
   {
@@ -41,16 +42,16 @@ export default function TestimonialSection() {
   const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials]
 
   return (
-    <section className="py-12 lg:py-16 bg-white overflow-hidden relative">
+    <section className="py-16 lg:py-20 bg-background overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-8 relative z-10">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
-            <span className="text-[#FF5722] font-medium tracking-wide text-sm uppercase">Client Testimonials & Reviews</span>
+            <div className="w-2 h-2 rounded-full bg-ignite-orange" />
+            <span className="text-ignite-orange font-medium tracking-wide text-sm uppercase">Client Testimonials & Reviews</span>
           </div>
           
           <div className="relative inline-block mt-2">
-            <h2 className="text-3xl md:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight max-w-2xl relative z-10">
+            <h2 className="text-3xl md:text-5xl font-light text-foreground tracking-tight leading-tight max-w-2xl relative z-10">
               What Our Happy Clients <br /><span className="font-normal">Say About Us</span>
             </h2>
             {/* The watermark effect from the image */}
@@ -75,21 +76,22 @@ export default function TestimonialSection() {
           {duplicatedTestimonials.map((testimonial, idx) => (
             <div key={`${testimonial.id}-${idx}`} className="flex flex-col gap-3 w-[240px] lg:w-[280px] flex-shrink-0">
               <div className="relative w-full h-[320px] lg:h-[380px] rounded-[1.5rem] overflow-hidden bg-gray-100 border border-gray-100">
-                <img
+                <Image
                   src={testimonial.image}
                   alt={testimonial.name}
-                  className="w-full h-full object-cover object-center"
-                  loading="lazy"
+                  fill
+                  sizes="(max-width: 1024px) 240px, 280px"
+                  className="object-cover object-center"
                 />
                 
                 {/* Mute Button */}
-                <button className="absolute bottom-5 left-5 w-12 h-12 bg-[#FF5722] hover:bg-[#E64A19] transition-colors rounded-full flex items-center justify-center text-white shadow-lg z-10 group">
+                <button className="absolute bottom-5 left-5 w-12 h-12 bg-ignite-orange hover:bg-ignite-orange hover:opacity-90 transition-all rounded-full flex items-center justify-center text-white shadow-lg z-10 group">
                   <VolumeX className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 </button>
               </div>
               
               <div className="px-2 mt-2">
-                <h3 className="text-xl font-bold tracking-tight text-[#0A0A0A]">{testimonial.logoText}</h3>
+                <h3 className="text-xl font-bold tracking-tight text-foreground">{testimonial.logoText}</h3>
               </div>
             </div>
           ))}

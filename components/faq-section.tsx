@@ -49,15 +49,15 @@ function AccordionItem({
   onClick: () => void 
 }) {
   return (
-    <div className={`border rounded-[1.5rem] mb-4 overflow-hidden transition-all duration-300 ${isOpen ? 'border-[#FF5722] bg-white shadow-lg' : 'border-[#E5E5E5] bg-transparent hover:border-[#FF5722]/40'}`}>
+    <div className={`border rounded-[1.5rem] mb-4 overflow-hidden transition-all duration-300 ${isOpen ? 'border-ignite-orange bg-background shadow-lg' : 'border-grey-200 bg-transparent hover:border-ignite-orange/40'}`}>
       <button 
         onClick={onClick}
         className="w-full flex justify-between items-center p-6 md:p-8 text-left"
       >
-        <span className={`font-medium text-lg md:text-xl pr-8 transition-colors ${isOpen ? 'text-[#0A0A0A]' : 'text-[#4A4A4A]'}`}>
+        <span className={`font-medium text-lg md:text-xl pr-8 transition-colors ${isOpen ? 'text-foreground' : 'text-grey-600'}`}>
           {question}
         </span>
-        <span className="text-[#FF5722] flex-shrink-0">
+        <span className="text-ignite-orange flex-shrink-0">
           {isOpen ? <X className="w-5 h-5 md:w-6 md:h-6" /> : <Plus className="w-5 h-5 md:w-6 md:h-6" />}
         </span>
       </button>
@@ -69,7 +69,7 @@ function AccordionItem({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            <div className="px-6 md:px-8 pb-6 md:pb-8 text-[#7D7D7D] leading-relaxed font-light text-base md:text-lg">
+            <div className="px-6 md:px-8 pb-6 md:pb-8 text-grey-400 leading-relaxed font-light text-base md:text-lg">
               {answer}
             </div>
           </motion.div>
@@ -83,14 +83,14 @@ export default function FAQSection() {
   const [openId, setOpenId] = useState<number | null>(2)
 
   return (
-    <section className="bg-white relative py-16 md:py-20 overflow-hidden border-t border-[#E5E5E5]">
+    <section className="bg-background relative py-16 md:py-20 overflow-hidden border-t border-grey-200">
       
       {/* Background Subtle Grid Pattern */}
       <div 
         className="absolute inset-0 opacity-[0.03] pointer-events-none" 
         style={{
           backgroundSize: '40px 40px',
-          backgroundImage: `linear-gradient(to right, #0A0A0A 1px, transparent 1px), linear-gradient(to bottom, #0A0A0A 1px, transparent 1px)`
+          backgroundImage: `linear-gradient(to right, var(--color-foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--color-foreground) 1px, transparent 1px)`
         }}
       />
       
@@ -100,14 +100,14 @@ export default function FAQSection() {
           {/* Left Column: Sticky Header */}
           <div className="lg:w-5/12 lg:sticky lg:top-24 h-max">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 rounded-full bg-[#FF5722]" />
-              <span className="text-[#FF5722] font-medium tracking-wide uppercase text-sm">FAQs</span>
+              <div className="w-2 h-2 rounded-full bg-ignite-orange" />
+              <span className="text-ignite-orange font-medium tracking-wide uppercase text-sm">FAQs</span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#0A0A0A] tracking-tight leading-tight mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-foreground tracking-tight leading-tight mb-6">
               Transformation with <br className="hidden lg:block"/>
               <span className="font-medium tracking-tight">Smart UX & Scalable Tech</span>
             </h2>
-            <p className="text-[#7D7D7D] text-base md:text-lg font-light leading-relaxed max-w-lg mb-6">
+            <p className="text-grey-400 text-base md:text-lg font-light leading-relaxed max-w-lg mb-6">
               You have the vision—we engineer for the future. At DigiiMark, we embrace modern technology with creativity to provide AI-powered multilingual support, predictive UX, and intelligent UI/UX design. No matter if you are looking for AI-powered hosting or AI-driven A/B testing, our teams have the expertise to build scalable digital products that think, adapt, and grow with your audience.
             </p>
           </div>
