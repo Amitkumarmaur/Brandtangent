@@ -16,9 +16,6 @@ const navItems = [
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  // "dark" = header is over a dark section → use white text
-  // "light" = header is over a light section → use dark text
-  const [sectionTheme, setSectionTheme] = useState<"dark" | "light">("dark")
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
@@ -26,80 +23,16 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Observe sections tagged with data-theme="dark" or data-theme="light"
-  useEffect(() => {
-    const initObserver = () => {
-      const sections = document.querySelectorAll<HTMLElement>("[data-theme]")
-      if (!sections.length) return false
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          const visible = entries
-            .filter((e) => e.isIntersecting)
-            .sort((a, b) => {
-              const aTop = Math.abs(a.boundingClientRect.top)
-              const bTop = Math.abs(b.boundingClientRect.top)
-              return aTop - bTop
-            })
-
-          if (visible.length > 0) {
-            const topEntry = visible[0]
-            const newTheme = topEntry.target.getAttribute("data-theme") as "dark" | "light"
-            if (newTheme) {
-              setSectionTheme(newTheme)
-              // console.log(`Header theme switched to: ${newTheme} (Section: ${topEntry.target.tagName})`)
-            }
-          }
-        },
-        {
-          rootMargin: "-10% 0px -85% 0px",
-          threshold: [0, 0.1, 0.5],
-        }
-      )
-
-      sections.forEach((s) => observer.observe(s))
-      return observer
-    }
-
-    let observerInstance: IntersectionObserver | null | false = initObserver()
-
-    // Fallback if sections weren't found immediately (hydration)
-    if (observerInstance === false) {
-      const timeout = setTimeout(() => {
-        observerInstance = initObserver()
-      }, 1000)
-      return () => {
-        clearTimeout(timeout)
-        if (observerInstance) (observerInstance as IntersectionObserver).disconnect()
-      }
-    }
-
-    return () => {
-      if (observerInstance) (observerInstance as IntersectionObserver).disconnect()
-    }
-  }, [])
-
-  // Is the header "Light" (White bg) or "Dark" (Black bg)?
-  // User wants: Section is Dark -> Header is Light | Section is Light -> Header is Dark
-  const isHeaderLight = sectionTheme === "dark"    // Over dark section → use white bg
-  const isHeaderDark = sectionTheme === "light"   // Over light section → use dark bg
-
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed z-50 mx-auto transition-all duration-500 ease-in-out ${isScrolled && !isMobileMenuOpen
-          ? `top-4 left-4 right-4 md:top-6 md:left-8 md:right-8 max-w-7xl backdrop-blur-md rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.15)] border ${isHeaderLight
-            ? "bg-white/90 border-black/10"          // white pill on dark section
-            : "bg-[#0A0A0A]/90 border-white/10"      // dark pill on light section
-          }`
+          ? "top-4 left-4 right-4 md:top-6 md:left-8 md:right-8 max-w-7xl bg-white/92 backdrop-blur-md rounded-full border border-black/25 shadow-[0_14px_36px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.12),0_0_28px_rgba(0,0,0,0.12)]"
           : isMobileMenuOpen
             ? "top-0 left-0 right-0 max-w-full bg-white shadow-md"
-            : `top-0 left-0 right-0 max-w-full border-b ${isHeaderLight
-              ? "bg-transparent border-white/10"       // transparent on dark section
-              : "bg-transparent border-black/10"       // transparent on light section
-            }`
+            : "top-0 left-0 right-0 max-w-full border-b bg-white/95 border-black/10 backdrop-blur-sm shadow-sm"
         }`}
     >
       <div className="mx-auto px-4 md:px-6 lg:px-8">
@@ -108,13 +41,10 @@ export default function Header() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-500 ${isHeaderLight ? "bg-[#0A0A0A]" : "bg-white"
-              }`}>
-              <span className={`font-bold text-xl transition-colors duration-500 ${isHeaderLight ? "text-white" : "text-[#0A0A0A]"
-                }`}>D</span>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#0A0A0A] transition-colors duration-500">
+              <span className="font-bold text-xl text-white transition-colors duration-500">D</span>
             </div>
-            <span className={`text-xl font-bold transition-colors duration-500 ${isHeaderLight ? (isScrolled ? "text-[#0A0A0A]" : "text-white") : (isScrolled ? "text-white" : "text-[#0A0A0A]")
-              }`}>DigiiMark</span>
+            <span className="font-heading text-xl md:text-[1.35rem] font-bold text-[#0A0A0A] transition-colors duration-500">DigiiMark</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -123,10 +53,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`transition-colors text-sm font-medium ${isHeaderLight
-                    ? (isScrolled ? "text-[#4A4A4A] hover:text-[#0A0A0A]" : "text-white/80 hover:text-white")
-                    : (isScrolled ? "text-white/80 hover:text-white" : "text-[#4A4A4A] hover:text-[#0A0A0A]")
-                  }`}
+                className="font-heading text-base md:text-[1.05rem] font-medium tracking-[0.01em] text-[#0A0A0A] transition-colors hover:text-black"
               >
                 {item.name}
               </Link>
@@ -134,21 +61,15 @@ export default function Header() {
           </nav>
 
           {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-4">
             <a
               href="tel:+1234567890"
-              className={`group flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-colors border ${isHeaderLight
-                  ? (isScrolled ? "bg-transparent hover:bg-black/5 text-[#0A0A0A] border-black/20 hover:border-black/40" : "bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/40")
-                  : (isScrolled ? "bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/40" : "bg-transparent hover:bg-black/5 text-[#0A0A0A] border-black/20 hover:border-black/40")
-                }`}
+              className="group flex items-center gap-2.5 px-5 py-2.5 rounded-full text-base font-semibold transition-all border border-black/20 text-[#0A0A0A] hover:bg-black/5 hover:border-black/40"
             >
-              <Phone className={`w-4 h-4 transition-colors ${isHeaderLight
-                  ? (isScrolled ? "text-[#0A0A0A]/60 group-hover:text-[#FF5722]" : "text-white/70 group-hover:text-[#FF5722]")
-                  : (isScrolled ? "text-white/70 group-hover:text-[#FF5722]" : "text-[#0A0A0A]/60 group-hover:text-[#FF5722]")
-                }`} />
-              <span className="text-sm font-semibold">Call Us</span>
+              <Phone className="w-4.5 h-4.5 text-[#0A0A0A]/60 transition-colors group-hover:text-[#FF5722]" />
+              <span className="text-base font-semibold">Call Us</span>
             </a>
-            <Button className="bg-[#FF5722] hover:bg-[#FF5722]/90 text-white px-6 py-2 rounded-full font-medium transition-all hover:scale-105 shadow-[0_4px_14px_rgba(255,87,34,0.25)]">
+            <Button className="bg-[#FF5722] hover:bg-[#FF5722]/90 text-white text-sm md:text-base px-7 py-2.5 rounded-full font-semibold transition-all hover:scale-105 shadow-[0_4px_14px_rgba(255,87,34,0.25)]">
               Start Automating
             </Button>
           </div>
@@ -157,10 +78,7 @@ export default function Header() {
           <button className="md:hidden p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             {isMobileMenuOpen
               ? <X className="w-6 h-6 text-[#0A0A0A]" />
-              : <Menu className={`w-6 h-6 transition-colors duration-500 ${isHeaderLight
-                  ? (isScrolled ? "text-[#0A0A0A]" : "text-white")
-                  : (isScrolled ? "text-white" : "text-[#0A0A0A]")
-                }`} />
+              : <Menu className="w-6 h-6 text-[#0A0A0A] transition-colors duration-500" />
             }
           </button>
         </div>
@@ -178,7 +96,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-[#4A4A4A] hover:text-[#0A0A0A] transition-colors text-base font-medium px-4"
+                  className="font-heading text-[#0A0A0A] hover:text-black transition-colors text-lg font-semibold px-4"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}

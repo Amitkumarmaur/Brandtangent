@@ -1,6 +1,6 @@
 "use client"
 
-import { Play, Zap } from "lucide-react"
+import { Play, Zap, Rocket } from "lucide-react"
 
 export default function HeroSection() {
   return (
@@ -25,7 +25,7 @@ export default function HeroSection() {
             {/* Main Folder Box */}
             <div className="flex-1 bg-[#FFD2B8] rounded-b-[2rem] rounded-tr-[2rem] sm:rounded-tl-none rounded-tl-[2rem] p-5 sm:p-8 lg:p-8 flex flex-col justify-between relative z-20 w-full shadow-md text-left transition-all">
               <div className="w-full mt-1 lg:mt-2">
-                <h1 className="text-3xl sm:text-4xl lg:text-[3.2rem] xl:text-[3.5rem] leading-[1.0] font-bold tracking-[-0.03em] uppercase text-foreground">
+                <h1 className="font-heading text-3xl sm:text-4xl lg:text-[3.2rem] xl:text-[3.5rem] leading-[1.0] font-bold tracking-[-0.03em] uppercase text-foreground">
                   <span className="block mb-1 sm:mb-[6px]">AI-FIRST</span>
                   <span className="block mb-1 sm:mb-[6px]">MARKETING</span>
                   <span className="block mb-1 sm:mb-[6px]">AGENCY HELPING</span>
@@ -37,7 +37,7 @@ export default function HeroSection() {
               <div className="mt-6 lg:mt-8 w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-foreground/10 pt-4 sm:pt-5">
                 
                 <div className="flex items-center gap-2 max-w-[280px]">
-                  <div className="text-2xl sm:text-2xl">🔥</div>
+                  <Rocket className="w-5 h-5 text-ignite-orange fill-ignite-orange shrink-0" />
                   <p className="text-foreground/80 text-xs sm:text-[0.85rem] font-medium leading-[1.2] text-balance">
                     12 years of design-driven development for B2B products
                   </p>

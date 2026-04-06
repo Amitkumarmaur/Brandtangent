@@ -34,19 +34,16 @@ export default function ClientsSection() {
       {/* Lighting Accents */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-ignite-orange/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-      <div className="relative z-10 container mx-auto px-4 md:px-6 mb-10 flex flex-col items-center text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 mb-8 md:mb-10 flex flex-col items-center text-center">
         
-        {/* Pre-heading with Animated Dot */}
-        <div className="flex items-center gap-3 mb-4">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ignite-orange opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-ignite-orange"></span>
-          </span>
-          <span className="uppercase tracking-widest text-ignite-orange text-sm font-semibold">Our Clients</span>
+        {/* Pre-heading */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-2 h-2 rounded-full bg-ignite-orange" />
+          <span className="font-heading text-ignite-orange font-medium tracking-wider text-sm uppercase">Our Clients</span>
         </div>
 
         {/* Main Heading */}
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-white text-balance leading-tight max-w-3xl">
+        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-white text-balance leading-tight max-w-3xl">
           5-Star Rated, Works <br className="hidden md:block" /> with GCC Giants
         </h2>
       </div>

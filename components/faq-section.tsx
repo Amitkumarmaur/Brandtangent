@@ -54,7 +54,7 @@ function AccordionItem({
         onClick={onClick}
         className="w-full flex justify-between items-center p-6 md:p-8 text-left"
       >
-        <span className={`font-medium text-lg md:text-xl pr-8 transition-colors ${isOpen ? 'text-foreground' : 'text-grey-600'}`}>
+        <span className={`font-heading font-medium text-lg md:text-xl pr-8 transition-colors ${isOpen ? 'text-foreground' : 'text-grey-600'}`}>
           {question}
         </span>
         <span className="text-ignite-orange flex-shrink-0">
@@ -101,11 +101,11 @@ export default function FAQSection() {
           <div className="lg:w-5/12 lg:sticky lg:top-24 h-max">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-              <span className="text-ignite-orange font-medium tracking-wide uppercase text-sm">FAQs</span>
+              <span className="font-heading text-ignite-orange font-medium tracking-wider uppercase text-sm">FAQs</span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-foreground tracking-tight leading-tight mb-6">
+            <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-tight">
               Transformation with <br className="hidden lg:block"/>
-              <span className="font-medium tracking-tight">Smart UX & Scalable Tech</span>
+              Smart UX & Scalable Tech
             </h2>
             <p className="text-grey-400 text-base md:text-lg font-light leading-relaxed max-w-lg mb-6">
               You have the vision—we engineer for the future. At DigiiMark, we embrace modern technology with creativity to provide AI-powered multilingual support, predictive UX, and intelligent UI/UX design. No matter if you are looking for AI-powered hosting or AI-driven A/B testing, our teams have the expertise to build scalable digital products that think, adapt, and grow with your audience.

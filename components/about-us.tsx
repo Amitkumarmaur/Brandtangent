@@ -3,8 +3,8 @@ import { Award, Medal, Star, CheckCircle, ShieldCheck } from "lucide-react"
 
 export default function AboutUs() {
   return (
-    <section className="bg-ignite-orange text-white py-16 lg:py-20 px-6 lg:px-12 w-full overflow-hidden">
-      <div className="max-w-[1500px] mx-auto w-full">
+    <section className="bg-[#0F0F0F] text-white py-16 lg:py-20 px-6 lg:px-12 w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto w-full">
         
         {/* Top Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-24 mb-16 lg:mb-20">
@@ -12,14 +12,14 @@ export default function AboutUs() {
           {/* Left: Founders Info */}
           <div className="flex flex-col shrink-0 pt-2">
             <div className="flex -space-x-4 mb-5">
-              <div className="w-16 h-16 rounded-full border-[3px] border-ignite-orange overflow-hidden bg-white shadow-lg isolate">
+              <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden bg-white shadow-lg isolate">
                  {/* Fallback to placeholder since professional headshots exist in public folder */}
                 <Image src="/professional-headshot-man-ceo.jpg" alt="Founder 1" width={64} height={64} className="object-cover w-full h-full" />
               </div>
-              <div className="w-16 h-16 rounded-full border-[3px] border-ignite-orange overflow-hidden bg-white shadow-lg z-10 isolate">
+              <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden bg-white shadow-lg z-10 isolate">
                 <Image src="/professional-headshot-woman-marketing-executive.jpg" alt="Founder 2" width={64} height={64} className="object-cover w-full h-full" />
               </div>
-              <div className="w-16 h-16 rounded-full border-[3px] border-ignite-orange overflow-hidden bg-white shadow-lg z-20 isolate">
+              <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden bg-white shadow-lg z-20 isolate">
                 <Image src="/professional-headshot-man-software-engineer.jpg" alt="Founder 3" width={64} height={64} className="object-cover w-full h-full" />
               </div>
             </div>
@@ -31,7 +31,7 @@ export default function AboutUs() {
 
           {/* Right: The About Paragraph */}
           <div className="lg:w-3/4 xl:w-2/3 max-w-4xl">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-medium leading-[1.3] tracking-tight text-white/95 text-balance">
+            <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-medium leading-[1.3] tracking-tight text-white/95 text-balance">
               Over the past 12 years, we've perfected our <span className="font-bold text-white">Design & Automation</span> game and are eager to help passionate Founders perfect theirs. Success is a team play, right? Let's aim for the top together!
             </h2>
           </div>

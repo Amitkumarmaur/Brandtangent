@@ -20,7 +20,7 @@ function BlogCard({ title, image, date, category }: { title: string, image: stri
           <span className="bg-ignite-orange text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{category}</span>
           <span className="text-grey-200 text-sm font-medium">{date}</span>
         </div>
-        <h3 className="text-white text-xl md:text-2xl font-bold tracking-tight leading-snug group-hover:-translate-y-1 transition-transform duration-300">{title}</h3>
+        <h3 className="font-heading text-white text-xl md:text-2xl font-semibold tracking-tight leading-snug group-hover:-translate-y-1 transition-transform duration-300">{title}</h3>
       </div>
     </div>
   )
@@ -35,13 +35,13 @@ export default function BlogSection() {
         <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 md:gap-8">
           
           <div className="flex-1 xl:flex-shrink-0 pr-4">
-            <div className="flex items-center gap-2 mb-4 md:mb-6 mt-2 md:mt-4">
+            <div className="flex items-center gap-2 mb-4">
               <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-              <span className="text-ignite-orange font-medium tracking-wide uppercase text-xs md:text-sm">Our Blog</span>
+              <span className="font-heading text-ignite-orange font-medium tracking-wider uppercase text-sm">Our Blog</span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-foreground tracking-tight leading-tight max-w-3xl">
+            <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-tight max-w-3xl">
               What's Happening in <br className="hidden md:block"/>
-              <span className="font-medium tracking-tight text-foreground">The Industry?</span>
+              The Industry?
             </h2>
           </div>
 

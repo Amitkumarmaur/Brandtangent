@@ -19,15 +19,15 @@ const MarqueeItem = ({ text }: { text: string }) => (
 export default function PartnersSection() {
   return (
     <section className="bg-background relative py-16 md:py-20 overflow-hidden border-t border-grey-200">
-      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-12 flex flex-col items-center">
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-8 md:mb-10 flex flex-col items-center">
         
         <div className="flex items-center gap-2 mb-4">
           <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-          <span className="text-ignite-orange font-medium tracking-wide uppercase text-xs md:text-sm">Partners & Recognition</span>
+          <span className="font-heading text-ignite-orange font-medium tracking-wider uppercase text-sm">Partners & Recognition</span>
         </div>
         
-        <h2 className="text-3xl md:text-5xl font-light text-foreground tracking-tight leading-tight text-center">
-          Trusted by the <span className="font-medium">Best in Business</span>
+        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-tight text-center">
+          Trusted by the Best in Business
         </h2>
         
       </div>

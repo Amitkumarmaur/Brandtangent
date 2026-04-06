@@ -45,14 +45,14 @@ export default function TestimonialSection() {
     <section className="py-16 lg:py-20 bg-background overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-8 relative z-10">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-4">
             <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-            <span className="text-ignite-orange font-medium tracking-wide text-sm uppercase">Client Testimonials & Reviews</span>
+            <span className="font-heading text-ignite-orange font-medium tracking-wider text-sm uppercase">Client Testimonials & Reviews</span>
           </div>
           
           <div className="relative inline-block mt-2">
-            <h2 className="text-3xl md:text-5xl font-light text-foreground tracking-tight leading-tight max-w-2xl relative z-10">
-              What Our Happy Clients <br /><span className="font-normal">Say About Us</span>
+            <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-tight max-w-2xl relative z-10">
+              What Our Happy Clients <br />Say About Us
             </h2>
             {/* The watermark effect from the image */}
             <div className="absolute -top-6 lg:-top-10 -left-4 lg:-left-6 text-[#F4F4F4]/80 text-6xl lg:text-8xl font-black uppercase tracking-tighter z-[-1] pointer-events-none select-none">
@@ -91,7 +91,7 @@ export default function TestimonialSection() {
               </div>
               
               <div className="px-2 mt-2">
-                <h3 className="text-xl font-bold tracking-tight text-foreground">{testimonial.logoText}</h3>
+                <h3 className="font-heading text-xl font-semibold tracking-tight text-foreground">{testimonial.logoText}</h3>
               </div>
             </div>
           ))}

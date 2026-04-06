@@ -1,9 +1,5 @@
-"use client"
-
-import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion"
-import { Linkedin, Twitter, Youtube, Instagram, X } from "lucide-react"
+import { Linkedin, Twitter, Youtube, Instagram } from "lucide-react"
 
 const socialLinks = [
   { icon: Twitter, href: "#", label: "Twitter" },
@@ -64,7 +60,7 @@ const DigitalGravityMenu = () => (
           <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-1">
             <span className="text-foreground font-black text-2xl">D</span>
           </div>
-          <span className="text-3xl font-light tracking-tight">digii<strong className="font-bold">mark</strong></span>
+          <span className="font-heading text-3xl font-light tracking-tight">digii<strong className="font-bold">mark</strong></span>
         </Link>
       </div>
 
@@ -85,7 +81,7 @@ const DigitalGravityMenu = () => (
         
         {/* Column 1: Contact Us */}
         <div className="flex flex-col">
-          <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+          <h3 className="font-heading text-xl font-semibold mb-6 flex items-center gap-2">
             <span className="w-0.5 h-6 bg-ignite-orange"></span>
             Contact Us
           </h3>
@@ -108,7 +104,7 @@ const DigitalGravityMenu = () => (
         {/* Columns 2-5 from array */}
         {footerColumns.map((col, idx) => (
           <div key={idx} className="flex flex-col">
-            <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <h3 className="font-heading text-xl font-semibold mb-6 flex items-center gap-2">
               <span className="w-0.5 h-6 bg-white/30"></span>
               {col.title}
             </h3>
@@ -131,141 +127,9 @@ const DigitalGravityMenu = () => (
 )
 
 export default function Footer() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isVisible, setIsVisible] = useState(true)
-  const { scrollY } = useScroll()
-  const lastScrollY = useRef(0)
-  const bottomTriggerRef = useRef<HTMLDivElement>(null)
-  const scrollUpStart = useRef<number | null>(null)
-  
-  // A lock to prevent the intersection observer from auto-opening the 
-  // menu immediately after the user manually closes it while still at the bottom.
-  const justClosed = useRef(false)
-  
-  // Track scroll direction to hide/show pill and close the menu
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const isScrollingDown = latest > lastScrollY.current
-    lastScrollY.current = latest
-    
-    if (!isOpen) {
-      if (isScrollingDown && latest > 50) {
-        setIsVisible(false) // Hide pill when scrolling down
-      } else {
-        setIsVisible(true) // Show pill when scrolling back up
-      }
-    } else {
-      // If the massive menu is open and the user scrolls up by over 50px continuously
-      if (!isScrollingDown) {
-        if (scrollUpStart.current === null) {
-          scrollUpStart.current = latest
-        } else if (scrollUpStart.current - latest > 50) {
-          setIsOpen(false)
-          setIsVisible(true)
-          justClosed.current = true // Keep it locked until intersection observer clears
-          scrollUpStart.current = null
-        }
-      } else {
-        // Reset the tracker if scrolling down
-        scrollUpStart.current = null
-      }
-    }
-  })
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          // If we reached the bottom, and the user hasn't explicitly closed it recently
-          if (!isOpen && !justClosed.current) {
-            setIsVisible(false)
-            setIsOpen(true)
-          }
-        } else {
-          // As soon as the user scrolls away from the bottom (trigger leaves the viewport),
-          // reset the lock so it can auto-open the NEXT time they scroll to the bottom.
-          justClosed.current = false
-        }
-      },
-      // Trigger slightly before the very bottom to mask any visual stutter
-      { rootMargin: "0px 0px 50px 0px", threshold: 0 } 
-    )
-    
-    if (bottomTriggerRef.current) {
-      observer.observe(bottomTriggerRef.current)
-    }
-    
-    return () => observer.disconnect()
-  }, [isOpen])
-
   return (
-    <>
-      <AnimatePresence>
-        {!isOpen && (
-          <motion.div
-            initial={{ y: 200, opacity: 0 }}
-            animate={{ y: isVisible ? 0 : 200, opacity: isVisible ? 1 : 0 }}
-            exit={{ y: 200, opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="fixed bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-50 w-[280px] md:w-[320px]"
-          >
-            {/* The Glassmorphic Minimal Pill Component */}
-            <button 
-              onClick={() => {
-                setIsVisible(false)
-                setIsOpen(true)
-                // Optionally scroll to bottom when they click the pill manually
-                window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
-              }}
-              className="bg-white/60 backdrop-blur-xl rounded-full pl-2.5 pr-5 py-2.5 flex items-center justify-between w-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/40 hover:bg-white/70 transition-all duration-300 cursor-pointer"
-            >
-              <div className="w-9 h-9 bg-foreground text-white rounded-full flex items-center justify-center shadow-inner">
-                <span className="font-bold text-sm">D</span>
-              </div>
-              
-              <div className="flex flex-col gap-[5px]">
-                <div className="w-5 h-[1.5px] bg-foreground rounded-full opacity-90"></div>
-                <div className="w-5 h-[1.5px] bg-foreground rounded-full opacity-90"></div>
-              </div>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 
-        This is an invisible anchor element at the very bottom of the natural DOM flow.
-        As the user scrolls down, when they hit this div, it triggers the mega-menu to open.
-      */}
-      <div className="w-full h-1" ref={bottomTriggerRef}></div>
-
-      {/* Expandable Digital Gravity Mega-Menu anchored at the bottom */}
-      <div className="relative z-40 w-full mb-0 md:px-4 lg:px-8 bg-white pb-4 md:pb-8">
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0, y: 50 }}
-              animate={{ opacity: 1, height: "auto", y: 0 }}
-              exit={{ opacity: 0, height: 0, y: 50 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className="overflow-hidden w-full origin-bottom"
-            >
-              <div className="relative">
-                 {/* Close button for the mega-menu to shrink it back down to a pill */}
-                 <button 
-                  onClick={() => {
-                    justClosed.current = true
-                    setIsOpen(false)
-                    setIsVisible(true)
-                  }} 
-                  className="absolute top-6 right-6 md:top-10 md:right-10 z-50 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors flex items-center justify-center group"
-                 >
-                   <X className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-300" />
-                 </button>
-                 <DigitalGravityMenu />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </>
+    <footer className="relative z-40 w-full mb-0 md:px-4 lg:px-8 bg-white pb-4 md:pb-8">
+      <DigitalGravityMenu />
+    </footer>
   )
 }

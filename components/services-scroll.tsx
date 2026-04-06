@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { Code2, Megaphone, Cpu, Palette } from "lucide-react"
 
 const servicesData = [
   {
     id: "development",
     title: "Development",
+    icon: Code2,
     items: [
       "Website Development",
       "Mobile App Development",
@@ -17,6 +19,7 @@ const servicesData = [
   {
     id: "marketing",
     title: "Digital Marketing",
+    icon: Megaphone,
     items: [
       "SEO",
       "Digital Marketing Services",
@@ -27,6 +30,7 @@ const servicesData = [
   {
     id: "emerging",
     title: "Emerging Tech",
+    icon: Cpu,
     items: [
       "AI Integration",
       "Artificial Intelligence",
@@ -38,6 +42,7 @@ const servicesData = [
   {
     id: "advertising",
     title: "Advertising & Creative",
+    icon: Palette,
     items: [
       "Branding and Designing",
       "Brand Identity",
@@ -71,9 +76,9 @@ export default function ServicesScroll() {
         
         {/* Left Side: Categories */}
         <div className="flex-1 w-full pl-6 md:pl-16">
-          <div className="flex items-center gap-2 mb-6 md:mb-8 mt-4 md:mt-0">
+          <div className="flex items-center gap-2 mb-4 mt-4 md:mt-0">
             <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-            <span className="text-white font-medium tracking-wide text-sm">Our Services</span>
+            <span className="font-heading text-white font-medium tracking-wider text-sm uppercase">Our Services</span>
           </div>
           
           <div className="flex flex-col gap-4 md:gap-6">
@@ -88,22 +93,21 @@ export default function ServicesScroll() {
                   <div className="absolute -left-12 md:-left-16 flex items-center justify-center w-10 h-10">
                     <AnimatePresence>
                       {isActive && (
-                        <motion.span 
-                          layoutId="rocketDarkFixed"
-                          className="text-2xl md:text-3xl filter drop-shadow-[0_0_10px_rgba(255,87,34,0.6)]"
+                        <motion.div
+                          layoutId="serviceIconIndicator"
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: -10 }}
                           transition={{ type: "spring", stiffness: 300, damping: 25 }}
                         >
-                          🚀
-                        </motion.span>
+                          <service.icon className="w-6 h-6 text-white drop-shadow-[0_0_10px_rgba(255,87,34,0.6)]" strokeWidth={2} />
+                        </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
                   
                   <motion.h3 
-                    className={`text-2xl md:text-4xl lg:text-5xl tracking-tight transition-colors duration-500 font-light ${isActive ? "text-white" : "text-white/30 hover:text-white/60"}`}
+                    className={`font-heading text-2xl md:text-4xl lg:text-5xl tracking-tight transition-colors duration-500 font-light ${isActive ? "text-white" : "text-white/30 hover:text-white/60"}`}
                   >
                     {service.title}
                   </motion.h3>

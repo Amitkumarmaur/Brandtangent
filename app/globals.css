@@ -38,13 +38,18 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* DigiiMark Custom Colors */
+  /* DigiiMark Brand Palette */
+  --grey-50: #fafafa;
   --grey-100: #f8f8f8;
   --grey-200: #e5e5e5;
+  --grey-300: #c4c4c4;
   --grey-400: #7d7d7d;
   --grey-600: #4a4a4a;
   --grey-800: #1a1a1a;
   --grey-900: #0a0a0a;
+  --dark-surface: #0f0f0f;
+  --peach-light: #fff5f0;
+  --peach: #ffd2b8;
   --success: #10b981;
   --ignite-orange: #ff5722;
 }
@@ -86,6 +91,7 @@
 
 @theme inline {
   --font-sans: "Inter", "Inter Fallback", system-ui, sans-serif;
+  --font-heading: var(--font-poppins), "Poppins", system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -125,12 +131,17 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* DigiiMark Brand Colors */
+  --color-grey-50: var(--grey-50);
   --color-grey-100: var(--grey-100);
   --color-grey-200: var(--grey-200);
+  --color-grey-300: var(--grey-300);
   --color-grey-400: var(--grey-400);
   --color-grey-600: var(--grey-600);
   --color-grey-800: var(--grey-800);
   --color-grey-900: var(--grey-900);
+  --color-dark-surface: var(--dark-surface);
+  --color-peach-light: var(--peach-light);
+  --color-peach: var(--peach);
   --color-success: var(--success);
   --color-ignite-orange: var(--ignite-orange);
 }
