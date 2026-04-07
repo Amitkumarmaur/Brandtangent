@@ -11,7 +11,8 @@ const socialLinks = [
 const footerColumns = [
   {
     title: "Overview",
-    links: ["About Us", "Services", "Our Work", "Blog", "Contact us", "Career"]
+    links: ["About Us", "Services", "Our Work", "Blog", "Contact us", "Career"],
+    hrefs: ["/about", "#services", "#work", "#blog", "#contact", "#career"]
   },
   {
     title: "Smart Technology Solutions",

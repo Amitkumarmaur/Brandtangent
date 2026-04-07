@@ -47,7 +47,7 @@ export default function InteractiveShowcase() {
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 15])
 
   return (
-    <section ref={containerRef} id="solutions" className="py-24 bg-white relative overflow-hidden">
+    <section ref={containerRef} id="solutions" className="py-16 md:py-20 bg-white relative overflow-hidden">
       {/* Background gradient mesh */}
       <div className="absolute inset-0 gradient-mesh opacity-50" />
 

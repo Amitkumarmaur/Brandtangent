@@ -11,7 +11,7 @@ interface ServiceCTAProps {
 
 export default function ServiceCTA({ title, subtitle, buttonText }: ServiceCTAProps) {
   return (
-    <section id="contact" className="relative w-full py-20 md:py-28 bg-foreground overflow-hidden">
+    <section id="contact" className="relative w-full py-16 md:py-20 bg-foreground overflow-hidden">
       {/* Gradient glows */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-ignite-orange/10 rounded-full blur-[160px]" />

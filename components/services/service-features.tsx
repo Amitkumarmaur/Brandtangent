@@ -23,7 +23,7 @@ export default function ServiceFeatures({ badge, title, subtitle, features }: Se
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section ref={ref} className="relative w-full py-16 md:py-24 bg-grey-100 border-t border-grey-200">
+    <section ref={ref} className="relative w-full py-16 md:py-20 bg-grey-100 border-t border-grey-200">
       {/* Subtle warm glow — uses fixed positioning to avoid overflow issues */}
       <div className="absolute top-0 right-0 w-[500px] h-[400px] bg-ignite-orange/5 rounded-full blur-[120px] pointer-events-none" style={{ zIndex: 0 }} />
 

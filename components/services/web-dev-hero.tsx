@@ -148,32 +148,24 @@ export default function WebDevHero() {
 
   return (
     <section
-      className="relative w-full bg-foreground flex items-center overflow-hidden"
-      style={{ height: "100vh", paddingTop: "80px" }}
+      className="relative w-full bg-background pt-32 pb-16 lg:pt-40 lg:pb-20 flex items-center overflow-hidden"
     >
       {/* Background ambient */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px]" style={{ background: "rgba(255,87,34,0.07)" }} />
-        <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: "rgba(255,140,0,0.05)" }} />
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,87,34,0.6) 1px, transparent 0)`,
-          backgroundSize: "40px 40px",
-        }} />
+        <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: "rgba(255,87,34,0.05)" }} />
+        <div className="absolute inset-0 opacity-[0.04] grid-pattern" />
       </div>
 
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6 lg:px-10" style={{ height: "calc(100% - 24px)" }}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 items-stretch h-full">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
 
           {/* ─── LEFT CARD ──────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative rounded-3xl overflow-hidden flex flex-col justify-between p-8 md:p-12"
-            style={{
-              background: "linear-gradient(135deg, #1a0800 0%, #2d1200 45%, #1f0a00 100%)",
-              border: "1px solid rgba(255,87,34,0.15)",
-            }}
+            className="relative rounded-[1.5rem] overflow-hidden flex flex-col justify-between p-8 md:p-12 bg-dark-surface border border-white/10"
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full" style={{ background: "rgba(255,87,34,0.3)" }} />
             <div className="absolute left-0 top-1/3 w-1 h-32 bg-ignite-orange rounded-r-full opacity-80" />
@@ -203,24 +195,24 @@ export default function WebDevHero() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="flex items-center gap-2 mb-5"
+                className="flex items-center gap-2 mb-4"
               >
                 <div className="w-2 h-2 rounded-full bg-ignite-orange animate-pulse" />
-                <span className="text-ignite-orange text-xs font-semibold tracking-widest uppercase">Web Development</span>
+                <span className="font-heading text-ignite-orange text-sm font-medium tracking-wider uppercase">Web Development</span>
               </motion.div>
 
-              <div className="mb-2">
+              <div className="mb-4">
                 <motion.h1
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.8 }}
-                  className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[0.88] tracking-tight uppercase"
+                  className="font-heading text-3xl sm:text-4xl lg:text-[3.2rem] xl:text-[3.5rem] leading-[1.0] font-bold tracking-[-0.03em] uppercase text-white"
                 >
                   WEB
                   <br />DEV
                 </motion.h1>
 
-                <div className="h-14 md:h-16 overflow-hidden mt-2">
+                <div className="h-10 md:h-12 overflow-hidden mt-3">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={wordIdx}
@@ -228,8 +220,7 @@ export default function WebDevHero() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -50, opacity: 0 }}
                       transition={{ duration: 0.45, ease: "easeOut" }}
-                      className="text-3xl md:text-4xl font-bold tracking-tight"
-                      style={{ color: "#FF5722" }}
+                      className="font-heading text-2xl md:text-3xl font-bold tracking-tight text-ignite-orange"
                     >
                       {WORDS[wordIdx]}
                     </motion.div>
@@ -241,19 +232,19 @@ export default function WebDevHero() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="text-white/50 text-sm leading-relaxed max-w-xs mt-3"
+                className="font-sans text-white/60 text-base md:text-lg leading-relaxed max-w-sm mt-3"
               >
                 We engineer blazing‑fast, scalable web apps using cutting-edge frameworks. Your website is your most powerful growth engine.
               </motion.p>
             </div>
 
             {/* Bottom stats + CTA */}
-            <div className="flex items-end justify-between mt-6 flex-wrap gap-4">
+            <div className="flex items-end justify-between mt-12 flex-wrap gap-4">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
-                <p className="text-4xl md:text-5xl font-black text-white leading-none">
+                <p className="font-mono text-4xl md:text-5xl font-black text-white leading-none">
                   500<span className="text-ignite-orange">+</span>
                 </p>
-                <p className="text-white/40 text-xs tracking-widest uppercase mt-1">Projects Done</p>
+                <p className="font-sans text-white/40 text-xs tracking-widest uppercase mt-2">Projects Done</p>
               </motion.div>
 
               <motion.a
@@ -263,8 +254,7 @@ export default function WebDevHero() {
                 transition={{ delay: 1.0 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-3 px-6 py-3 rounded-full font-bold text-sm text-black"
-                style={{ background: "linear-gradient(135deg, #FFC107, #FF8F00)" }}
+                className="flex items-center gap-3 px-6 py-3 rounded-full font-sans font-medium text-white bg-ignite-orange hover:bg-ignite-orange/90 transition-colors shadow-[0_4px_24px_rgba(255,87,34,0.3)]"
               >
                 <ArrowDown className="w-4 h-4" />
                 ALL CASES
@@ -280,9 +270,9 @@ export default function WebDevHero() {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{ rotateX, rotateY, perspective: 800, transformStyle: "preserve-3d" }}
-            className="relative rounded-3xl overflow-hidden h-full"
+            className="relative rounded-[1.5rem] overflow-hidden h-full min-h-[500px]"
           >
-            <div className="relative w-full h-full" style={{ minHeight: "400px" }}>
+            <div className="relative w-full h-full min-h-[500px] lg:min-h-full">
               {/* Slide images */}
               <AnimatePresence mode="sync">
                 <motion.div

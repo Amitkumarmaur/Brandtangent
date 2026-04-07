@@ -184,7 +184,7 @@ export default function ServiceElevate({
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-20 md:py-28">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 md:py-20">
         {/* Top — Text */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

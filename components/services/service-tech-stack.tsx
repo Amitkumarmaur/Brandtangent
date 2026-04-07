@@ -46,7 +46,7 @@ export default function ServiceTechStack({
   const scrollItems = [...techStack, ...techStack]
 
   return (
-    <section ref={ref} className="relative w-full py-16 md:py-24 bg-foreground overflow-hidden">
+    <section ref={ref} className="relative w-full py-16 md:py-20 bg-foreground overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         {/* Header */}
         <motion.div

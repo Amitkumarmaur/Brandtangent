@@ -7,7 +7,6 @@ import ServiceFeatures from "@/components/services/service-features"
 import ProjectsSection from "@/components/projects-section"
 import ServiceTechStack from "@/components/services/service-tech-stack"
 import ServiceWebServices from "@/components/services/service-web-services"
-import ServiceElevate from "@/components/services/service-elevate"
 import ServiceProcessGrid from "@/components/services/service-process-grid"
 import ServiceIndustries from "@/components/services/service-industries"
 import {
@@ -84,9 +83,6 @@ export default function WebDevelopmentServicePage() {
       </div>
       <div data-theme="light">
         <ServiceWebServices />
-      </div>
-      <div data-theme="dark">
-        <ServiceElevate />
       </div>
       <div data-theme="light">
         <ServiceProcessGrid />

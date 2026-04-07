@@ -5,7 +5,7 @@ import { ArrowDown } from "lucide-react"
 
 export default function ProjectHero() {
   return (
-    <section className="relative w-full h-screen min-h-[700px] flex items-center justify-center bg-white overflow-hidden pt-20 px-4 md:px-8">
+    <section className="relative w-full min-h-[700px] flex items-center justify-center bg-white overflow-hidden py-24 md:py-32 px-4 md:px-8">
       
       {/* Soft Ambient Background Elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-grey-50 rounded-full blur-[120px] opacity-60" />

@@ -64,7 +64,7 @@ export default function ServiceWebServices({
 
   return (
     <>
-      <section ref={ref} className="relative w-full py-16 md:py-24 overflow-hidden" style={{ background: "#fff" }}>
+      <section ref={ref} className="relative w-full py-16 md:py-20 overflow-hidden" style={{ background: "#fff" }}>
         {/* Subtle dot grid */}
         <div
           className="absolute inset-0 opacity-[0.06] pointer-events-none"

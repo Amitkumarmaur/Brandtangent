@@ -24,7 +24,7 @@ export default function ServicePortfolio({ badge, title, subtitle, items }: Serv
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section ref={ref} className="relative w-full py-16 md:py-24 bg-foreground overflow-hidden">
+    <section ref={ref} className="relative w-full py-16 md:py-20 bg-foreground overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <motion.div

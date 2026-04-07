@@ -1,0 +1,30 @@
+﻿
+> my-v0-project@0.1.0 build
+> next build
+
+   Γû▓ Next.js 16.0.3 (Turbopack)
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 4.3s
+   Skipping validation of types
+   Collecting page data using 15 workers ...
+   Generating static pages using 15 workers (0/7) ...
+   Generating static pages using 15 workers (1/7) 
+   Generating static pages using 15 workers (3/7) 
+   Generating static pages using 15 workers (5/7) 
+ Γ£ô Generating static pages using 15 workers (7/7) in 841.3ms
+   Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ Γùï /about
+Γö£ ╞Æ /case-studies/[slug]
+Γö£ Γùï /projects
+Γö£ Γùï /services/seo
+Γöö Γùï /services/web-development
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

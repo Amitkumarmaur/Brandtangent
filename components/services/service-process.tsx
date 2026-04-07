@@ -21,7 +21,7 @@ export default function ServiceProcess({ badge, title, subtitle, steps }: Servic
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section ref={ref} id="process" className="relative w-full py-16 md:py-24 bg-grey-800 overflow-hidden">
+    <section ref={ref} id="process" className="relative w-full py-16 md:py-20 bg-grey-800 overflow-hidden">
       {/* Ambient glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-ignite-orange/5 rounded-full blur-[120px] pointer-events-none" />
 
