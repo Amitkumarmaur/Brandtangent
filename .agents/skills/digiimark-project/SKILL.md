@@ -112,13 +112,26 @@ public/
 
 ### Typography
 
-- **Headings:** `font-heading` (Poppins)
-- **Body:** `font-sans` (Inter, default)
-- **Code/stats:** `font-mono`
-- **H1:** `text-3xl sm:text-4xl lg:text-[3.2rem] font-bold uppercase` (hero only)
-- **H2:** `text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-tight`
-- **H3:** `text-xl md:text-2xl font-semibold tracking-tight`
-- **Eyebrow:** `w-2 h-2` orange dot + `text-sm uppercase tracking-wider font-medium`
+Font families: `font-heading` (Poppins), `font-sans` (Inter), `font-mono` (Geist Mono).
+
+All heading sizes are CSS variables in `globals.css` with fluid `clamp()` values.
+Use either the utility classes or the Tailwind equivalents.
+
+| Level | Variable | Size | Utility Class | Weight |
+|-------|----------|------|---------------|--------|
+| Display | `--text-display` | 40→56px | `.heading-display` | 700 bold, uppercase |
+| H1 | `--text-h1` | 32→48px | `.heading-h1` | 700 bold |
+| H2 | `--text-h2` | 30→44px | `.heading-h2` | 600 semibold |
+| H3 | `--text-h3` | 20→24px | `.heading-h3` | 600 semibold |
+| H4 | `--text-h4` | 18→20px | `.heading-h4` | 600 semibold |
+| Eyebrow | `--text-body-sm` | 14px | `.text-eyebrow` | 500 medium, uppercase |
+| Subtitle | `--text-body-lg` | 18px | `.text-subtitle` | 400 normal, grey-400 |
+| Body | `--text-body` | 16px | `.text-body` | 400 normal, grey-400 |
+| Caption | `--text-caption` | 12px | `.text-caption` | 400 normal, grey-400 |
+
+Spacing variables are also in `globals.css`:
+`--space-section-y` (64px), `--space-section-y-lg` (80px),
+`--space-eyebrow-to-heading` (16px), `--space-heading-to-content` (32px).
 
 ### Section Pattern
 
