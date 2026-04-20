@@ -106,7 +106,14 @@ function FloatingUICard({ project }: { project: Project }) {
 const WORDS = ["POWERFUL", "SCALABLE", "BLAZING FAST", "PREMIUM"]
 
 // ── Main hero ────────────────────────────────────────────────────
-export default function WebDevHero() {
+interface WebDevHeroProps {
+  title?: string
+  description?: string
+  image?: string
+  badge?: string
+}
+
+export default function WebDevHero({ title, description, image, badge }: WebDevHeroProps) {
   const [wordIdx, setWordIdx] = useState(0)
   const [slideIdx, setSlideIdx] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -148,7 +155,7 @@ export default function WebDevHero() {
 
   return (
     <section
-      className="relative w-full bg-background pt-32 pb-16 lg:pt-40 lg:pb-20 flex items-center overflow-hidden"
+      className="relative w-full bg-background pt-24 pb-10 lg:pt-28 lg:pb-12 flex items-center overflow-hidden"
     >
       {/* Background ambient */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -198,7 +205,7 @@ export default function WebDevHero() {
                 className="flex items-center gap-2 mb-4"
               >
                 <div className="w-2 h-2 rounded-full bg-ignite-orange animate-pulse" />
-                <span className="font-heading text-ignite-orange text-sm font-medium tracking-wider uppercase">Web Development</span>
+                <span className="font-heading text-ignite-orange text-sm font-medium tracking-wider uppercase">{badge || "Web Development"}</span>
               </motion.div>
 
               <div className="mb-4">
@@ -206,13 +213,19 @@ export default function WebDevHero() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.8 }}
-                  className="font-heading text-3xl sm:text-4xl lg:text-[3.2rem] xl:text-[3.5rem] leading-[1.0] font-bold tracking-[-0.03em] uppercase text-white"
+                  className="font-heading text-2xl sm:text-3xl lg:text-[2.4rem] xl:text-[2.6rem] leading-[1.05] font-bold tracking-[-0.02em] uppercase text-white"
                 >
-                  WEB
-                  <br />DEV
+                  {title ? (
+                    <span dangerouslySetInnerHTML={{ __html: title.replace(' ', '<br />') }} />
+                  ) : (
+                    <>
+                      WEB
+                      <br />DEV
+                    </>
+                  )}
                 </motion.h1>
 
-                <div className="h-10 md:h-12 overflow-hidden mt-3">
+                <div className="h-8 md:h-10 overflow-hidden mt-2">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={wordIdx}
@@ -220,7 +233,7 @@ export default function WebDevHero() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -50, opacity: 0 }}
                       transition={{ duration: 0.45, ease: "easeOut" }}
-                      className="font-heading text-2xl md:text-3xl font-bold tracking-tight text-ignite-orange"
+                      className="font-heading text-xl md:text-2xl font-bold tracking-tight text-ignite-orange"
                     >
                       {WORDS[wordIdx]}
                     </motion.div>
@@ -232,14 +245,14 @@ export default function WebDevHero() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="font-sans text-white/60 text-base md:text-lg leading-relaxed max-w-sm mt-3"
+                className="font-sans text-white/60 text-sm md:text-base leading-relaxed max-w-sm mt-2"
               >
-                We engineer blazing‑fast, scalable web apps using cutting-edge frameworks. Your website is your most powerful growth engine.
+                {description || "We engineer blazing‑fast, scalable web apps using cutting-edge frameworks. Your website is your most powerful growth engine."}
               </motion.p>
             </div>
 
             {/* Bottom stats + CTA */}
-            <div className="flex items-end justify-between mt-12 flex-wrap gap-4">
+            <div className="flex items-end justify-between mt-6 flex-wrap gap-4">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
                 <p className="font-mono text-4xl md:text-5xl font-black text-white leading-none">
                   500<span className="text-ignite-orange">+</span>
@@ -270,9 +283,9 @@ export default function WebDevHero() {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{ rotateX, rotateY, perspective: 800, transformStyle: "preserve-3d" }}
-            className="relative rounded-[1.5rem] overflow-hidden h-full min-h-[500px]"
+            className="relative rounded-[1.5rem] overflow-hidden h-full min-h-[420px]"
           >
-            <div className="relative w-full h-full min-h-[500px] lg:min-h-full">
+            <div className="relative w-full h-full min-h-[420px] lg:min-h-full">
               {/* Slide images */}
               <AnimatePresence mode="sync">
                 <motion.div
@@ -284,8 +297,8 @@ export default function WebDevHero() {
                   className="absolute inset-0"
                 >
                   <Image
-                    src={project.image}
-                    alt={project.title}
+                    src={image || project.image}
+                    alt={title || project.title}
                     fill
                     sizes="50vw"
                     className="object-cover object-center"

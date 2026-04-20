@@ -60,9 +60,11 @@ app/
 ├── layout.tsx            # Root layout (fonts, metadata)
 ├── page.tsx              # Homepage (composes all sections)
 ├── globals.css           # Design tokens, theme, utilities
+├── blog/
+│   └── page.tsx          # Blog listing page
 ├── services/
-│   ├── web-development/  # Web dev service page
-│   └── seo/              # SEO service page
+│   ├── page.tsx          # Services directory (lists all from Supabase)
+│   └── [slug]/           # Dynamic service detail pages
 └── projects/
     └── page.tsx          # Projects showcase
 
@@ -82,7 +84,16 @@ components/
 ├── faq-section.tsx       # FAQ accordion
 ├── tech-globe.tsx        # 3D globe (Three.js)
 ├── ui/                   # shadcn/ui primitives
-└── services/             # Service page sub-components
+├── blog/                 # Blog page sub-components
+│   ├── blog-hero.tsx     # Blog page hero (H1)
+│   └── blog-grid.tsx     # Blog listing grid with category filters
+├── case-studies/         # Case study detail + index
+│   ├── case-studies-hero.tsx   # Case studies index hero
+│   └── case-studies-grid.tsx   # Index grid + Supabase topic filters
+└── services/             # Service pages + directory
+    ├── services-directory-hero.tsx
+    ├── services-directory.tsx   # Index grid (grouped by service_categories)
+    └── …                 # web-dev-hero, service-features, etc.
 
 .agents/skills/
 ├── digiimark-project/    # THIS SKILL — project rules

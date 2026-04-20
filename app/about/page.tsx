@@ -775,24 +775,38 @@ export default function AboutPage() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
-      <section data-theme="dark" className="relative w-full py-16 md:py-20 bg-foreground overflow-hidden border-t border-white/10">
-        {/* Animated grid */}
-        <div className="absolute inset-0 opacity-[0.05]"
-          style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "60px 60px" }}
+      <section
+        data-theme="light"
+        className="relative w-full py-16 md:py-20 bg-grey-100 overflow-hidden border-t-2 border-grey-400"
+      >
+        {/* Soft light lift toward center (reads clearly as a “light” band before the footer) */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_0%,rgb(255_255_255)_0%,transparent_58%)] opacity-70"
+          aria-hidden
         />
-        <FloatingOrb size={600} color="rgba(255,87,34,0.12)" x="30%" y="20%" delay={0} duration={10} />
-        <FloatingOrb size={350} color="rgba(99,102,241,0.1)" x="65%" y="55%" delay={3} duration={8} />
+        {/* Light grid: fine neutral lines on grey-100 */}
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgb(10 10 10 / 0.06) 1px, transparent 1px), linear-gradient(to bottom, rgb(10 10 10 / 0.06) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
 
-        {/* Rotating ring decoration */}
+        <FloatingOrb size={520} color="rgba(255,87,34,0.06)" x="55%" y="15%" delay={0} duration={9} />
+        <FloatingOrb size={320} color="rgba(255,255,255,0.35)" x="10%" y="55%" delay={2} duration={11} />
+
+        {/* Rotating ring decoration — light section */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-white/5 pointer-events-none"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-grey-300 pointer-events-none"
         />
         <motion.div
           animate={{ rotate: -360 }}
           transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-white/[0.03] pointer-events-none"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-grey-300/70 pointer-events-none"
         />
 
         <motion.div
@@ -802,13 +816,13 @@ export default function AboutPage() {
           transition={{ duration: 0.8 }}
           className="w-full max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10"
         >
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-white tracking-tight leading-tight mb-6 max-w-3xl mx-auto">
+          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-tight mb-6 max-w-3xl mx-auto">
             Ready to Build Your{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-ignite-orange via-[#FF8A50] to-[#FF5722]">
               Growth Machine?
             </span>
           </h2>
-          <p className="font-sans text-white/60 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+          <p className="font-sans text-grey-600 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
             One strategy call is all it takes to see if we're the right fit for your pipeline goals.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -821,7 +835,7 @@ export default function AboutPage() {
             </MagneticButton>
             <MagneticButton
               href="/"
-              className="inline-flex items-center gap-2 border border-white/20 text-white font-sans font-medium px-8 py-4 rounded-full hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 border-2 border-grey-400 bg-white/70 text-foreground font-sans font-medium px-8 py-4 rounded-full hover:bg-white hover:border-grey-500 transition-colors shadow-sm"
             >
               Explore Our Work
             </MagneticButton>

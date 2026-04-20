@@ -5,34 +5,84 @@ import { motion, useInView } from "framer-motion"
 
 interface TechItem {
   name: string
-  icon: string
+  logo?: string | null
+  /** legacy icon support for default stack */
+  icon?: string
   color: string
 }
 
 const defaultTechStack: TechItem[] = [
-  { name: "JavaScript", icon: "JS", color: "#F7DF1E" },
-  { name: "TypeScript", icon: "TS", color: "#3178C6" },
-  { name: "React", icon: "⚛", color: "#61DAFB" },
-  { name: "Next.js", icon: "N", color: "#ffffff" },
-  { name: "Node.js", icon: "⬢", color: "#339933" },
-  { name: "Python", icon: "🐍", color: "#3776AB" },
-  { name: "Laravel", icon: "L", color: "#FF2D20" },
-  { name: "Angular", icon: "A", color: "#DD0031" },
-  { name: "Vue.js", icon: "V", color: "#4FC08D" },
-  { name: "HTML5", icon: "5", color: "#E34F26" },
-  { name: "CSS3", icon: "3", color: "#1572B6" },
-  { name: "Tailwind", icon: "≋", color: "#06B6D4" },
-  { name: "PostgreSQL", icon: "🐘", color: "#4169E1" },
-  { name: "MongoDB", icon: "M", color: "#47A248" },
-  { name: "AWS", icon: "☁", color: "#FF9900" },
-  { name: "Docker", icon: "🐳", color: "#2496ED" },
+  { name: "JavaScript",  icon: "JS",  color: "#F7DF1E", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" },
+  { name: "TypeScript",  icon: "TS",  color: "#3178C6", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
+  { name: "React",       icon: "⚛",  color: "#61DAFB", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
+  { name: "Next.js",     icon: "N",   color: "#ffffff", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" },
+  { name: "Node.js",     icon: "⬢",  color: "#339933", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
+  { name: "Python",      icon: "🐍", color: "#3776AB", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
+  { name: "PostgreSQL",  icon: "🐘", color: "#4169E1", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
+  { name: "Tailwind CSS",icon: "≋",  color: "#06B6D4", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" },
+  { name: "Docker",      icon: "🐳", color: "#2496ED", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
 ]
+
+// ─── Card rendered outside the parent so React never remounts it ─────────────
+function TechCard({ tech }: { tech: TechItem }) {
+  return (
+    <div className="flex flex-col items-center gap-4 flex-shrink-0">
+      <div
+        className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-grey-800 flex items-center justify-center border border-white/5 relative overflow-hidden cursor-default transition-transform duration-300 hover:scale-125 hover:border-white/15 hover:shadow-lg"
+        style={{ boxShadow: `0 0 20px ${tech.color}10` }}
+      >
+        <div
+          className="absolute inset-0 opacity-15 rounded-2xl"
+          style={{ background: `radial-gradient(circle at center, ${tech.color}40, transparent 70%)` }}
+        />
+        <div
+          className="absolute bottom-0 left-0 right-0 h-[2px] opacity-70"
+          style={{ background: `linear-gradient(90deg, transparent, ${tech.color}, transparent)` }}
+        />
+
+        {tech.logo ? (
+          <div className="relative z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={tech.logo}
+              alt={tech.name}
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                const target = e.currentTarget
+                target.style.display = "none"
+                const fallback = target.nextElementSibling as HTMLElement
+                if (fallback) fallback.style.display = "flex"
+              }}
+            />
+            <span
+              className="hidden items-center justify-center text-xl md:text-2xl font-bold"
+              style={{ color: tech.color }}
+            >
+              {tech.icon ?? tech.name.charAt(0)}
+            </span>
+          </div>
+        ) : (
+          <span style={{ color: tech.color }} className="relative z-10 text-2xl md:text-3xl font-bold select-none">
+            {tech.icon ?? tech.name.charAt(0)}
+          </span>
+        )}
+      </div>
+      <span className="text-white/50 text-xs md:text-sm font-medium whitespace-nowrap">
+        {tech.name}
+      </span>
+    </div>
+  )
+}
 
 interface ServiceTechStackProps {
   title?: string
   subtitle?: string
   techStack?: TechItem[]
 }
+
+// Minimum number of items in one "pass" so the strip always overflows the viewport.
+// Each card is ~96px + 32px gap ≈ 128px. 14 items ≈ 1792px — safely > any viewport.
+const MIN_STRIP_ITEMS = 14
 
 export default function ServiceTechStack({
   title = "Web Development\nTechnology Stack",
@@ -42,8 +92,19 @@ export default function ServiceTechStack({
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
-  // Duplicate for seamless infinite scroll
-  const scrollItems = [...techStack, ...techStack]
+  // Repeat the source items until we have at least MIN_STRIP_ITEMS in one strip.
+  // This ensures the strip is always wider than the viewport regardless of how
+  // few platforms are connected.
+  const repeatCount = Math.ceil(MIN_STRIP_ITEMS / techStack.length)
+  const baseStrip = Array.from({ length: repeatCount }, () => techStack).flat()
+
+  // Duplicate once: [baseStrip, baseStrip].
+  // The CSS animation moves translateX(-50%), which is exactly one baseStrip width —
+  // loop is perfectly seamless no matter how few items there are.
+  const marqueeItems = [...baseStrip, ...baseStrip]
+
+  // Slower for fewer unique items so it doesn't look like a blur
+  const animDuration = Math.max(18, techStack.length * 3)
 
   return (
     <section ref={ref} className="relative w-full py-16 md:py-20 bg-foreground overflow-hidden">
@@ -64,7 +125,7 @@ export default function ServiceTechStack({
         </motion.div>
       </div>
 
-      {/* Scrolling tech row */}
+      {/* ── Infinite Marquee ── */}
       <div className="relative w-full">
         {/* Fade edges */}
         <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-foreground to-transparent z-10 pointer-events-none" />
@@ -75,32 +136,10 @@ export default function ServiceTechStack({
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.3 }}
           className="flex gap-6 md:gap-8 animate-scroll-left"
+          style={{ "--scroll-duration": `${animDuration}s` } as React.CSSProperties}
         >
-          {scrollItems.map((tech, index) => (
-            <div key={`${tech.name}-${index}`} className="flex flex-col items-center gap-4 flex-shrink-0">
-              <div
-                className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-grey-800 flex items-center justify-center text-2xl md:text-3xl font-bold border border-white/5 relative overflow-hidden group cursor-default transition-transform duration-300 hover:scale-125 hover:border-white/15 hover:shadow-lg"
-              >
-                {/* Colored glow */}
-                <div
-                  className="absolute inset-0 opacity-20 rounded-2xl"
-                  style={{
-                    boxShadow: `inset 0 0 30px ${tech.color}30, 0 0 20px ${tech.color}15`,
-                    borderColor: tech.color,
-                  }}
-                />
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-1 opacity-60"
-                  style={{ background: `linear-gradient(90deg, transparent, ${tech.color}, transparent)` }}
-                />
-                <span style={{ color: tech.color }} className="relative z-10 select-none">
-                  {tech.icon}
-                </span>
-              </div>
-              <span className="text-white/50 text-xs md:text-sm font-medium whitespace-nowrap">
-                {tech.name}
-              </span>
-            </div>
+          {marqueeItems.map((tech, index) => (
+            <TechCard key={`${tech.name}-${index}`} tech={tech} />
           ))}
         </motion.div>
       </div>
@@ -108,11 +147,11 @@ export default function ServiceTechStack({
       {/* Scroll animation keyframes */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes scroll-left {
-          0% { transform: translateX(0); }
+          0%   { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
         .animate-scroll-left {
-          animation: scroll-left 30s linear infinite;
+          animation: scroll-left var(--scroll-duration, 30s) linear infinite;
           will-change: transform;
         }
         .animate-scroll-left:hover {

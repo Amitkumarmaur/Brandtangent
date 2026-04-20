@@ -5,22 +5,52 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { Menu, X, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { supabase } from "@/lib/supabase"
+import { NavServicesDesktop, NavServicesMobile, type NavServiceCategoryRow } from "@/components/nav-services"
 
 const navItems = [
-  { name: "Services", href: "#services" },
-  { name: "Industries", href: "#industries" },
-  { name: "Solutions", href: "#solutions" },
+  { name: "Our Work", href: "/case-studies" },
+  { name: "Blog", href: "/blog" },
+  { name: "Careers", href: "/careers" },
   { name: "About", href: "/about" },
 ]
+
+const navLinkClass =
+  "font-heading text-base md:text-[1.05rem] font-medium tracking-[0.01em] text-foreground transition-colors hover:text-ignite-orange"
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [serviceCategories, setServiceCategories] = useState<NavServiceCategoryRow[]>([])
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const [catsRes, svcRes] = await Promise.all([
+        supabase
+          .from("service_categories")
+          .select("id, name, slug, display_order")
+          .order("display_order", { ascending: true }),
+        supabase.from("services").select("category_id"),
+      ])
+      if (cancelled) return
+      const cats = (catsRes.data ?? []) as NavServiceCategoryRow[]
+      const withSvc = new Set(
+        (svcRes.data ?? [])
+          .map((r: { category_id: string | null }) => r.category_id)
+          .filter((id): id is string => Boolean(id))
+      )
+      setServiceCategories(cats.filter((c) => withSvc.has(c.id)))
+    })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   return (
@@ -49,12 +79,9 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
+            <NavServicesDesktop categories={serviceCategories} />
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="font-heading text-base md:text-[1.05rem] font-medium tracking-[0.01em] text-[#0A0A0A] transition-colors hover:text-black"
-              >
+              <Link key={item.name} href={item.href} className={navLinkClass}>
                 {item.name}
               </Link>
             ))}
@@ -92,11 +119,12 @@ export default function Header() {
             className="md:hidden bg-white border-t border-[#E5E5E5] py-6"
           >
             <nav className="flex flex-col gap-4">
+              <NavServicesMobile categories={serviceCategories} onNavigate={() => setIsMobileMenuOpen(false)} />
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="font-heading text-[#0A0A0A] hover:text-black transition-colors text-lg font-semibold px-4"
+                  className="font-heading text-foreground hover:text-ignite-orange transition-colors text-lg font-semibold px-4"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}

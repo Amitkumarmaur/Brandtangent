@@ -125,20 +125,22 @@ export default function ServiceProcessGrid({
                 <div className="absolute top-0 right-0 w-14 h-14 rounded-bl-3xl rounded-tr-2xl opacity-70" style={{ background: "#FFD2B8" }} />
 
                 {/* Step number */}
-                <div className="absolute top-4 right-5 text-xs font-mono font-bold" style={{ color: "rgba(255,87,34,0.3)" }}>0{index + 1}</div>
+                <div className="absolute top-4 right-5 text-xs font-mono font-bold z-10" style={{ color: "rgba(255,87,34,0.3)" }}>0{index + 1}</div>
 
-                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-5 group-hover:text-ignite-orange transition-colors">
-                  {phase.title}
-                </h3>
+                <div className="relative z-10">
+                  <h3 className="text-lg md:text-xl font-semibold text-foreground mb-5 group-hover:text-ignite-orange transition-colors pr-10">
+                    {phase.title}
+                  </h3>
 
-                <ul className="space-y-3">
-                  {phase.items.map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: "#FF5722" }} />
-                      <span className="text-foreground/55 text-sm leading-relaxed">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                  <ul className="space-y-3">
+                    {phase.items.map((item) => (
+                      <li key={item} className="flex items-start gap-3">
+                        <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: "#FF5722" }} />
+                        <span className="text-foreground/55 text-sm leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </motion.div>
             ))}
           </div>

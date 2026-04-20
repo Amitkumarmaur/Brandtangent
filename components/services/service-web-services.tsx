@@ -118,8 +118,8 @@ export default function ServiceWebServices({
                 <div className="absolute top-0 left-4 right-4 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" style={{ background: "linear-gradient(to right, transparent, #FF5722, transparent)" }} />
                 {/* Peach corner accent */}
                 <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-3xl rounded-tr-2xl opacity-60" style={{ background: "#FFD2B8" }} />
-                <div>
-                  <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3 leading-snug group-hover:text-ignite-orange transition-colors">
+                <div className="relative z-10">
+                  <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3 leading-snug group-hover:text-ignite-orange transition-colors pr-10">
                     {service.title}
                   </h3>
                   <p className="text-foreground/60 text-sm leading-relaxed">
@@ -128,7 +128,7 @@ export default function ServiceWebServices({
                 </div>
 
                 {/* Bottom circle button */}
-                <div className="flex justify-end mt-6">
+                <div className="flex justify-end mt-6 relative z-10">
                   <div className="w-9 h-9 rounded-full flex items-center justify-center transition-all group-hover:scale-110" style={{ background: "#FFD2B8" }}>
                     <Minus className="w-4 h-4 transition-colors" style={{ color: "#FF5722" }} />
                   </div>
