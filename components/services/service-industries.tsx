@@ -114,14 +114,13 @@ export default function ServiceIndustries({
               style={{ maxWidth: "1200px", paddingLeft: "clamp(16px, 4vw, 60px)", paddingRight: "clamp(16px, 4vw, 60px)" }}
             >
               <div
-                className="rounded-2xl md:rounded-3xl overflow-hidden relative"
+                className="rounded-2xl md:rounded-3xl overflow-hidden relative bg-grey-50 border border-grey-200"
                 style={{
-                  background: "linear-gradient(135deg, #727480 0%, #5e6068 100%)",
-                  boxShadow: "0 -1px 0 rgba(255,255,255,0.08), 0 32px 100px rgba(0,0,0,0.8)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.04)",
                 }}
               >
                 {/* Card index badge */}
-                <div className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/40 text-xs font-mono z-10">
+                <div className="absolute top-5 right-5 w-8 h-8 rounded-full bg-grey-200 flex items-center justify-center text-grey-400 text-xs font-mono z-10">
                   {String(index + 1).padStart(2, '0')}
                 </div>
                 {/* 3-column grid: 35% | 35% | 30% */}
@@ -133,19 +132,19 @@ export default function ServiceIndustries({
                   {/* LEFT — Title + Headline + Services */}
                   <div className="flex flex-col justify-between p-10 md:p-14">
                     <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-white mb-5 leading-tight">
+                      <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-5 leading-tight">
                         {card.industry}
                       </h3>
-                      <p className="text-white text-base md:text-lg font-bold leading-snug">
+                      <p className="text-foreground text-base md:text-lg font-bold leading-snug">
                         {card.headline}
                       </p>
                     </div>
                     <div className="mt-8">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-                        <span className="text-white/50 text-sm">Our Services Include</span>
+                        <span className="text-grey-400 text-sm">Our Services Include</span>
                       </div>
-                      <p className="text-white/40 text-sm leading-relaxed">{card.services}</p>
+                      <p className="text-grey-400 text-sm leading-relaxed">{card.services}</p>
                     </div>
                   </div>
 
@@ -171,18 +170,18 @@ export default function ServiceIndustries({
                   <div className="flex flex-col justify-between p-10 md:p-12">
                     <div className="space-y-7">
                       <div>
-                        <p className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-none">
+                        <p className="text-5xl md:text-6xl font-bold text-foreground tracking-tight leading-none">
                           {card.yearsExp} <span className="text-ignite-orange">+</span>
                         </p>
-                        <p className="text-white/40 text-sm mt-2 leading-relaxed">
+                        <p className="text-grey-400 text-sm mt-2 leading-relaxed">
                           Years of experience in the {card.industry.toLowerCase()} sectors.
                         </p>
                       </div>
                       <div>
-                        <p className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-none">
+                        <p className="text-5xl md:text-6xl font-bold text-foreground tracking-tight leading-none">
                           {card.clients} <span className="text-ignite-orange">+</span>
                         </p>
-                        <p className="text-white/40 text-sm mt-2 leading-relaxed">
+                        <p className="text-grey-400 text-sm mt-2 leading-relaxed">
                           {card.clientLabel}
                         </p>
                       </div>
@@ -191,14 +190,14 @@ export default function ServiceIndustries({
                     <div className="mt-8">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-                        <span className="text-white/50 text-sm">See Case Studies</span>
+                        <span className="text-grey-400 text-sm">See Case Studies</span>
                       </div>
                       <div className="flex gap-3 flex-wrap">
                         {card.caseStudies.map((cs) => (
                           <div
                             key={cs.name}
-                            className="h-12 px-4 min-w-[76px] rounded-xl flex items-center justify-center text-white/50 text-xs font-semibold border border-white/10 hover:border-ignite-orange/40 hover:text-white hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
-                            style={{ background: cs.bg }}
+                            className="h-12 px-4 min-w-[76px] rounded-xl flex items-center justify-center text-foreground/60 text-xs font-semibold border border-grey-200 bg-background hover:border-ignite-orange/60 hover:text-ignite-orange hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+
                           >
                             {cs.name}
                           </div>

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
 
 const blogPosts = [
   { id: 1, title: "The Future of Cloud Infrastructure", category: "Technology", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800&h=800", date: "Oct 12, 2026" },
@@ -46,9 +47,9 @@ export default function BlogSection() {
           </div>
 
           <div className="flex justify-start xl:justify-end w-full xl:w-auto mt-2 md:mt-0 xl:mb-2">
-            <button className="bg-foreground hover:bg-grey-800 transition-colors text-white font-medium tracking-wide text-sm md:text-base py-3 px-8 rounded-full shadow-lg">
+            <Link href="/blog" className="bg-foreground hover:bg-grey-800 transition-colors text-white font-medium tracking-wide text-sm md:text-base py-3 px-8 rounded-full shadow-lg inline-block">
               View All Blogs
-            </button>
+            </Link>
           </div>
 
         </div>

@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useInView } from "framer-motion"
 import type { LucideIcon } from "lucide-react"
 
 interface Feature {
-  icon: LucideIcon
+  icon?: LucideIcon
   title: string
   description: string
 }

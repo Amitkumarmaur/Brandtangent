@@ -1,19 +1,22 @@
-"use client"
+import type { Metadata } from "next"
+import Header from "@/components/header"
+import Footer from "@/components/footer"
+import CaseStudiesHero from "@/components/case-studies/case-studies-hero"
+import CaseStudiesGrid from "@/components/case-studies/case-studies-grid"
 
-import React, { useEffect } from "react"
-import { useRouter } from "next/navigation"
+export const metadata: Metadata = {
+  title: "Case Studies & Portfolio | DigiiMark",
+  description:
+    "Explore DigiiMark case studies across AI, automation, web, and growth — filterable by the same content topics we use across the site.",
+}
 
-export default function CaseStudiesIndex() {
-  const router = useRouter()
-
-  useEffect(() => {
-    // Automatically redirect to the Vanguard Realty demo case study
-    router.push("/case-studies/vanguard-realty")
-  }, [router])
-
+export default function CaseStudiesPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-8 h-8 border-4 border-ignite-orange border-t-transparent rounded-full animate-spin" />
-    </div>
+    <main className="min-h-screen bg-background">
+      <Header />
+      <CaseStudiesHero />
+      <CaseStudiesGrid />
+      <Footer />
+    </main>
   )
 }

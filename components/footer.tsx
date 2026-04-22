@@ -11,8 +11,8 @@ const socialLinks = [
 const footerColumns = [
   {
     title: "Overview",
-    links: ["About Us", "Services", "Our Work", "Blog", "Contact us", "Career"],
-    hrefs: ["/about", "#services", "#work", "#blog", "#contact", "#career"]
+    links: ["About Us", "Services", "Our Work", "Blog", "Contact us", "Career", "Privacy Policy"],
+    hrefs: ["/about", "/services", "/case-studies", "/blog", "#contact", "/careers", "/privacy-policy"]
   },
   {
     title: "Smart Technology Solutions",
@@ -112,7 +112,7 @@ const DigitalGravityMenu = () => (
             <ul className="flex flex-col gap-4 text-sm text-gray-400">
               {col.links.map((link, linkIdx) => (
                 <li key={linkIdx}>
-                  <Link href="#" className="hover:text-white transition-colors block">
+                  <Link href={col.hrefs ? col.hrefs[linkIdx] : "#"} className="hover:text-white transition-colors block">
                     {link}
                   </Link>
                 </li>
