@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import CareersHero from "@/components/careers/careers-hero"
+import CareersOpenPositions from "@/components/careers/careers-open-positions"
 import CareersApplicationForm from "@/components/careers/careers-application-form"
 import { fetchOpenCareers } from "@/lib/careers"
 
@@ -11,9 +12,16 @@ export const metadata: Metadata = {
     "Join DigiiMark — submit your resume for open roles or our general talent pool. AI-first marketing and engineering team.",
 }
 
-export default async function CareersPage() {
+export default async function CareersPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ career?: string }>
+}) {
   const { careers, error } = await fetchOpenCareers()
   const fallbackCareerId = process.env.CAREERS_FALLBACK_CAREER_ID?.trim() || null
+  const sp = searchParams ? await searchParams : {}
+  const preferredCareerId =
+    typeof sp.career === "string" && /^[0-9a-f-]{36}$/i.test(sp.career) ? sp.career : null
 
   return (
     <main className="min-h-screen bg-grey-100">
@@ -22,7 +30,9 @@ export default async function CareersPage() {
         <CareersHero />
       </div>
 
-      <section className="max-w-7xl mx-auto px-6 lg:px-8 py-16 md:py-20">
+      <CareersOpenPositions careers={careers} />
+
+      <section id="apply" className="max-w-7xl mx-auto px-6 lg:px-8 py-16 md:py-20 scroll-mt-24">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-start">
           <div className="lg:col-span-2 space-y-6">
             <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground leading-tight">
@@ -53,7 +63,12 @@ export default async function CareersPage() {
             </ul>
           </div>
           <div className="lg:col-span-3">
-            <CareersApplicationForm careers={careers} listError={error} fallbackCareerId={fallbackCareerId} />
+            <CareersApplicationForm
+              careers={careers}
+              listError={error}
+              fallbackCareerId={fallbackCareerId}
+              preferredCareerId={preferredCareerId}
+            />
           </div>
         </div>
       </section>

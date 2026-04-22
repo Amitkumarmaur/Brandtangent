@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import type { CareerRow } from "@/lib/careers"
@@ -11,6 +11,8 @@ type Props = {
   listError: string | null
   /** When no `careers` rows exist, optional server env UUID for a “general” open role. */
   fallbackCareerId: string | null
+  /** When present and matching an open role, pre-selects that role (e.g. from a job detail link). */
+  preferredCareerId?: string | null
 }
 
 function pickDefaultCareerId(careers: CareerRow[]): string | null {
@@ -19,13 +21,27 @@ function pickDefaultCareerId(careers: CareerRow[]): string | null {
   return general?.id ?? careers[0]?.id ?? null
 }
 
-export default function CareersApplicationForm({ careers, listError, fallbackCareerId }: Props) {
+export default function CareersApplicationForm({
+  careers,
+  listError,
+  fallbackCareerId,
+  preferredCareerId,
+}: Props) {
   const initialCareerId = useMemo(() => {
+    if (preferredCareerId && careers.some((c) => c.id === preferredCareerId)) {
+      return preferredCareerId
+    }
     if (careers.length) return pickDefaultCareerId(careers)
     return fallbackCareerId
-  }, [careers, fallbackCareerId])
+  }, [careers, fallbackCareerId, preferredCareerId])
 
   const [careerId, setCareerId] = useState<string>(initialCareerId ?? "")
+
+  useEffect(() => {
+    if (preferredCareerId && careers.some((c) => c.id === preferredCareerId)) {
+      setCareerId(preferredCareerId)
+    }
+  }, [preferredCareerId, careers])
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
