@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
@@ -8,13 +8,12 @@ import type { BlogPost } from "@/lib/supabase"
 import {
   ALL_ARTICLES_LABEL,
   blogRowToBlogPost,
-  fetchBlogsForCategoryFilter,
+  fetchBlogsPage,
   fetchContentCategories,
-  flattenBlogContentCategories,
-  postMatchesContentCategorySlug,
   sortContentCategories,
-  type BlogRowWithCategories,
 } from "@/lib/content-categories"
+
+const PAGE_SIZE = 10
 
 /** Badge text: when a filter chip is active, show that topic if the post has it; else primary. */
 function categoryBadgeForCard(post: BlogPost, activeCategorySlug: string | null): string {
@@ -130,17 +129,23 @@ function BlogCard({
 export default function BlogGrid() {
   const [activeCategorySlug, setActiveCategorySlug] = useState<string | null>(null)
   const [posts, setPosts] = useState<BlogPost[]>([])
+  const [hasMore, setHasMore] = useState(false)
   const [filterCategories, setFilterCategories] = useState<{ name: string; slug: string }[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const fetchGeneration = useRef(0)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       const fromDb = await fetchContentCategories()
       if (cancelled) return
-      setFilterCategories(sortContentCategories(fromDb).map((c) => ({ name: c.name, slug: c.slug })))
+      setFilterCategories(
+        sortContentCategories(fromDb).map((c) => ({
+          name: c.name,
+          slug: c.slug,
+        }))
+      )
     })()
     return () => {
       cancelled = true
@@ -148,71 +153,54 @@ export default function BlogGrid() {
   }, [])
 
   useEffect(() => {
-    const gen = ++fetchGeneration.current
     let cancelled = false
-
     ;(async () => {
       setLoading(true)
       setLoadError(null)
+      setPosts([])
+      setHasMore(false)
 
-      const blogsRes = await fetchBlogsForCategoryFilter(activeCategorySlug)
+      const page = await fetchBlogsPage(activeCategorySlug, PAGE_SIZE, 0)
+      if (cancelled) return
 
-      if (cancelled || fetchGeneration.current !== gen) return
-
-      if (blogsRes.error) {
-        setLoadError(blogsRes.error.message)
-        setPosts([])
+      if (page.error) {
+        setLoadError(page.error.message)
         setLoading(false)
         return
       }
 
-      const rowsRaw = (blogsRes.data ?? []) as BlogRowWithCategories[]
-      const slug = activeCategorySlug
-      const rowsFiltered = slug
-        ? rowsRaw.filter((row) =>
-            flattenBlogContentCategories(row).some((c) => c.slug === slug)
-          )
-        : rowsRaw
-
-      const mapped = rowsFiltered.map(blogRowToBlogPost)
-      const postsFiltered = slug
-        ? mapped.filter((p) => postMatchesContentCategorySlug(p, slug))
-        : mapped
-
-      setPosts(postsFiltered)
+      setPosts(page.data.map(blogRowToBlogPost))
+      setHasMore(page.hasMore)
       setLoading(false)
     })()
-
     return () => {
       cancelled = true
     }
   }, [activeCategorySlug])
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  }
+  const handleLoadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    const page = await fetchBlogsPage(
+      activeCategorySlug,
+      PAGE_SIZE,
+      posts.length
+    )
+    if (page.error) {
+      setLoadError(page.error.message)
+      setLoadingMore(false)
+      return
+    }
+    setPosts((prev) => [...prev, ...page.data.map(blogRowToBlogPost)])
+    setHasMore(page.hasMore)
+    setLoadingMore(false)
+  }, [activeCategorySlug, hasMore, loadingMore, posts.length])
 
   const isFiltered = activeCategorySlug !== null
   const showFeatured = !isFiltered && posts.length > 0
   const featuredPost = showFeatured ? posts[0] : null
   const gridPosts = showFeatured ? posts.slice(1) : posts
-
-  if (loading) {
-    return (
-      <section className="relative w-full py-16 md:py-20 bg-grey-100 min-h-[400px] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-ignite-orange border-t-transparent rounded-full animate-spin" />
-      </section>
-    )
-  }
+  const showInitialSpinner = loading && posts.length === 0
 
   return (
     <section className="relative w-full py-16 md:py-20 bg-grey-100 overflow-hidden">
@@ -251,7 +239,13 @@ export default function BlogGrid() {
           </p>
         )}
 
-        {!loadError && posts.length === 0 && (
+        {showInitialSpinner && (
+          <div className="min-h-[300px] flex items-center justify-center">
+            <div className="w-8 h-8 border-4 border-ignite-orange border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+
+        {!loadError && !showInitialSpinner && posts.length === 0 && (
           <p className="text-body text-grey-500 mb-12">
             {isFiltered
               ? "No published posts in this category yet."
@@ -276,24 +270,37 @@ export default function BlogGrid() {
           </motion.div>
         )}
 
-        <motion.div
-          key={activeCategorySlug ?? "all"}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {gridPosts.map((post) => (
-            <motion.div key={post.id} variants={itemVariants} className="h-full">
+            <div key={post.id} className="h-full">
               <BlogCard
                 post={post}
                 variant="grid"
                 activeCategorySlug={activeCategorySlug}
               />
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
+
+        {hasMore && !showInitialSpinner && (
+          <div className="flex justify-center mt-12 md:mt-16">
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="bg-foreground text-white text-sm md:text-base font-medium tracking-wide py-3 px-8 rounded-full shadow-lg hover:bg-grey-800 transition-colors disabled:opacity-60 disabled:cursor-wait inline-flex items-center gap-3"
+            >
+              {loadingMore ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Load More Articles"
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   )

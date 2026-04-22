@@ -78,7 +78,7 @@ export default function ServiceIndustries({
   const titleInView = useInView(titleRef, { once: true, margin: "-100px" })
 
   return (
-    <section className="relative w-full bg-foreground py-16 md:py-20">
+    <section className="relative w-full bg-foreground pt-16 md:pt-20 pb-24 md:pb-32 lg:pb-40 mb-8 md:mb-12">
 
       {/* Section Title */}
       <motion.h2

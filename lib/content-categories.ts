@@ -238,6 +238,62 @@ export async function fetchBlogsWithContentCategories(): Promise<{
   return fetchBlogsForCategoryFilter(null)
 }
 
+/**
+ * Paginated published blogs with content-category joins.
+ * Fetches `limit + 1` rows under the hood so we can report `hasMore` without an
+ * extra `count` query. Returns at most `limit` rows to the caller.
+ */
+export async function fetchBlogsPage(
+  categorySlug: string | null,
+  limit: number,
+  offset: number
+): Promise<{
+  data: BlogRowWithCategories[]
+  hasMore: boolean
+  error: Error | null
+}> {
+  const rangeFrom = offset
+  const rangeTo = offset + limit // inclusive end => limit + 1 rows
+
+  if (!categorySlug) {
+    const { data, error } = await supabase
+      .from("blogs")
+      .select(BLOG_LIST_SELECT)
+      .eq("published", true)
+      .order("published_at", { ascending: false })
+      .range(rangeFrom, rangeTo)
+
+    if (error) {
+      return { data: [], hasMore: false, error: new Error(error.message) }
+    }
+
+    const rows = (data as BlogRowWithCategories[] | null) ?? []
+    const hasMore = rows.length > limit
+    return { data: rows.slice(0, limit), hasMore, error: null }
+  }
+
+  const ids = await fetchBlogIdsForCategorySlug(categorySlug)
+  if (ids.length === 0) {
+    return { data: [], hasMore: false, error: null }
+  }
+
+  const { data, error } = await supabase
+    .from("blogs")
+    .select(BLOG_LIST_SELECT)
+    .eq("published", true)
+    .in("id", ids)
+    .order("published_at", { ascending: false })
+    .range(rangeFrom, rangeTo)
+
+  if (error) {
+    return { data: [], hasMore: false, error: new Error(error.message) }
+  }
+
+  const rows = (data as BlogRowWithCategories[] | null) ?? []
+  const hasMore = rows.length > limit
+  return { data: rows.slice(0, limit), hasMore, error: null }
+}
+
 /** Case study detail: topics linked in Supabase (optional). */
 export async function fetchCaseStudyContentCategories(
   caseStudyId: string

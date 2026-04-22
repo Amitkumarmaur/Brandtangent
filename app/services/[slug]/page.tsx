@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import { supabase } from "@/lib/supabase"
+import { deviconLogoForPlatformName } from "@/lib/devicon-platform-logos"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import WebDevHero from "@/components/services/web-dev-hero"
@@ -110,7 +111,8 @@ export default async function DynamicServicePage({ params }: { params: Promise<{
 
         return {
           name: p.platform_name,
-          logo: p.logo || null,
+          logo:
+            deviconLogoForPlatformName(p.platform_name) ?? p.logo ?? null,
           color,
         };
       });

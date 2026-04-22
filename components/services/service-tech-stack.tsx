@@ -2,6 +2,7 @@
 
 import { useRef } from "react"
 import { motion, useInView } from "framer-motion"
+import { deviconLogoForPlatformName } from "@/lib/devicon-platform-logos"
 
 interface TechItem {
   name: string
@@ -12,15 +13,15 @@ interface TechItem {
 }
 
 const defaultTechStack: TechItem[] = [
-  { name: "JavaScript",  icon: "JS",  color: "#F7DF1E", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" },
-  { name: "TypeScript",  icon: "TS",  color: "#3178C6", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
-  { name: "React",       icon: "⚛",  color: "#61DAFB", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
-  { name: "Next.js",     icon: "N",   color: "#ffffff", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" },
-  { name: "Node.js",     icon: "⬢",  color: "#339933", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
-  { name: "Python",      icon: "🐍", color: "#3776AB", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
-  { name: "PostgreSQL",  icon: "🐘", color: "#4169E1", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
-  { name: "Tailwind CSS",icon: "≋",  color: "#06B6D4", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" },
-  { name: "Docker",      icon: "🐳", color: "#2496ED", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
+  { name: "JavaScript",  icon: "JS",  color: "#F7DF1E", logo: deviconLogoForPlatformName("JavaScript") },
+  { name: "TypeScript",  icon: "TS",  color: "#3178C6", logo: deviconLogoForPlatformName("TypeScript") },
+  { name: "React",       icon: "⚛",  color: "#61DAFB", logo: deviconLogoForPlatformName("React") },
+  { name: "Next.js",     icon: "N",   color: "#ffffff", logo: deviconLogoForPlatformName("Next.js") },
+  { name: "Node.js",     icon: "⬢",  color: "#339933", logo: deviconLogoForPlatformName("Node.js") },
+  { name: "Python",      icon: "🐍", color: "#3776AB", logo: deviconLogoForPlatformName("Python") },
+  { name: "PostgreSQL",  icon: "🐘", color: "#4169E1", logo: deviconLogoForPlatformName("PostgreSQL") },
+  { name: "Tailwind CSS",icon: "≋",  color: "#06B6D4", logo: deviconLogoForPlatformName("Tailwind CSS") },
+  { name: "Docker",      icon: "🐳", color: "#2496ED", logo: deviconLogoForPlatformName("Docker") },
 ]
 
 // ─── Card rendered outside the parent so React never remounts it ─────────────
