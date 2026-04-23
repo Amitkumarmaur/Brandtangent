@@ -10,17 +10,41 @@ async function getPlatforms(): Promise<Platform[]> {
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
   )
 
-  const { data, error } = await supabase
+  const full = await supabase
     .from('platforms')
     .select('id, platform_name, url, logo, display_style, display_order')
     .order('display_order', { ascending: true })
 
-  if (error) {
-    console.error('[TrustIndicators] Supabase error:', error.message)
+  if (!full.error) {
+    return (full.data as Platform[]) ?? []
+  }
+
+  const msg = full.error.message ?? ''
+  const missingDisplayStyle =
+    full.error.code === '42703' ||
+    /display_style/.test(msg) ||
+    /column .* does not exist/i.test(msg)
+
+  if (!missingDisplayStyle) {
+    console.error('[TrustIndicators] Supabase error:', full.error.message)
     return []
   }
 
-  return (data as Platform[]) ?? []
+  const minimal = await supabase
+    .from('platforms')
+    .select('id, platform_name, url, logo, display_order')
+    .order('display_order', { ascending: true })
+
+  if (minimal.error) {
+    console.error('[TrustIndicators] Supabase error:', minimal.error.message)
+    return []
+  }
+
+  const rows = minimal.data ?? []
+  return rows.map((row) => ({
+    ...row,
+    display_style: null,
+  })) as Platform[]
 }
 
 export default async function TrustIndicators() {
