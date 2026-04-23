@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import type { CareerRow } from "@/lib/careers"
+import { filterOpenCareers, type CareerRow } from "@/lib/careers"
 import Link from "next/link"
 
 type Props = {
@@ -11,6 +11,10 @@ type Props = {
   listError: string | null
   /** When no `careers` rows exist, optional server env UUID for a “general” open role. */
   fallbackCareerId: string | null
+  /** When set and present in `careers`, pre-select this role (e.g. job detail page). */
+  preferredCareerId?: string | null
+  /** Tighter spacing and no duplicate “Apply” heading when the page already introduces the form. */
+  compact?: boolean
 }
 
 function pickDefaultCareerId(careers: CareerRow[]): string | null {
@@ -19,11 +23,20 @@ function pickDefaultCareerId(careers: CareerRow[]): string | null {
   return general?.id ?? careers[0]?.id ?? null
 }
 
-export default function CareersApplicationForm({ careers, listError, fallbackCareerId }: Props) {
+export default function CareersApplicationForm({
+  careers,
+  listError,
+  fallbackCareerId,
+  preferredCareerId,
+  compact = false,
+}: Props) {
+  const openCareers = useMemo(() => filterOpenCareers(careers), [careers])
+
   const initialCareerId = useMemo(() => {
-    if (careers.length) return pickDefaultCareerId(careers)
+    if (preferredCareerId && openCareers.some((c) => c.id === preferredCareerId)) return preferredCareerId
+    if (openCareers.length) return pickDefaultCareerId(openCareers)
     return fallbackCareerId
-  }, [careers, fallbackCareerId])
+  }, [openCareers, fallbackCareerId, preferredCareerId])
 
   const [careerId, setCareerId] = useState<string>(initialCareerId ?? "")
   const [fullName, setFullName] = useState("")
@@ -100,20 +113,26 @@ export default function CareersApplicationForm({ careers, listError, fallbackCar
     )
   }
 
-  return (
-    <form onSubmit={onSubmit} className="rounded-2xl border border-grey-200 bg-white p-8 md:p-10 shadow-sm space-y-6">
-      <div>
-        <h2 className="font-heading text-2xl font-semibold text-foreground mb-2">Apply</h2>
-        <p className="text-sm text-grey-400">
-          PDF or Word, up to 5 MB. By submitting, you agree we store your details to evaluate hiring — see our{" "}
-          <Link href="/privacy-policy" className="text-ignite-orange font-medium hover:underline">
-            Privacy Policy
-          </Link>
-          .
-        </p>
-      </div>
+  const formShell = compact
+    ? "rounded-2xl border border-grey-200 bg-white p-6 md:p-8 shadow-sm space-y-4"
+    : "rounded-2xl border border-grey-200 bg-white p-8 md:p-10 shadow-sm space-y-6"
 
-      {careers.length > 0 ? (
+  return (
+    <form onSubmit={onSubmit} className={formShell}>
+      {!compact ? (
+        <div>
+          <h2 className="font-heading text-2xl font-semibold text-foreground mb-2">Apply</h2>
+          <p className="text-sm text-grey-400">
+            PDF or Word, up to 5 MB. By submitting, you agree we store your details to evaluate hiring — see our{" "}
+            <Link href="/privacy-policy" className="text-ignite-orange font-medium hover:underline">
+              Privacy Policy
+            </Link>
+            .
+          </p>
+        </div>
+      ) : null}
+
+      {openCareers.length > 0 ? (
         <div className="space-y-2">
           <label htmlFor="career_id" className="text-sm font-medium text-foreground">
             Role
@@ -126,7 +145,7 @@ export default function CareersApplicationForm({ careers, listError, fallbackCar
             required
             className="w-full rounded-xl border border-grey-200 bg-white px-4 py-3 text-foreground text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
           >
-            {careers.map((c) => (
+            {openCareers.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.job_title}
                 {c.location ? ` — ${c.location}` : ""}
@@ -141,7 +160,7 @@ export default function CareersApplicationForm({ careers, listError, fallbackCar
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${compact ? "gap-4" : "gap-5"}`}>
         <div className="space-y-2">
           <label htmlFor="full_name" className="text-sm font-medium text-foreground">
             Full name
@@ -200,7 +219,7 @@ export default function CareersApplicationForm({ careers, listError, fallbackCar
           name="cover_letter"
           value={coverLetter}
           onChange={(e) => setCoverLetter(e.target.value)}
-          rows={5}
+          rows={compact ? 3 : 5}
           placeholder="What you want to work on, links to portfolio or GitHub, availability…"
           className="w-full rounded-xl border border-grey-200 bg-white px-4 py-3 text-sm text-foreground placeholder:text-grey-400 outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
         />
@@ -232,10 +251,24 @@ export default function CareersApplicationForm({ careers, listError, fallbackCar
         </p>
       ) : null}
 
+      {compact ? (
+        <p className="text-xs text-grey-400 leading-relaxed">
+          PDF or Word, up to 5 MB. By submitting you agree we store your details for hiring — see our{" "}
+          <Link href="/privacy-policy" className="text-ignite-orange font-medium hover:underline">
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      ) : null}
+
       <Button
         type="submit"
         disabled={!canSubmit || status === "submitting"}
-        className="w-full md:w-auto rounded-full bg-ignite-orange hover:bg-ignite-orange/90 text-white px-10 py-6 text-base font-semibold shadow-[0_4px_14px_rgba(255,87,34,0.25)]"
+        className={
+          compact
+            ? "w-full md:w-auto rounded-full bg-ignite-orange hover:bg-ignite-orange/90 text-white px-8 py-5 text-sm font-semibold shadow-[0_4px_14px_rgba(255,87,34,0.25)]"
+            : "w-full md:w-auto rounded-full bg-ignite-orange hover:bg-ignite-orange/90 text-white px-10 py-6 text-base font-semibold shadow-[0_4px_14px_rgba(255,87,34,0.25)]"
+        }
       >
         {status === "submitting" ? "Sending…" : "Submit application"}
       </Button>

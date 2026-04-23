@@ -129,7 +129,7 @@ const DigitalGravityMenu = () => (
 
 export default function Footer() {
   return (
-    <footer className="relative z-40 w-full mb-0 md:px-4 lg:px-8 bg-white pb-4 md:pb-8">
+    <footer className="relative z-40 w-full mt-16 md:mt-20 mb-0 md:px-4 lg:px-8 bg-white pb-4 md:pb-8">
       <DigitalGravityMenu />
     </footer>
   )
