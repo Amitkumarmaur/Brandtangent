@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
   const { data: job, error: jobErr } = await admin
     .from("careers")
-    .select("id, status")
+    .select("id, status, job_title, location, type, team")
     .eq("id", career_id)
     .maybeSingle()
 
@@ -126,5 +126,62 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  await notifyApplicationWebhook({
+    career_id,
+    job_title: job.job_title,
+    location: job.location ?? null,
+    type: job.type ?? null,
+    team: job.team ?? null,
+    full_name,
+    email,
+    phone: phone?.trim() || null,
+    cover_letter: cover_letter?.trim() || null,
+    resume_url: resumeUrl,
+    resume_storage_path: objectPath,
+    resume_file_name: safeName,
+    resume_mime_type: resume.type,
+    resume_size_bytes: resume.size,
+    submitted_at: new Date().toISOString(),
+  })
+
   return NextResponse.json({ ok: true })
+}
+
+type ApplicationWebhookPayload = {
+  career_id: string
+  job_title: string
+  location: string | null
+  type: string | null
+  team: string | null
+  full_name: string
+  email: string
+  phone: string | null
+  cover_letter: string | null
+  resume_url: string
+  resume_storage_path: string
+  resume_file_name: string
+  resume_mime_type: string
+  resume_size_bytes: number
+  submitted_at: string
+}
+
+/** Fire-and-forget notification to the automations webhook; failures are logged but do not fail the submission. */
+async function notifyApplicationWebhook(payload: ApplicationWebhookPayload): Promise<void> {
+  const url = process.env.CAREERS_APPLICATION_WEBHOOK_URL?.trim()
+  if (!url) return
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) {
+      console.error(
+        `[careers/apply] webhook responded ${res.status} ${res.statusText}`
+      )
+    }
+  } catch (err) {
+    console.error("[careers/apply] webhook request failed", err)
+  }
 }

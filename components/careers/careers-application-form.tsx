@@ -39,6 +39,12 @@ export default function CareersApplicationForm({
   }, [openCareers, fallbackCareerId, preferredCareerId])
 
   const [careerId, setCareerId] = useState<string>(initialCareerId ?? "")
+
+  /** When rendered on a specific job page, lock the selector to that role so candidates cannot apply to a different one by accident. */
+  const lockedRole = useMemo(() => {
+    if (!preferredCareerId) return null
+    return openCareers.find((c) => c.id === preferredCareerId) ?? null
+  }, [openCareers, preferredCareerId])
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
@@ -133,27 +139,42 @@ export default function CareersApplicationForm({
       ) : null}
 
       {openCareers.length > 0 ? (
-        <div className="space-y-2">
-          <label htmlFor="career_id" className="text-sm font-medium text-foreground">
-            Role
-          </label>
-          <select
-            id="career_id"
-            name="career_id"
-            value={careerId}
-            onChange={(e) => setCareerId(e.target.value)}
-            required
-            className="w-full rounded-xl border border-grey-200 bg-white px-4 py-3 text-foreground text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
-          >
-            {openCareers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.job_title}
-                {c.location ? ` — ${c.location}` : ""}
-                {c.type ? ` (${c.type})` : ""}
-              </option>
-            ))}
-          </select>
-        </div>
+        lockedRole ? (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Applying for</label>
+            <div className="rounded-xl border border-grey-200 bg-grey-50 px-4 py-3">
+              <p className="text-sm font-semibold text-foreground">{lockedRole.job_title}</p>
+              {lockedRole.location || lockedRole.type ? (
+                <p className="mt-0.5 text-xs text-grey-400">
+                  {[lockedRole.location, lockedRole.type].filter(Boolean).join(" · ")}
+                </p>
+              ) : null}
+            </div>
+            <input type="hidden" name="career_id" value={careerId} />
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <label htmlFor="career_id" className="text-sm font-medium text-foreground">
+              Role
+            </label>
+            <select
+              id="career_id"
+              name="career_id"
+              value={careerId}
+              onChange={(e) => setCareerId(e.target.value)}
+              required
+              className="w-full rounded-xl border border-grey-200 bg-white px-4 py-3 text-foreground text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
+            >
+              {openCareers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.job_title}
+                  {c.location ? ` — ${c.location}` : ""}
+                  {c.type ? ` (${c.type})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+        )
       ) : (
         <div className="rounded-xl bg-grey-100 border border-grey-200 px-4 py-3 text-sm text-grey-600">
           Applying to the <strong className="text-foreground">general talent pool</strong> (configured fallback role).

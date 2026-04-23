@@ -3,7 +3,7 @@ import { filterOpenCareers, type CareerRow } from "@/lib/careers"
 import CareersApplicationForm from "@/components/careers/careers-application-form"
 import CareerDescriptionHtml from "@/components/careers/career-description-html"
 import type { LucideIcon } from "lucide-react"
-import { ArrowLeft, Briefcase, Clock, MapPin, Sparkles, Users } from "lucide-react"
+import { ArrowLeft, Briefcase, Clock, MapPin, Users } from "lucide-react"
 
 type Props = {
   career: CareerRow
@@ -126,48 +126,27 @@ export default function CareerJobDetailView({
               </div>
             </div>
 
-            <aside className="lg:col-span-4">
-              <div className="space-y-6 lg:sticky lg:top-28">
-                <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
-                  <h3 className="font-heading text-lg font-semibold text-foreground">Quick snapshot</h3>
-                  <ul className="mt-4 space-y-3 text-sm text-grey-400">
-                    <li className="flex gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ignite-orange" aria-hidden />
-                      Async-friendly interviews with clear expectations at each step.
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ignite-orange" aria-hidden />
-                      Small teams; you will touch production early—not slide decks.
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ignite-orange" aria-hidden />
-                      We read every application; a human reviews your resume and note.
-                    </li>
-                  </ul>
-                  <a
-                    href="#apply"
-                    className="mt-6 flex w-full items-center justify-center rounded-full bg-foreground py-3.5 text-sm font-semibold text-white transition hover:bg-grey-800"
-                  >
-                    Jump to application
-                  </a>
+            <aside id="apply" className="scroll-mt-24 lg:col-span-4">
+              <div className="space-y-4 lg:sticky lg:top-28">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-ignite-orange" />
+                  <span className="font-heading text-sm font-medium uppercase tracking-wider text-ignite-orange">
+                    Apply for this role
+                  </span>
                 </div>
-
-                <div className="rounded-2xl border border-ignite-orange/25 bg-peach-light p-6">
-                  <div className="flex items-center gap-2 text-ignite-orange">
-                    <Sparkles className="h-5 w-5" aria-hidden />
-                    <h3 className="font-heading text-lg font-semibold text-foreground">Questions first?</h3>
-                  </div>
-                  <p className="mt-2 text-sm text-grey-600">
-                    Email us about this listing, visa/contracting, or timelines—we are happy to clarify before you
-                    invest time in a take-home.
-                  </p>
-                  <a
-                    href={`mailto:careers@digiimark.com?subject=${encodeURIComponent(`Question: ${career.job_title}`)}`}
-                    className="mt-4 inline-flex text-sm font-semibold text-ignite-orange hover:underline"
-                  >
-                    careers@digiimark.com
-                  </a>
-                </div>
+                <h3 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
+                  Send us your application
+                </h3>
+                <p className="text-sm text-grey-400">
+                  Resume PDF or Word (5 MB max). A human reviews every application.
+                </p>
+                <CareersApplicationForm
+                  careers={openCareers}
+                  listError={listError}
+                  fallbackCareerId={fallbackCareerId}
+                  preferredCareerId={career.id}
+                  compact
+                />
               </div>
             </aside>
           </div>
@@ -258,43 +237,6 @@ export default function CareerJobDetailView({
         </section>
       ) : null}
 
-      {/* Apply — side-by-side on large screens so the block fits the viewport better */}
-      <section
-        id="apply"
-        className="scroll-mt-24 border-t border-grey-200 bg-dark-surface pt-12 pb-16 mb-10 md:pt-14 md:pb-20 md:mb-12"
-      >
-        <div className="mx-auto w-full max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
-            <div className="text-center lg:col-span-4 lg:text-left">
-              <div className="mb-3 flex justify-center lg:justify-start">
-                <div className="h-2 w-2 rounded-full bg-ignite-orange" />
-              </div>
-              <span className="font-heading text-sm font-medium uppercase tracking-wider text-ignite-orange">
-                Application
-              </span>
-              <h2 className="mt-3 font-heading text-2xl font-semibold tracking-tight text-white md:text-3xl">
-                Ready to talk?
-              </h2>
-              <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-white/60 lg:mx-0 lg:max-w-none">
-                Resume PDF or Word (5 MB max). Role stays pre-selected; add links to work you are proud of in the cover
-                note.
-              </p>
-              <p className="mx-auto mt-6 max-w-sm text-caption leading-relaxed text-white/45 lg:mx-0 lg:max-w-none">
-                Equal opportunity employer — we evaluate on skills, evidence, and values fit.
-              </p>
-            </div>
-            <div className="lg:col-span-8">
-              <CareersApplicationForm
-                careers={openCareers}
-                listError={listError}
-                fallbackCareerId={fallbackCareerId}
-                preferredCareerId={career.id}
-                compact
-              />
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   )
 }
