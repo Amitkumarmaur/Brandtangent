@@ -1,7 +1,9 @@
 import type React from "react"
+import { Suspense } from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Poppins } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import ScrollToTop from "@/components/scroll-to-top"
 import "./globals.css"
 
 const inter = Inter({
@@ -45,6 +47,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
       <body className="font-sans antialiased">
+        <Suspense fallback={null}>
+          <ScrollToTop />
+        </Suspense>
         {children}
         <Analytics />
       </body>

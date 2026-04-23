@@ -250,8 +250,14 @@
   color: var(--grey-400);
 }
 
-/* Smooth scrolling */
-html {
+/* Smooth scrolling for in-page anchors only.
+ * Using :has(:target) scopes smooth scrolling to when an anchor with matching id
+ * exists in the DOM (i.e. the user just clicked an in-page link like #contact).
+ * During cross-page navigation there is no :target, so the browser performs an
+ * instant scroll-to-top — preventing the bug where users get stranded at the
+ * bottom of the new page because a smooth-scroll animation was interrupted.
+ */
+html:has(:target) {
   scroll-behavior: smooth;
 }
 
