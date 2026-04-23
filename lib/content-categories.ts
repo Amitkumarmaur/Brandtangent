@@ -363,15 +363,24 @@ export type CaseStudyContentCategoryJoin = {
   content_categories: ContentCategory | null
 }
 
+/**
+ * Case study row as returned from Supabase with both joins:
+ *   - `case_study_content_categories` (m-n topic taxonomy, legacy but still used by blogs)
+ *   - `industries` (single-select industry via `industry_id` FK)
+ *   - `services` (single-select service via `linked_service_id` FK)
+ */
 export type CaseStudyRowWithCategories = {
   id: string
   slug: string
   h1_title?: string | null
   brief_description?: string | null
   hero_image?: string | null
-  industry?: string | null
+  industry_id?: string | null
+  linked_service_id?: string | null
   display_order?: number | null
   case_study_content_categories?: CaseStudyContentCategoryJoin[] | null
+  industries?: { id: string; name: string; slug: string; display_order: number } | null
+  services?: { id: string; name: string; slug: string; display_order: number | null } | null
 }
 
 export type CaseStudyListItem = {
@@ -380,7 +389,14 @@ export type CaseStudyListItem = {
   title: string
   excerpt: string
   image_url: string
+  /** Human-readable industry name resolved from the `industries` FK join. */
   industry: string
+  /** Industry slug (for filtering). Empty string when no industry is set. */
+  industry_slug: string
+  /** Human-readable service name resolved from the `services` FK join. */
+  service_name: string
+  /** Service slug (for filtering). Empty string when no service is linked. */
+  service_slug: string
   content_categories?: ContentCategory[]
 }
 
@@ -391,7 +407,9 @@ const CASE_STUDY_LIST_SELECT = `
   *,
   case_study_content_categories (
     content_categories ( id, name, slug, display_order )
-  )
+  ),
+  industries:industry_id ( id, name, slug, display_order ),
+  services:linked_service_id ( id, name, slug, display_order )
 `
 
 export function flattenCaseStudyContentCategories(row: CaseStudyRowWithCategories): ContentCategory[] {
@@ -408,13 +426,20 @@ export function flattenCaseStudyContentCategories(row: CaseStudyRowWithCategorie
 export function caseStudyRowToListItem(row: CaseStudyRowWithCategories): CaseStudyListItem {
   const content_categories = flattenCaseStudyContentCategories(row)
   const img = (row.hero_image ?? "").trim()
+  const industryName = (row.industries?.name ?? "").trim()
+  const industrySlug = (row.industries?.slug ?? "").trim()
+  const serviceName = (row.services?.name ?? "").trim()
+  const serviceSlug = (row.services?.slug ?? "").trim()
   return {
     id: row.id,
     slug: row.slug,
     title: (row.h1_title ?? "").trim() || "Case study",
     excerpt: (row.brief_description ?? "").trim(),
     image_url: img || CASE_STUDY_CARD_FALLBACK_IMAGE,
-    industry: (row.industry ?? "").trim() || "B2B",
+    industry: industryName || "B2B",
+    industry_slug: industrySlug,
+    service_name: serviceName,
+    service_slug: serviceSlug,
     content_categories: content_categories.length ? content_categories : undefined,
   }
 }
@@ -501,6 +526,28 @@ export async function fetchCaseStudiesForCategoryFilter(categorySlug: string | n
     .select(CASE_STUDY_LIST_SELECT)
     .eq("published", true)
     .in("id", ids)
+    .order("display_order", { ascending: true })
+
+  return {
+    data: (data as CaseStudyRowWithCategories[] | null) ?? null,
+    error: error ? new Error(error.message) : null,
+  }
+}
+
+/**
+ * Fetches every published case study with the joins needed to power the
+ * /case-studies index (topics + industry + service). The grid filters are
+ * applied client-side against this list, so we only hit Supabase once per
+ * visit regardless of how many facets the user toggles.
+ */
+export async function fetchAllPublishedCaseStudies(): Promise<{
+  data: CaseStudyRowWithCategories[] | null
+  error: Error | null
+}> {
+  const { data, error } = await supabase
+    .from("case_studies")
+    .select(CASE_STUDY_LIST_SELECT)
+    .eq("published", true)
     .order("display_order", { ascending: true })
 
   return {

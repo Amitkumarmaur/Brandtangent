@@ -51,11 +51,13 @@ export default async function CaseStudyPage({
 
   const { data: cs, error } = await supabase
     .from("case_studies")
-    .select("*")
+    .select("*, industries:industry_id ( id, name, slug )")
     .eq("slug", resolvedParams.slug)
     .single()
 
   if (error || !cs) return notFound()
+
+  const industryName: string | null = cs.industries?.name ?? null
 
   const contentCategories = await fetchCaseStudyContentCategories(cs.id)
   const contentTopicNames =
@@ -126,7 +128,7 @@ export default async function CaseStudyPage({
 
         {/* 2. OVERVIEW ROW — industry, service, client */}
         <CaseStudyOverview
-          industry={cs.industry}
+          industry={industryName}
           serviceName={serviceName}
           clientName={client?.client_name}
           clientWebsite={client?.website_url}
