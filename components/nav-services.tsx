@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { ChevronDown, ChevronRight } from "lucide-react"
-import { servicesCategorySectionId } from "@/lib/services-anchors"
+import { categoryUrl } from "@/lib/services-urls"
 
 export type NavServiceCategoryRow = {
   id: string
@@ -13,8 +13,7 @@ export type NavServiceCategoryRow = {
 }
 
 function categoryHref(cat: NavServiceCategoryRow): string {
-  const hash = servicesCategorySectionId(cat.slug?.trim() || null, cat.name)
-  return `/services#${hash}`
+  return categoryUrl(cat.slug)
 }
 
 export function NavServicesDesktop({ categories }: { categories: NavServiceCategoryRow[] }) {

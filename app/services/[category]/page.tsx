@@ -1,0 +1,325 @@
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import Header from "@/components/header"
+import Footer from "@/components/footer"
+import CategoryHero, { type CategoryHeroProject } from "@/components/services/category-hero"
+import ServiceFeatures from "@/components/services/service-features"
+import CategoryServicesGrid, { type CategoryService } from "@/components/services/category-services-grid"
+import ServiceProcessGrid from "@/components/services/service-process-grid"
+import ServiceIndustries from "@/components/services/service-industries"
+import ServiceTechStack from "@/components/services/service-tech-stack"
+import ServiceCTA from "@/components/services/service-cta"
+import { supabase } from "@/lib/supabase"
+import { deviconLogoForPlatformName } from "@/lib/devicon-platform-logos"
+
+export const revalidate = 60
+
+type ServiceCategoryRecord = {
+  id: string
+  name: string
+  slug: string
+  icon: string | null
+  display_order: number | null
+  hero_display_title: string | null
+  hero_description: string | null
+  hero_animated_words: string[] | null
+  hero_stat_value: string | null
+  hero_stat_label: string | null
+  featured_projects: unknown
+  expertise_badge: string | null
+  expertise_title: string | null
+  expertise_subtitle: string | null
+  process_heading: string | null
+  process_description: string | null
+  process_steps: unknown
+  tech_stack_ids: string[] | null
+  target_industries: unknown
+  seo_title: string | null
+  meta_description: string | null
+}
+
+type ProcessStepRow = { title?: string | null; items?: string[] | null }
+type IndustryRow = {
+  industry?: string | null
+  headline?: string | null
+  services?: string | null
+  yearsExp?: number | null
+  clients?: number | null
+  clientLabel?: string | null
+  image?: string | null
+  caseStudies?: { name?: string | null; bg?: string | null }[] | null
+}
+type FeaturedProjectRow = {
+  id?: number | string
+  title?: string
+  image?: string
+  category?: string
+  flag?: string
+  accent?: string
+  uiColors?: string[]
+  stat?: { value?: string; label?: string }
+}
+
+function asArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : []
+}
+
+export async function generateStaticParams() {
+  const { data } = await supabase.from("service_categories").select("slug")
+  return (data ?? [])
+    .map((row: { slug: string | null }) => row.slug?.trim())
+    .filter((slug): slug is string => Boolean(slug))
+    .map((slug) => ({ category: slug }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ category: string }>
+}): Promise<Metadata> {
+  const { category } = await params
+  const { data } = await supabase
+    .from("service_categories")
+    .select("name, seo_title, meta_description, hero_description")
+    .eq("slug", category)
+    .single()
+
+  if (!data) return { title: "Services | DigiiMark" }
+
+  const title = data.seo_title || `${data.name} Services | DigiiMark`
+  const description =
+    data.meta_description || data.hero_description || `Explore ${data.name} services from DigiiMark.`
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: "website" },
+  }
+}
+
+export default async function ServiceCategoryPage({
+  params,
+}: {
+  params: Promise<{ category: string }>
+}) {
+  const { category } = await params
+
+  const { data: categoryRow, error: categoryError } = await supabase
+    .from("service_categories")
+    .select(
+      "id, name, slug, icon, display_order, hero_display_title, hero_description, hero_animated_words, hero_stat_value, hero_stat_label, featured_projects, expertise_badge, expertise_title, expertise_subtitle, process_heading, process_description, process_steps, tech_stack_ids, target_industries, seo_title, meta_description",
+    )
+    .eq("slug", category)
+    .single<ServiceCategoryRecord>()
+
+  if (categoryError || !categoryRow) {
+    notFound()
+  }
+
+  const [{ data: servicesData }, platformsRes] = await Promise.all([
+    supabase
+      .from("services")
+      .select(
+        "id, slug, name, hero_h1, hero_description, hero_image, short_description, description, display_order",
+      )
+      .eq("category_id", categoryRow.id)
+      .order("display_order", { ascending: true, nullsFirst: false }),
+    categoryRow.tech_stack_ids && categoryRow.tech_stack_ids.length > 0
+      ? supabase
+          .from("platforms")
+          .select("id, platform_name, logo")
+          .in("id", categoryRow.tech_stack_ids)
+      : Promise.resolve({ data: [] as { id: string; platform_name: string; logo: string | null }[] }),
+  ])
+
+  const services = (servicesData ?? []) as CategoryService[]
+
+  // Featured projects → hero slider
+  const featured = asArray<FeaturedProjectRow>(categoryRow.featured_projects)
+  const projects: CategoryHeroProject[] = featured
+    .map((p, i): CategoryHeroProject | null => {
+      if (!p?.title || !p?.image) return null
+      return {
+        id: p.id ?? i + 1,
+        title: p.title,
+        image: p.image,
+        category: p.category ?? categoryRow.name,
+        flag: p.flag,
+        accent: p.accent ?? "#FF5722",
+        uiColors: p.uiColors,
+        stat: {
+          value: p.stat?.value ?? "",
+          label: p.stat?.label ?? "",
+        },
+      }
+    })
+    .filter((p): p is CategoryHeroProject => p !== null)
+
+  // Expertise accordion uses the category's child services as "features"
+  const expertiseFeatures = services
+    .map((s) => ({
+      title: s.name,
+      description:
+        (s.short_description ?? s.hero_description ?? s.description ?? "").trim() ||
+        `Learn more about ${s.name} at DigiiMark.`,
+    }))
+    .slice(0, 8)
+
+  // Process steps
+  const processPhases = asArray<ProcessStepRow>(categoryRow.process_steps)
+    .map((step) => ({
+      title: (step.title ?? "").trim(),
+      items: Array.isArray(step.items) ? step.items.filter((i): i is string => Boolean(i)) : [],
+    }))
+    .filter((step) => step.title && step.items.length > 0)
+
+  // Target industries (matches ServiceIndustries shape exactly)
+  const industryRows = asArray<IndustryRow>(categoryRow.target_industries)
+  const industries = industryRows
+    .map((row) => ({
+      industry: (row.industry ?? "").trim(),
+      headline: (row.headline ?? "").trim(),
+      services: (row.services ?? "").trim(),
+      yearsExp: row.yearsExp ?? 0,
+      clients: row.clients ?? 0,
+      clientLabel: (row.clientLabel ?? "").trim(),
+      image: (row.image ?? "").trim() ||
+        "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=900&q=80",
+      caseStudies: Array.isArray(row.caseStudies)
+        ? row.caseStudies
+            .map((cs) => ({ name: (cs?.name ?? "").trim(), bg: (cs?.bg ?? "#111").trim() || "#111" }))
+            .filter((cs) => cs.name)
+        : [],
+    }))
+    .filter((i) => i.industry && i.headline)
+
+  // Tech stack
+  const platforms = (platformsRes.data ?? []) as {
+    id: string
+    platform_name: string
+    logo: string | null
+  }[]
+  const techStackData = platforms.length
+    ? platforms.map((p) => {
+        const n = p.platform_name.toLowerCase()
+        let color = "#ffffff"
+        if (n.includes("hubspot")) color = "#FF7A59"
+        else if (n.includes("salesforce")) color = "#00A1E0"
+        else if (n.includes("zapier")) color = "#FF4A00"
+        else if (n.includes("make")) color = "#5C0099"
+        else if (n.includes("n8n")) color = "#EA4B71"
+        else if (n.includes("wordpress")) color = "#21759B"
+        else if (n.includes("shopify")) color = "#95BF47"
+        else if (n.includes("chatgpt")) color = "#10A37F"
+        else if (n.includes("claude")) color = "#D97757"
+        else if (n.includes("next")) color = "#ffffff"
+        else if (n.includes("react")) color = "#61DAFB"
+        else if (n.includes("node")) color = "#339933"
+        else if (n.includes("postgres")) color = "#4169E1"
+        else if (n.includes("tailwind")) color = "#06B6D4"
+        else if (n.includes("google")) color = "#4285F4"
+        else if (n.includes("meta")) color = "#0081FB"
+        else if (n.includes("linkedin")) color = "#0A66C2"
+        else if (n.includes("instagram")) color = "#E1306C"
+        else if (n.includes("facebook")) color = "#1877F2"
+        return {
+          name: p.platform_name,
+          logo: deviconLogoForPlatformName(p.platform_name) ?? p.logo ?? null,
+          color,
+        }
+      })
+    : undefined
+
+  const heroDisplayTitle = (categoryRow.hero_display_title ?? categoryRow.name).trim() || categoryRow.name
+  const heroDescription =
+    (categoryRow.hero_description ?? "").trim() ||
+    `Explore our ${categoryRow.name.toLowerCase()} capabilities.`
+  const expertiseTitle =
+    (categoryRow.expertise_title ?? "").trim() || `End-to-End ${categoryRow.name}`
+  const expertiseSubtitle =
+    (categoryRow.expertise_subtitle ?? "").trim() ||
+    `Our complete suite of ${categoryRow.name.toLowerCase()} capabilities, built to compound over time.`
+  const processHeading =
+    (categoryRow.process_heading ?? "").trim() || `Our ${categoryRow.name} Process`
+  const processDescription =
+    (categoryRow.process_description ?? "").trim() ||
+    `A transparent, phased approach to delivering ${categoryRow.name.toLowerCase()} outcomes that stay maintainable.`
+
+  return (
+    <main>
+      <Header />
+      <div data-theme="dark">
+        <CategoryHero
+          badge={categoryRow.name}
+          displayTitle={heroDisplayTitle}
+          description={heroDescription}
+          animatedWords={categoryRow.hero_animated_words ?? undefined}
+          statValue={categoryRow.hero_stat_value}
+          statLabel={categoryRow.hero_stat_label}
+          projects={projects}
+        />
+      </div>
+
+      {expertiseFeatures.length > 0 ? (
+        <div data-theme="light">
+          <ServiceFeatures
+            badge={(categoryRow.expertise_badge ?? "Our Expertise").trim() || "Our Expertise"}
+            title={expertiseTitle}
+            subtitle={expertiseSubtitle}
+            features={expertiseFeatures}
+          />
+        </div>
+      ) : null}
+
+      {services.length > 0 ? (
+        <div data-theme="light">
+          <CategoryServicesGrid
+            badge="Capabilities"
+            title={`${categoryRow.name} services we deliver`}
+            subtitle={`Drill into any capability below to see methodology, tech stack, and proof points specific to that ${categoryRow.name.toLowerCase()} offering.`}
+            categorySlug={categoryRow.slug}
+            services={services}
+          />
+        </div>
+      ) : null}
+
+      {processPhases.length > 0 ? (
+        <div data-theme="light">
+          <ServiceProcessGrid
+            title={processHeading}
+            description={processDescription}
+            phases={processPhases}
+          />
+        </div>
+      ) : null}
+
+      {techStackData && techStackData.length > 0 ? (
+        <div data-theme="dark">
+          <ServiceTechStack
+            title={`${categoryRow.name}\nTechnology Stack`}
+            techStack={techStackData}
+          />
+        </div>
+      ) : null}
+
+      {industries.length > 0 ? (
+        <div data-theme="dark">
+          <ServiceIndustries
+            title={`Proven ${categoryRow.name} results across industries`}
+            industries={industries}
+          />
+        </div>
+      ) : null}
+
+      <div data-theme="dark">
+        <ServiceCTA
+          title={`Ready to compound your ${categoryRow.name.toLowerCase()}?`}
+          subtitle="Tell us about your stack, pipeline goals, and timeline. We will recommend a phased roadmap that compounds over quarters, not weeks of vanity work."
+          buttonText="Talk to DigiiMark"
+        />
+      </div>
+
+      <Footer />
+    </main>
+  )
+}

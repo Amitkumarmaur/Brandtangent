@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
-import { servicesCategorySectionId } from "@/lib/services-anchors"
+import { categoryUrl, serviceUrl } from "@/lib/services-urls"
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=1200&h=675"
@@ -55,7 +55,13 @@ function buildSections(categories: ServiceCategoryRow[], services: ServiceListRo
   return sections
 }
 
-function ServiceCard({ service }: { service: ServiceListRow }) {
+function ServiceCard({
+  service,
+  categorySlug,
+}: {
+  service: ServiceListRow
+  categorySlug: string | null
+}) {
   const title = (service.hero_h1 ?? service.name).trim() || "Service"
   const blurb =
     (service.short_description ?? service.hero_description ?? service.description ?? "").trim() || ""
@@ -63,7 +69,7 @@ function ServiceCard({ service }: { service: ServiceListRow }) {
 
   return (
     <Link
-      href={`/services/${service.slug}`}
+      href={serviceUrl(categorySlug, service.slug)}
       className="group flex flex-col h-full rounded-[1.5rem] overflow-hidden border border-grey-200 bg-white shadow-sm hover:shadow-md hover:border-grey-300 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-grey-100">
@@ -154,11 +160,7 @@ export default function ServicesDirectory({
         ) : (
           <div className="space-y-16 md:space-y-20">
             {sections.map((section) => (
-              <section
-                key={section.heading}
-                id={servicesCategorySectionId(section.slug, section.heading)}
-                className="scroll-mt-28"
-              >
+              <section key={section.heading} className="scroll-mt-28">
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 md:mb-10">
                   <div>
                     <div className="flex items-center gap-2 mb-3">
@@ -169,10 +171,19 @@ export default function ServicesDirectory({
                     </div>
                     <h2 className="heading-h2 text-foreground">{section.heading}</h2>
                   </div>
+                  {section.slug ? (
+                    <Link
+                      href={categoryUrl(section.slug)}
+                      className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-ignite-orange transition-colors"
+                    >
+                      View {section.heading} page
+                      <ArrowUpRight className="w-4 h-4" aria-hidden />
+                    </Link>
+                  ) : null}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
                   {section.services.map((s) => (
-                    <ServiceCard key={s.id} service={s} />
+                    <ServiceCard key={s.id} service={s} categorySlug={section.slug} />
                   ))}
                 </div>
               </section>
