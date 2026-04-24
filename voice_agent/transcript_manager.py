@@ -1,95 +1,91 @@
 """
-transcript_manager.py — Save call transcripts and maintain the calls log.
+transcript_manager.py — Persist call transcripts to Supabase.
 
-After every conversation:
-  1. Writes a Markdown transcript to transcripts/YYYY-MM-DD_HH-MM-SS_<id>.md
-  2. Appends a metadata record to transcripts/calls_log.json
+Writes three tables:
+  * voice_calls            — one row per call
+  * voice_call_turns       — one row per conversation turn
+  * voice_call_tool_calls  — one row per tool invocation
 
-calls_log.json format:
-[
-  {
-    "call_id":         "abc123",
-    "date":            "2026-04-15",
-    "time":            "11:30:00",
-    "duration_seconds": 180,
-    "transcript_file": "transcripts/2026-04-15_11-30-00_abc123.md",
-    "topics":          ["pricing", "SEO", "appointment"],
-    "tools_used":      ["calendar_tool"],
-    "turn_count":      12
-  },
-  ...
-]
+Calls are created on start_call() (so they appear in admin dashboards while
+still live). Turns and tool calls are buffered in memory during the call and
+flushed in a single batched write from end_call() — this keeps the Gemini
+Live loop latency-free.
+
+Public interface is preserved from the previous file-based implementation so
+server.py and agent.py do not need to change call sites.
 """
 
 from __future__ import annotations
 
-import json
 import logging
+import os
+import sys
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
 import config
+from supabase_client import get_client
 
 logger = logging.getLogger(__name__)
 
 
-# ─── Data models (plain dicts for simplicity) ─────────────────────────────────
-
 def _make_call_id() -> str:
+    """8-char hex id, matches the previous format for easy cross-referencing."""
     return uuid.uuid4().hex[:8]
 
 
-# ─── Transcript Writer ────────────────────────────────────────────────────────
-
 class TranscriptManager:
     """
-    Manages saving call transcripts and the master calls log.
-
     Usage:
         tm = TranscriptManager()
-        call_id = tm.start_call()
+        call_id = tm.start_call(caller_metadata={"source": "web"})
 
-        # During the call:
         tm.add_turn(call_id, role="user", content="Hello")
         tm.add_turn(call_id, role="assistant", content="Hi! How can I help?")
-        tm.add_tool_call(call_id, tool_name="calendar_tool", args={...}, result={...})
+        tm.add_tool_call(call_id, "calendar_tool", {...}, {...})
 
-        # After the call:
         tm.end_call(call_id, topics=["pricing"])
     """
 
-    def __init__(self):
-        config.TRANSCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
-        self._calls: Dict[str, Dict[str, Any]] = {}  # in-memory, keyed by call_id
+    def __init__(self) -> None:
+        # In-memory buffer: {call_id: {"started_at", "turns", "tool_calls"}}
+        self._calls: Dict[str, Dict[str, Any]] = {}
 
-    # ── Call lifecycle ─────────────────────────────────────────────────────
+    # ── Lifecycle ──────────────────────────────────────────────────────────
 
-    def start_call(self) -> str:
-        """Initialize a new call record. Returns the call_id."""
+    def start_call(self, caller_metadata: Optional[Dict[str, Any]] = None) -> str:
+        """Insert a voice_calls row and start buffering turns/tool calls."""
         call_id = _make_call_id()
         now = datetime.now(tz=timezone.utc)
+
         self._calls[call_id] = {
-            "call_id": call_id,
             "started_at": now,
-            "turns": [],          # List[{"role": str, "content": str, "ts": str}]
-            "tool_calls": [],     # List[{"tool": str, "args": dict, "result": dict, "ts": str}]
+            "turns": [],
+            "tool_calls": [],
         }
-        logger.info("📞 Call started | ID: %s", call_id)
+
+        try:
+            get_client().table("voice_calls").insert({
+                "call_id": call_id,
+                "started_at": now.isoformat(),
+                "agent_name": config.AGENT_NAME,
+                "voice_name": config.AGENT_VOICE,
+                "model": config.LIVE_MODEL,
+                "caller_metadata": caller_metadata or {},
+            }).execute()
+        except Exception as exc:
+            logger.warning(
+                "Could not insert voice_calls row (call will still be buffered): %s",
+                exc,
+            )
+
+        logger.info("Call started | ID: %s", call_id)
         return call_id
 
     def add_turn(self, call_id: str, role: str, content: str) -> None:
-        """
-        Record a conversation turn.
-
-        Args:
-            call_id: The active call identifier.
-            role:    "user" or "assistant".
-            content: Transcribed text of the turn.
-        """
+        """Buffer a conversation turn (in memory until end_call)."""
         call = self._calls.get(call_id)
         if not call:
             logger.warning("add_turn: unknown call_id %s", call_id)
@@ -97,7 +93,7 @@ class TranscriptManager:
         call["turns"].append({
             "role": role,
             "content": content,
-            "ts": datetime.now(tz=timezone.utc).isoformat(),
+            "ts": datetime.now(tz=timezone.utc),
         })
 
     def add_tool_call(
@@ -107,167 +103,120 @@ class TranscriptManager:
         args: Dict[str, Any],
         result: Dict[str, Any],
     ) -> None:
-        """Record a tool invocation and its result."""
+        """Buffer a tool invocation."""
         call = self._calls.get(call_id)
         if not call:
             return
         call["tool_calls"].append({
             "tool": tool_name,
-            "args": args,
-            "result": result,
-            "ts": datetime.now(tz=timezone.utc).isoformat(),
+            "args": args or {},
+            "result": result or {},
+            "ts": datetime.now(tz=timezone.utc),
         })
 
     def end_call(
         self,
         call_id: str,
         topics: Optional[List[str]] = None,
-    ) -> Optional[Path]:
-        """
-        Finalise the call, write the transcript, and update calls_log.json.
-
-        Args:
-            call_id: The call to finalise.
-            topics:  Optional list of topics discussed (used in the log).
-
-        Returns:
-            Path to the written transcript file, or None on error.
-        """
+    ) -> None:
+        """Flush buffered turns/tool calls and finalise the voice_calls row."""
         call = self._calls.pop(call_id, None)
         if not call:
             logger.error("end_call: unknown call_id %s", call_id)
-            return None
+            return
 
         ended_at = datetime.now(tz=timezone.utc)
         started_at: datetime = call["started_at"]
         duration = int((ended_at - started_at).total_seconds())
 
-        date_str = started_at.strftime("%Y-%m-%d")
-        time_str = started_at.strftime("%H-%M-%S")
-        filename = f"{date_str}_{time_str}_{call_id}.md"
-        transcript_path = config.TRANSCRIPTS_DIR / filename
+        client = get_client()
 
-        # ── Write Markdown transcript ──────────────────────────────────────
-        md = self._render_markdown(call, date_str, time_str, duration, topics or [])
-        try:
-            transcript_path.write_text(md, encoding="utf-8")
-            logger.info("📝 Transcript saved: %s", filename)
-        except IOError as exc:
-            logger.error("Failed to write transcript: %s", exc)
-            return None
-
-        # ── Update calls_log.json ──────────────────────────────────────────
-        tools_used = list({tc["tool"] for tc in call["tool_calls"]})
-        log_entry = {
-            "call_id": call_id,
-            "date": date_str,
-            "time": started_at.strftime("%H:%M:%S"),
-            "duration_seconds": duration,
-            "transcript_file": str(transcript_path),
-            "topics": topics or [],
-            "tools_used": tools_used,
-            "turn_count": len(call["turns"]),
-        }
-        self._append_to_log(log_entry)
-
-        return transcript_path
-
-    # ── Rendering ──────────────────────────────────────────────────────────
-
-    def _render_markdown(
-        self,
-        call: Dict[str, Any],
-        date_str: str,
-        time_str: str,
-        duration_seconds: int,
-        topics: List[str],
-    ) -> str:
-        lines = [
-            "# DigiiMark Voice Agent — Call Transcript",
-            "",
-            f"**Call ID:** `{call['call_id']}`  ",
-            f"**Date:** {date_str}  ",
-            f"**Time:** {time_str.replace('-', ':')} UTC  ",
-            f"**Duration:** {duration_seconds // 60}m {duration_seconds % 60}s  ",
-            f"**Topics:** {', '.join(topics) if topics else 'N/A'}  ",
-            "",
-            "---",
-            "",
-            "## Conversation",
-            "",
-        ]
-
-        for turn in call["turns"]:
-            role_label = "🧑 **User**" if turn["role"] == "user" else f"🤖 **{config.AGENT_NAME}**"
-            lines.append(f"{role_label}: {turn['content']}")
-            lines.append("")
-
-        if call["tool_calls"]:
-            lines += [
-                "---",
-                "",
-                "## Tool Calls",
-                "",
+        # Bulk insert turns.
+        if call["turns"]:
+            turn_rows = [
+                {
+                    "call_id": call_id,
+                    "turn_index": i,
+                    "role": t["role"],
+                    "content": t["content"],
+                    "created_at": t["ts"].isoformat(),
+                }
+                for i, t in enumerate(call["turns"])
             ]
-            for tc in call["tool_calls"]:
-                lines.append(f"### `{tc['tool']}`")
-                lines.append(f"**Time:** {tc['ts']}  ")
-                lines.append(f"**Arguments:**")
-                lines.append("```json")
-                lines.append(json.dumps(tc["args"], indent=2, ensure_ascii=False))
-                lines.append("```")
-                lines.append(f"**Result:**")
-                lines.append("```json")
-                lines.append(json.dumps(tc["result"], indent=2, ensure_ascii=False))
-                lines.append("```")
-                lines.append("")
-
-        lines += [
-            "---",
-            "",
-            f"*Generated by DigiiMark Voice Agent ({config.AGENT_NAME}) — {date_str}*",
-        ]
-        return "\n".join(lines)
-
-    # ── Log management ─────────────────────────────────────────────────────
-
-    def _append_to_log(self, entry: Dict[str, Any]) -> None:
-        """Append a call entry to calls_log.json."""
-        log_path = config.CALLS_LOG_PATH
-        existing: List[Dict] = []
-
-        if log_path.exists():
             try:
-                existing = json.loads(log_path.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, IOError):
-                existing = []
+                client.table("voice_call_turns").insert(turn_rows).execute()
+            except Exception as exc:
+                logger.error("Failed to insert voice_call_turns: %s", exc)
 
-        existing.append(entry)
+        # Bulk insert tool calls.
+        if call["tool_calls"]:
+            tool_rows = [
+                {
+                    "call_id": call_id,
+                    "tool_name": tc["tool"],
+                    "args": tc["args"],
+                    "result": tc["result"],
+                    "called_at": tc["ts"].isoformat(),
+                }
+                for tc in call["tool_calls"]
+            ]
+            try:
+                client.table("voice_call_tool_calls").insert(tool_rows).execute()
+            except Exception as exc:
+                logger.error("Failed to insert voice_call_tool_calls: %s", exc)
 
+        tools_used = sorted({tc["tool"] for tc in call["tool_calls"]})
+
+        # Finalise the calls row.
         try:
-            log_path.write_text(
-                json.dumps(existing, indent=2, ensure_ascii=False),
-                encoding="utf-8",
-            )
-        except IOError as exc:
-            logger.error("Failed to update calls_log.json: %s", exc)
+            client.table("voice_calls").update({
+                "ended_at": ended_at.isoformat(),
+                "duration_seconds": duration,
+                "topics": topics or [],
+                "tools_used": tools_used,
+                "turn_count": len(call["turns"]),
+            }).eq("call_id", call_id).execute()
+        except Exception as exc:
+            logger.error("Failed to finalise voice_calls row: %s", exc)
 
-    # ── Query helpers ──────────────────────────────────────────────────────
+        logger.info(
+            "Call %s ended | duration=%ds | turns=%d | tools=%s",
+            call_id, duration, len(call["turns"]), tools_used,
+        )
+
+    # ── Query helpers (used by CLI + /api/calls endpoints) ─────────────────
 
     @staticmethod
-    def load_calls_log() -> List[Dict[str, Any]]:
-        """Return the full calls log as a list of dicts."""
-        if not config.CALLS_LOG_PATH.exists():
-            return []
+    def load_calls_log(limit: int = 50) -> List[Dict[str, Any]]:
+        """Return recent calls (newest first)."""
         try:
-            return json.loads(config.CALLS_LOG_PATH.read_text(encoding="utf-8"))
-        except Exception:
+            res = (
+                get_client()
+                .table("voice_calls")
+                .select("*")
+                .order("started_at", desc=True)
+                .limit(limit)
+                .execute()
+            )
+            return res.data or []
+        except Exception as exc:
+            logger.error("load_calls_log failed: %s", exc)
             return []
 
     @staticmethod
     def find_call(call_id: str) -> Optional[Dict[str, Any]]:
-        """Look up a specific call by ID from the log."""
-        for entry in TranscriptManager.load_calls_log():
-            if entry.get("call_id") == call_id:
-                return entry
-        return None
+        """Look up a single call by ID."""
+        try:
+            res = (
+                get_client()
+                .table("voice_calls")
+                .select("*")
+                .eq("call_id", call_id)
+                .limit(1)
+                .execute()
+            )
+            rows = res.data or []
+            return rows[0] if rows else None
+        except Exception as exc:
+            logger.error("find_call failed: %s", exc)
+            return None

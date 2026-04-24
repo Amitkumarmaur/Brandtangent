@@ -1,41 +1,27 @@
-# DigiiMark Voice AI Agent — Python Dependencies
+# DigiiMark Voice AI Agent — Python dependencies (web/server mode).
+#
+# These are everything needed to run `python server.py` on Railway / a VPS.
+# Terminal mode additionally requires PyAudio — install it separately via
+# `pip install pyaudio` after system dependencies (PortAudio) are in place.
 
-# Gemini AI (Live API + embeddings + function calling)
+# Gemini Live API + embeddings + function calling
 google-genai>=1.0.0
 
-# Vector store for RAG
-faiss-cpu>=1.8.0
-
-# Audio input/output (microphone + speaker)
-PyAudio>=0.2.14
-
-# File system watcher (auto-index knowledge_base/)
-watchdog>=4.0.0
+# Supabase client (RAG retrieval, transcripts, content lookups)
+supabase>=2.0.0
 
 # Environment variables
 python-dotenv>=1.0.0
 
-# Numerical operations (FAISS)
-numpy>=1.26.0
-
-# Token counting for chunking
-tiktoken>=0.7.0
-
-# Document parsing
-pypdf>=4.0.0
-python-docx>=1.1.0
-
-# Async HTTP for webhooks / tools
+# Async HTTP for tool webhooks (Cal.com, lead capture)
 httpx>=0.27.0
 
-# Rich terminal output
+# Rich terminal output (logs + admin CLI)
 rich>=13.0.0
 
-# UUID generation
-uuid>=1.30
+# FastAPI web server for the browser widget
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
 
-# JSON handling (stdlib, listed for clarity)
-# json — stdlib
-
-# Async support
-asyncio-extras>=1.3.2
+# Numerical types (used indirectly by pgvector serialisation and local tests)
+numpy>=1.26.0

@@ -652,26 +652,40 @@
       $('#statusText').textContent = text;
     }
 
-    function addTranscriptMsg(role, text) {
+    // Tracks the active (still-streaming) bubble per role. When a transcript
+    // message arrives with final=false we update the active bubble. When
+    // final=true we seal it and count it toward turnCount.
+    const activeBubble = { user: null, assistant: null };
+
+    function upsertTranscript(role, text, final) {
       const body = $('#transcriptBody');
-      // Clear empty state
       const empty = body.querySelector('.transcript-empty');
       if (empty) empty.remove();
 
-      const div = document.createElement('div');
-      div.className = 'msg';
-      div.innerHTML = `
-        <div class="msg-role ${role}">
-          <div class="msg-role-dot"></div>
-          ${role === 'user' ? 'You' : ($('#agentName') ? $('#agentName').textContent : 'Maya')}
-        </div>
-        <div class="msg-text">${escapeHtml(text)}</div>
-      `;
-      body.appendChild(div);
+      let bubble = activeBubble[role];
+      if (!bubble) {
+        const div = document.createElement('div');
+        div.className = 'msg';
+        div.innerHTML = `
+          <div class="msg-role ${role}">
+            <div class="msg-role-dot"></div>
+            ${role === 'user' ? 'You' : ($('#agentName') ? $('#agentName').textContent : 'Maya')}
+          </div>
+          <div class="msg-text"></div>
+        `;
+        body.appendChild(div);
+        bubble = div.querySelector('.msg-text');
+        activeBubble[role] = bubble;
+      }
+
+      bubble.textContent = text;
       body.scrollTop = body.scrollHeight;
 
-      turnCount++;
-      $('#turnCount').textContent = turnCount + ' turn' + (turnCount !== 1 ? 's' : '');
+      if (final) {
+        activeBubble[role] = null;
+        turnCount++;
+        $('#turnCount').textContent = turnCount + ' turn' + (turnCount !== 1 ? 's' : '');
+      }
     }
 
     function addToolCall(tool, args, result) {
@@ -737,6 +751,10 @@
       btn.disabled = true;
 
       try {
+        // Unlock audio playback inside the user-gesture handler so Chrome's
+        // autoplay policy doesn't leave playbackCtx stuck in "suspended".
+        await ensurePlaybackCtx();
+
         // Get mic access
         micStream = await navigator.mediaDevices.getUserMedia({
           audio: {
@@ -798,7 +816,7 @@
             const msg = JSON.parse(event.data);
 
             if (msg.type === 'transcript') {
-              addTranscriptMsg(msg.role, msg.text);
+              upsertTranscript(msg.role, msg.text, !!msg.final);
             } else if (msg.type === 'tool_call') {
               addToolCall(msg.tool, msg.args, msg.result);
             } else if (msg.type === 'status') {
@@ -875,10 +893,27 @@
 
       // Reset for next call
       turnCount = 0;
+      activeBubble.user = null;
+      activeBubble.assistant = null;
     }
 
     // ─── Audio playback ─────────────────────────────────────────────
-    const playbackCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+    // Created lazily on the first user click so Chrome's autoplay policy
+    // is satisfied. If we create it at module load the context ends up in
+    // the "suspended" state and source.start() plays silence.
+    let playbackCtx = null;
+
+    async function ensurePlaybackCtx() {
+      if (!playbackCtx) {
+        playbackCtx = new (window.AudioContext || window.webkitAudioContext)({
+          sampleRate: 24000,
+        });
+      }
+      if (playbackCtx.state === 'suspended') {
+        try { await playbackCtx.resume(); }
+        catch (e) { console.warn('playbackCtx.resume failed:', e); }
+      }
+    }
 
     function playAudioChunk(arrayBuffer) {
       playQueue.push(arrayBuffer);
@@ -887,6 +922,9 @@
 
     async function drainPlayQueue() {
       isPlaying = true;
+
+      // Safety: make sure the context is alive before we try to play anything.
+      await ensurePlaybackCtx();
 
       while (playQueue.length > 0) {
         const buffer = playQueue.shift();

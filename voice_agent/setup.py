@@ -95,8 +95,9 @@ def copy_env() -> None:
         print()
         print(f"  {YELLOW}{BOLD}ACTION REQUIRED:{RESET}")
         print(f"  Open {BOLD}voice_agent/.env{RESET} and set:")
-        print(f"    {CYAN}GEMINI_API_KEY{RESET} = your key from https://aistudio.google.com/apikey")
-        print(f"    {CYAN}CALENDAR_WEBHOOK_URL{RESET} = your booking webhook URL")
+        print(f"    {CYAN}GEMINI_API_KEY{RESET} = key from https://aistudio.google.com/apikey")
+        print(f"    {CYAN}SUPABASE_URL{RESET} + {CYAN}SUPABASE_SERVICE_ROLE_KEY{RESET} = Supabase project API settings")
+        print(f"    {CYAN}CALCOM_API_KEY{RESET} + {CYAN}CALCOM_EVENT_TYPE_ID{RESET} = Cal.com (booking)")
 
 
 def test_gemini(venv_python: Path) -> None:
@@ -168,12 +169,12 @@ def print_next_steps() -> None:
     print()
     print(f"  4. Useful commands:")
     print(f"       {BOLD}python main.py --list-devices{RESET}   # List audio devices")
-    print(f"       {BOLD}python main.py --index-only{RESET}     # Re-index knowledge base")
-    print(f"       {BOLD}python main.py --list-calls{RESET}     # View call history")
+    print(f"       {BOLD}python main.py --sync-kb{RESET}        # Re-sync knowledge base from Supabase")
+    print(f"       {BOLD}python main.py --list-calls{RESET}     # View recent call history")
     print()
-    print(f"  5. Add company documents to {CYAN}knowledge_base/{RESET}")
-    print(f"     Supported: .md  .txt  .pdf  .docx")
-    print(f"     They are auto-indexed while the agent runs.")
+    print(f"  5. Run the SQL migration in Supabase first:")
+    print(f"       {CYAN}scripts/voice-agent-supabase-migration.sql{RESET}")
+    print(f"     Then run {BOLD}python scripts/sync_voice_kb.py{RESET} to populate the knowledge base.")
     print()
     print(f"{sep}\n")
 

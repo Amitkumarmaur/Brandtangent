@@ -24,13 +24,12 @@ env/
 ENV/
 .env/
 
-# RAG vector store (auto-generated — re-built from knowledge_base/ on startup)
+# Legacy local artifacts (RAG and transcripts now live in Supabase).
+# Kept here so an accidental re-creation never gets committed.
 rag/vector_store.faiss
 rag/vector_metadata.json
-
-# Transcripts (keep locally, don't push to shared repos)
-transcripts/*.md
-transcripts/calls_log.json
+transcripts/
+*.faiss
 
 # IDE
 .vscode/
