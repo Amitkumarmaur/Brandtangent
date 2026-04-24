@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -13,10 +13,46 @@ export interface BlogMarqueeItem {
   date: string
 }
 
-function BlogCard({ item }: { item: BlogMarqueeItem }) {
+const LEAVE_DEBOUNCE_MS = 120
+
+type PauseHandlers = {
+  onMouseEnter: () => void
+  onMouseLeave: () => void
+}
+
+function useRowPauseHandlers(setPaused: (v: boolean) => void) {
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const clearLeave = useCallback(() => {
+    if (leaveTimer.current) {
+      clearTimeout(leaveTimer.current)
+      leaveTimer.current = null
+    }
+  }, [])
+
+  useEffect(() => () => clearLeave(), [clearLeave])
+
+  const onMouseEnter = useCallback(() => {
+    clearLeave()
+    setPaused(true)
+  }, [clearLeave, setPaused])
+
+  const onMouseLeave = useCallback(() => {
+    clearLeave()
+    leaveTimer.current = setTimeout(() => {
+      leaveTimer.current = null
+      setPaused(false)
+    }, LEAVE_DEBOUNCE_MS)
+  }, [clearLeave, setPaused])
+
+  return { onMouseEnter, onMouseLeave }
+}
+
+function BlogCard({ item, pauseHandlers }: { item: BlogMarqueeItem; pauseHandlers: PauseHandlers }) {
   return (
     <Link
       href={`/blog/${item.slug}`}
+      {...pauseHandlers}
       className="w-[85vw] sm:w-[320px] md:w-[400px] h-[300px] md:h-[360px] flex-shrink-0 rounded-[2rem] overflow-hidden group cursor-pointer relative shadow-xl border border-grey-200 block"
     >
       <Image
@@ -46,30 +82,54 @@ interface BlogSectionMarqueeProps {
 }
 
 export default function BlogSectionMarquee({ items }: BlogSectionMarqueeProps) {
+  const [paused, setPaused] = useState(false)
+  const pauseHandlers = useRowPauseHandlers(setPaused)
+
   if (!items.length) return null
 
-  // Duplicate list so translateX(-50%) loops seamlessly.
   return (
     <div className="relative w-full flex overflow-hidden pt-4 pb-8">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+@keyframes blog-marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.blog-marquee-track {
+  animation: blog-marquee-scroll 45s linear infinite;
+}
+.blog-marquee-paused {
+  animation-play-state: paused !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .blog-marquee-track {
+    animation: none;
+    transform: none;
+  }
+}
+`,
+        }}
+      />
+
       <div className="absolute top-0 bottom-0 left-0 w-12 md:w-32 bg-gradient-to-r from-grey-100 to-transparent z-10 pointer-events-none" />
       <div className="absolute top-0 bottom-0 right-0 w-12 md:w-32 bg-gradient-to-l from-grey-100 to-transparent z-10 pointer-events-none" />
 
-      <motion.div
-        className="flex w-max"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ repeat: Infinity, ease: "linear", duration: 45 }}
+      <div
+        className={`blog-marquee-track flex w-max ${paused ? "blog-marquee-paused" : ""}`}
+        style={{ willChange: "transform" }}
       >
         <div className="flex gap-6 md:gap-8 px-3 md:px-4">
           {items.map((item) => (
-            <BlogCard key={`a-${item.id}`} item={item} />
+            <BlogCard key={`a-${item.id}`} item={item} pauseHandlers={pauseHandlers} />
           ))}
         </div>
         <div className="flex gap-6 md:gap-8 px-3 md:px-4" aria-hidden>
           {items.map((item) => (
-            <BlogCard key={`b-${item.id}`} item={item} />
+            <BlogCard key={`b-${item.id}`} item={item} pauseHandlers={pauseHandlers} />
           ))}
         </div>
-      </motion.div>
+      </div>
     </div>
   )
 }

@@ -26,7 +26,7 @@ export default async function ServicesIndexPage() {
       .order("display_order", { ascending: true }),
     supabase
       .from("service_categories")
-      .select("id, name, slug, display_order")
+      .select("id, name, slug, display_order, hero_description")
       .order("display_order", { ascending: true }),
   ])
 

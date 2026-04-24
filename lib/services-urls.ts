@@ -23,3 +23,15 @@ export function serviceUrl(
   if (!cat) return `/services/${svc}`
   return `/services/${cat}/${svc}`
 }
+
+/** Decode and trim a dynamic route segment (e.g. `%26` → safe slug for Supabase `eq`). */
+export function normalizeRouteSlug(param: string | undefined | null): string {
+  if (param == null) return ""
+  const s = String(param).trim()
+  if (!s) return ""
+  try {
+    return decodeURIComponent(s).trim()
+  } catch {
+    return s
+  }
+}

@@ -194,7 +194,7 @@ class DigiiMarkVoiceAgent:
             if response.text:
                 text = response.text.strip()
                 if text:
-                    self._history.append(text)
+                    self._history.append(f"{config.AGENT_NAME}: {text}") 
                     if self._call_id:
                         self._tm.add_turn(self._call_id, "assistant", text)
                     console.print(f"[cyan]{config.AGENT_NAME}:[/cyan] {text}")
@@ -207,7 +207,7 @@ class DigiiMarkVoiceAgent:
                 if hasattr(sc, "input_transcription") and sc.input_transcription:
                     user_text = sc.input_transcription.text.strip() if hasattr(sc.input_transcription, 'text') else str(sc.input_transcription).strip()
                     if user_text:
-                        self._history.append(user_text)
+                        self._history.append(f"Caller: {user_text}")
                         if self._call_id:
                             self._tm.add_turn(self._call_id, "user", user_text)
                         console.print(f"[white]  You:[/white] {user_text}")
@@ -287,13 +287,17 @@ class DigiiMarkVoiceAgent:
 
         try:
             async with _client.aio.live.connect(
-                model=config.LIVE_MODEL,
-                config=self._session_config(),
-            ) as session:
-                console.print("[green]✓ Connected to Gemini Live. Start speaking![/green]\n")
+    model=config.LIVE_MODEL,
+    config=self._session_config(),
+) as session:
+    console.print("[green]✓ Connected to Gemini Live. Start speaking![/green]\n")
 
-                # Run sender + receiver concurrently
-                send_task = asyncio.create_task(self._task_send_audio(session))
+    # ✅ PATCH 1 — Maya greets the caller first (ADD THESE 4 LINES)
+    opening = config.OPENING_TRIGGER.format(agent_name=config.AGENT_NAME)
+    await session.send(input=opening, end_of_turn=True)
+
+    # Run sender + receiver concurrently
+    send_task = asyncio.create_task(self._task_send_audio(session))
                 recv_task = asyncio.create_task(self._task_receive(session))
 
                 # Wait for either to complete (receiver ends when session closes)

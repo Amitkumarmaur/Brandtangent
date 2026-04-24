@@ -1,109 +1,23 @@
-"use client"
+import ClientsSectionClient from "@/components/clients-section-client"
+import { fetchClientsForMarquee, splitClientsIntoTwoRows } from "@/lib/clients-marquee"
 
-import { motion } from "framer-motion"
-import Image from "next/image"
-
-// We use an array of objects for the logos to easily render them in a loop.
-// Since actual SVGs are not provided, we use styled text and geometric shapes to simulate the logos.
-
-const logosRow1 = [
-  { name: "BEYOND", visual: <div className="font-serif tracking-[0.2em] text-lg">BEYOND</div>, tagline: "We helped them with a responsive" },
-  { name: "GBM", visual: <div className="font-black text-3xl tracking-tighter outline-text">GBM</div> },
-  { name: "SkillBridge", visual: <div className="font-bold text-xl flex flex-col items-center leading-none"><span>SkillBridge</span><span className="text-[0.6rem] tracking-widest font-normal uppercase">Academy</span></div> },
-  { name: "EMDAD", visual: <div className="font-bold text-2xl flex items-center gap-2"><div className="w-6 h-6 border-2 border-white rotate-45 flex items-center justify-center"><div className="w-2 h-2 bg-white rounded-full"></div></div> EMDAD</div> },
-  { name: "mediaPro", visual: <div className="font-semibold text-xl flex flex-col items-center leading-none"><span>mediaPro</span><span className="text-[0.6rem] tracking-widest font-normal uppercase">International</span></div> },
-  { name: "SANAD", visual: <div className="font-serif text-2xl italic tracking-wider flex items-center gap-1">SANAD<div className="w-4 h-[1px] bg-white"></div></div> },
-]
-
-const logosRow2 = [
-  { name: "Sharjah Investment Forum", visual: <div className="font-light text-sm text-center flex items-center gap-2"><div className="w-8 h-8 grid grid-cols-2 gap-0.5"><div className="border border-white/50 w-full h-full"></div><div className="border border-white/50 w-full h-full"></div><div className="border border-white/50 w-full h-full"></div><div className="border border-white/50 w-full h-full"></div></div><div><span>منتدى الشارقة للاستثمار</span><br/><span className="text-[0.6rem] uppercase">Sharjah Investment Forum</span></div></div> },
-  { name: "ATMOSPHERE", visual: <div className="font-serif text-xl flex flex-col items-center leading-none"><div className="flex items-end gap-1"><div className="w-2 h-8 bg-white/80"></div><span>ATMOSPHERE</span></div><span className="text-[0.5rem] tracking-[0.3em] uppercase mt-1">Burj Khalifa</span></div> },
-  { name: "exa", visual: <div className="font-black italic text-3xl lowercase">exa</div> },
-  { name: "Terra Nexus", visual: <div className="font-serif text-xl flex flex-col items-center leading-none"><div className="w-12 h-4 border-b-2 border-white rounded-[100%] mb-1"></div><span>Terra Nexus</span></div> },
-  { name: "American Legal Center", visual: <div className="w-12 h-12 rounded-full border border-white flex items-center justify-center text-[0.5rem] text-center uppercase p-1">American Legal Center</div> },
-  { name: "Globe", visual: <div className="flex flex-col items-center gap-2"><Image src="/light_tech_globe.png" alt="Globe" width={60} height={60} className="object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" /><span className="text-xs font-semibold">500+ Clients worldwide</span></div> }
-]
-
-export default function ClientsSection() {
-  return (
-    <section className="relative w-full bg-foreground py-16 lg:py-20 overflow-hidden border-t border-white/10 font-sans">
-      
-      {/* Subtle Grid Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:40px_40px] mix-blend-screen pointer-events-none"></div>
-
-      {/* Lighting Accents */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-ignite-orange/5 rounded-full blur-[100px] pointer-events-none"></div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 mb-8 md:mb-10 flex flex-col items-center text-center">
-        
-        {/* Pre-heading */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-          <span className="font-heading text-ignite-orange font-medium tracking-wider text-sm uppercase">Our Clients</span>
-        </div>
-
-        {/* Main Heading */}
-        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-white text-balance leading-tight max-w-3xl">
-          5-Star Rated, Works <br className="hidden md:block" /> with GCC Giants
-        </h2>
-      </div>
-
-      {/* Marquee Section */}
-      <div className="relative z-10 w-full flex flex-col gap-8 sm:gap-12 pt-4">
-        
-        {/* Row 1: Left to Right */}
-        <div className="group relative flex overflow-hidden w-full mask-edges">
-          <motion.div
-            initial={{ x: 0 }}
-            animate={{ x: "-50%" }}
-            transition={{ duration: 40, ease: "linear", repeat: Infinity }}
-            className="flex items-center gap-16 sm:gap-24 whitespace-nowrap px-8 sm:px-12 w-max"
-          >
-            {/* Double the array for seamless infinite looping */}
-            {[...logosRow1, ...logosRow1, ...logosRow1].map((logo, idx) => (
-              <div key={`row1-${idx}`} className="flex flex-col items-center justify-center text-white/70 hover:text-white transition-colors duration-300 min-w-[150px]">
-                {logo.visual}
-                {logo.tagline && <p className="text-[0.65rem] text-white/40 mt-3 uppercase tracking-wider">{logo.tagline}</p>}
-              </div>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* Row 2: Right to Left */}
-        <div className="group relative flex overflow-hidden w-full mask-edges pb-10">
-          <motion.div
-            initial={{ x: "-50%" }}
-            animate={{ x: 0 }}
-            transition={{ duration: 45, ease: "linear", repeat: Infinity }}
-            className="flex items-center gap-16 sm:gap-24 whitespace-nowrap px-8 sm:px-12 w-max"
-          >
-            {/* Double the array for seamless infinite looping */}
-            {[...logosRow2, ...logosRow2, ...logosRow2].map((logo, idx) => (
-              <div key={`row2-${idx}`} className="flex flex-col items-center justify-center text-white/70 hover:text-white transition-colors duration-300 min-w-[150px]">
-                {logo.visual}
-              </div>
-            ))}
-          </motion.div>
-        </div>
-
-      </div>
-
-      {/* Global styles for the fade mask on the edges of the marquee */}
-      <style jsx global>{`
-        .mask-edges {
-          mask-image: linear-gradient(
-            to right,
-            transparent,
-            black 10%,
-            black 90%,
-            transparent
-          );
-        }
-        .outline-text {
-          -webkit-text-stroke: 1px rgba(255,255,255,0.7);
-          color: transparent;
-        }
-      `}</style>
-    </section>
-  )
+/** “Our clients” — `public.clients` (`is_visible`, `sort_order`) with optional `website_url` on each mark. */
+export default async function ClientsSection() {
+  const { clients, error } = await fetchClientsForMarquee()
+  if (!clients.length) {
+    if (error) {
+      return (
+        <section className="relative w-full bg-foreground py-16 lg:py-20 overflow-hidden border-t border-white/10 font-sans">
+          <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
+            <p className="text-sm text-red-300/90" role="alert">
+              Clients could not be loaded ({error}).
+            </p>
+          </div>
+        </section>
+      )
+    }
+    return null
+  }
+  const { row1, row2 } = splitClientsIntoTwoRows(clients)
+  return <ClientsSectionClient row1={row1} row2={row2} loadError={error} />
 }

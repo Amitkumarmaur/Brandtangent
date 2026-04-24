@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import type { Metadata } from "next"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
@@ -8,11 +8,12 @@ import CategoryServicesGrid, { type CategoryService } from "@/components/service
 import ServiceProcessGrid from "@/components/services/service-process-grid"
 import ServiceIndustries from "@/components/services/service-industries"
 import ServiceTechStack from "@/components/services/service-tech-stack"
-import ServiceCTA from "@/components/services/service-cta"
 import { supabase } from "@/lib/supabase"
 import { deviconLogoForPlatformName } from "@/lib/devicon-platform-logos"
+import { normalizeRouteSlug } from "@/lib/services-urls"
 
 export const revalidate = 60
+export const dynamicParams = true
 
 type ServiceCategoryRecord = {
   id: string
@@ -36,9 +37,16 @@ type ServiceCategoryRecord = {
   target_industries: unknown
   seo_title: string | null
   meta_description: string | null
+  created_at: string | null
 }
 
-type ProcessStepRow = { title?: string | null; items?: string[] | null }
+type ProcessStepRow = {
+  title?: string | null
+  h3_title?: string | null
+  items?: string[] | null
+  description?: string | null
+  bullet_points?: string[] | null
+}
 type IndustryRow = {
   industry?: string | null
   headline?: string | null
@@ -53,6 +61,8 @@ type FeaturedProjectRow = {
   id?: number | string
   title?: string
   image?: string
+  cover_image?: string
+  hero_image?: string
   category?: string
   flag?: string
   accent?: string
@@ -62,6 +72,21 @@ type FeaturedProjectRow = {
 
 function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : []
+}
+
+function categoryIconAsUrl(icon: string | null | undefined): string | null {
+  const t = (icon ?? "").trim()
+  if (!t) return null
+  const low = t.toLowerCase()
+  if (low.startsWith("http://") || low.startsWith("https://")) return t
+  return null
+}
+
+function categoryIconAsGlyph(icon: string | null | undefined): string | null {
+  const t = (icon ?? "").trim()
+  if (!t || categoryIconAsUrl(icon)) return null
+  if (t.length > 12) return null
+  return t
 }
 
 export async function generateStaticParams() {
@@ -77,12 +102,12 @@ export async function generateMetadata({
 }: {
   params: Promise<{ category: string }>
 }): Promise<Metadata> {
-  const { category } = await params
+  const category = normalizeRouteSlug((await params).category)
   const { data } = await supabase
     .from("service_categories")
-    .select("name, seo_title, meta_description, hero_description")
+    .select("name, seo_title, meta_description, hero_description, created_at")
     .eq("slug", category)
-    .single()
+    .maybeSingle()
 
   if (!data) return { title: "Services | DigiiMark" }
 
@@ -93,7 +118,12 @@ export async function generateMetadata({
   return {
     title,
     description,
-    openGraph: { title, description, type: "website" },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      ...(data.created_at ? { publishedTime: data.created_at } : {}),
+    },
   }
 }
 
@@ -102,17 +132,34 @@ export default async function ServiceCategoryPage({
 }: {
   params: Promise<{ category: string }>
 }) {
-  const { category } = await params
+  const category = normalizeRouteSlug((await params).category)
 
-  const { data: categoryRow, error: categoryError } = await supabase
+  const { data: categoryRow } = await supabase
     .from("service_categories")
     .select(
-      "id, name, slug, icon, display_order, hero_display_title, hero_description, hero_animated_words, hero_stat_value, hero_stat_label, featured_projects, expertise_badge, expertise_title, expertise_subtitle, process_heading, process_description, process_steps, tech_stack_ids, target_industries, seo_title, meta_description",
+      "id, name, slug, icon, display_order, hero_display_title, hero_description, hero_animated_words, hero_stat_value, hero_stat_label, featured_projects, expertise_badge, expertise_title, expertise_subtitle, process_heading, process_description, process_steps, tech_stack_ids, target_industries, seo_title, meta_description, created_at",
     )
     .eq("slug", category)
-    .single<ServiceCategoryRecord>()
+    .maybeSingle<ServiceCategoryRecord>()
 
-  if (categoryError || !categoryRow) {
+  if (!categoryRow) {
+    // Flat links like `/services/[serviceSlug]` — resolve service then parent category (no FK embed: names
+    // differ across Supabase projects).
+    const { data: svc } = await supabase
+      .from("services")
+      .select("slug, category_id")
+      .eq("slug", category)
+      .maybeSingle<{ slug: string; category_id: string | null }>()
+
+    if (svc?.slug && svc.category_id) {
+      const { data: cat } = await supabase
+        .from("service_categories")
+        .select("slug")
+        .eq("id", svc.category_id)
+        .maybeSingle<{ slug: string | null }>()
+      const catSlug = (cat?.slug ?? "").trim()
+      if (catSlug) redirect(`/services/${catSlug}/${svc.slug}`)
+    }
     notFound()
   }
 
@@ -138,11 +185,12 @@ export default async function ServiceCategoryPage({
   const featured = asArray<FeaturedProjectRow>(categoryRow.featured_projects)
   const projects: CategoryHeroProject[] = featured
     .map((p, i): CategoryHeroProject | null => {
-      if (!p?.title || !p?.image) return null
+      const image = (p?.image ?? p?.cover_image ?? p?.hero_image ?? "").trim()
+      if (!p?.title || !image) return null
       return {
         id: p.id ?? i + 1,
         title: p.title,
-        image: p.image,
+        image,
         category: p.category ?? categoryRow.name,
         flag: p.flag,
         accent: p.accent ?? "#FF5722",
@@ -167,10 +215,20 @@ export default async function ServiceCategoryPage({
 
   // Process steps
   const processPhases = asArray<ProcessStepRow>(categoryRow.process_steps)
-    .map((step) => ({
-      title: (step.title ?? "").trim(),
-      items: Array.isArray(step.items) ? step.items.filter((i): i is string => Boolean(i)) : [],
-    }))
+    .map((step) => {
+      const title = (step.title ?? step.h3_title ?? "").trim()
+      let items: string[] = []
+      if (Array.isArray(step.items)) items = step.items.filter((i): i is string => Boolean(i))
+      else if (Array.isArray(step.bullet_points))
+        items = step.bullet_points.filter((i): i is string => Boolean(i))
+      else if (typeof step.description === "string" && step.description.trim()) {
+        items = step.description
+          .split(/\n+|•|;/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+      }
+      return { title, items }
+    })
     .filter((step) => step.title && step.items.length > 0)
 
   // Target industries (matches ServiceIndustries shape exactly)
@@ -245,12 +303,18 @@ export default async function ServiceCategoryPage({
     (categoryRow.process_description ?? "").trim() ||
     `A transparent, phased approach to delivering ${categoryRow.name.toLowerCase()} outcomes that stay maintainable.`
 
+  const capabilitiesSubtitle =
+    (categoryRow.meta_description ?? "").trim() ||
+    `Drill into any capability below to see methodology, tech stack, and proof points specific to that ${categoryRow.name.toLowerCase()} offering.`
+
   return (
-    <main>
+    <main data-service-category-slug={categoryRow.slug} data-display-order={categoryRow.display_order ?? ""}>
       <Header />
       <div data-theme="dark">
         <CategoryHero
           badge={categoryRow.name}
+          badgeIconUrl={categoryIconAsUrl(categoryRow.icon)}
+          badgeIconGlyph={categoryIconAsGlyph(categoryRow.icon)}
           displayTitle={heroDisplayTitle}
           description={heroDescription}
           animatedWords={categoryRow.hero_animated_words ?? undefined}
@@ -276,7 +340,7 @@ export default async function ServiceCategoryPage({
           <CategoryServicesGrid
             badge="Capabilities"
             title={`${categoryRow.name} services we deliver`}
-            subtitle={`Drill into any capability below to see methodology, tech stack, and proof points specific to that ${categoryRow.name.toLowerCase()} offering.`}
+            subtitle={capabilitiesSubtitle}
             categorySlug={categoryRow.slug}
             services={services}
           />
@@ -310,14 +374,6 @@ export default async function ServiceCategoryPage({
           />
         </div>
       ) : null}
-
-      <div data-theme="dark">
-        <ServiceCTA
-          title={`Ready to compound your ${categoryRow.name.toLowerCase()}?`}
-          subtitle="Tell us about your stack, pipeline goals, and timeline. We will recommend a phased roadmap that compounds over quarters, not weeks of vanity work."
-          buttonText="Talk to DigiiMark"
-        />
-      </div>
 
       <Footer />
     </main>

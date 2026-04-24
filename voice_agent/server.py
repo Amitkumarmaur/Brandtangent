@@ -14,7 +14,7 @@ Run:
     cd voice_agent
     venv\\Scripts\\activate
     python server.py
-    # Open http://localhost:8000 in your browser
+    # Open http://localhost:8001 (or VOICE_WEB_PORT) in your browser
 """
 
 from __future__ import annotations
@@ -397,6 +397,8 @@ def _infer_topics(history: list[str]) -> list[str]:
 # ─── Run with uvicorn ─────────────────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
+
+    port = config.VOICE_WEB_PORT
     print(f"\n  DigiiMark Voice Agent — Web UI")
-    print(f"  Open: http://localhost:8000\n")
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    print(f"  Open: http://localhost:{port}\n")
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")

@@ -19,6 +19,10 @@ export interface CategoryHeroProject {
 interface CategoryHeroProps {
   /** Eyebrow badge shown above the title (e.g. the category name). */
   badge: string
+  /** Optional icon URL from `service_categories.icon` when stored as an image URL. */
+  badgeIconUrl?: string | null
+  /** Optional short glyph from `service_categories.icon` (emoji / letter) when not a URL. */
+  badgeIconGlyph?: string | null
   /** The large uppercase display title. Line breaks: pass the raw string; we split on space if no <br>. */
   displayTitle: string
   /** Description paragraph beneath the title. */
@@ -89,8 +93,15 @@ function FloatingUICard({ project }: { project: CategoryHeroProject }) {
   )
 }
 
+function isHttpUrl(s: string | null | undefined): boolean {
+  const t = (s ?? "").trim().toLowerCase()
+  return t.startsWith("http://") || t.startsWith("https://")
+}
+
 export default function CategoryHero({
   badge,
+  badgeIconUrl,
+  badgeIconGlyph,
   displayTitle,
   description,
   animatedWords,
@@ -186,10 +197,25 @@ export default function CategoryHero({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="flex items-center gap-2 mb-4"
+                className="flex items-center gap-3 mb-4"
               >
-                <div className="w-2 h-2 rounded-full bg-ignite-orange animate-pulse" />
-                <span className="font-heading text-ignite-orange text-sm font-medium tracking-wider uppercase">{badge}</span>
+                <div className="w-2 h-2 rounded-full bg-ignite-orange animate-pulse shrink-0" />
+                {badgeIconUrl && isHttpUrl(badgeIconUrl) ? (
+                  <Image
+                    src={badgeIconUrl.trim()}
+                    alt=""
+                    width={28}
+                    height={28}
+                    className="rounded-lg object-cover border border-white/15 shrink-0"
+                  />
+                ) : badgeIconGlyph ? (
+                  <span className="text-xl leading-none shrink-0" aria-hidden>
+                    {badgeIconGlyph}
+                  </span>
+                ) : null}
+                <span className="font-heading text-ignite-orange text-sm font-medium tracking-wider uppercase">
+                  {badge}
+                </span>
               </motion.div>
 
               <div className="mb-4">

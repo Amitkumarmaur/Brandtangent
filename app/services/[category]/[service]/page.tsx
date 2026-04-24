@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import type { Metadata } from "next"
 import { supabase } from "@/lib/supabase"
+import { normalizeRouteSlug } from "@/lib/services-urls"
 import { deviconLogoForPlatformName } from "@/lib/devicon-platform-logos"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
@@ -13,6 +14,7 @@ import ServiceProcessGrid from "@/components/services/service-process-grid"
 import ServiceIndustries from "@/components/services/service-industries"
 
 export const revalidate = 60
+export const dynamicParams = true
 
 type ServiceDetailRow = {
   id: string
@@ -28,7 +30,6 @@ type ServiceDetailRow = {
   methodology: unknown
   what_we_provide: unknown
   platform_ids: string[] | null
-  service_categories: { slug: string; name: string } | null
 }
 
 type JsonObj = Record<string, unknown>
@@ -46,12 +47,12 @@ export async function generateMetadata({
 }: {
   params: Promise<{ category: string; service: string }>
 }): Promise<Metadata> {
-  const { service } = await params
+  const serviceSlugParam = normalizeRouteSlug((await params).service)
   const { data } = await supabase
     .from("services")
     .select("seo_title, meta_description, name")
-    .eq("slug", service)
-    .single()
+    .eq("slug", serviceSlugParam)
+    .maybeSingle()
 
   if (!data) return { title: "Service | DigiiMark" }
 
@@ -67,24 +68,33 @@ export default async function ServiceDetailPage({
 }: {
   params: Promise<{ category: string; service: string }>
 }) {
-  const { category, service: serviceSlug } = await params
+  const categoryParam = normalizeRouteSlug((await params).category)
+  const serviceSlug = normalizeRouteSlug((await params).service)
 
-  const { data: service, error } = await supabase
+  const { data: service } = await supabase
     .from("services")
     .select(
-      "id, category_id, name, slug, hero_h1, hero_description, hero_image, seo_title, meta_description, service_details, methodology, what_we_provide, platform_ids, service_categories!services_category_id_fkey(slug, name)",
+      "id, category_id, name, slug, hero_h1, hero_description, hero_image, seo_title, meta_description, service_details, methodology, what_we_provide, platform_ids",
     )
     .eq("slug", serviceSlug)
-    .single<ServiceDetailRow>()
+    .maybeSingle<ServiceDetailRow>()
 
-  if (error || !service) {
+  if (!service) {
     notFound()
   }
 
-  // Enforce that the service actually belongs to the category in the URL.
-  const svcCategorySlug = service.service_categories?.slug ?? null
-  if (svcCategorySlug && svcCategorySlug !== category) {
-    notFound()
+  let dbCategorySlug: string | null = null
+  if (service.category_id) {
+    const { data: cat } = await supabase
+      .from("service_categories")
+      .select("slug")
+      .eq("id", service.category_id)
+      .maybeSingle<{ slug: string | null }>()
+    dbCategorySlug = (cat?.slug ?? "").trim() || null
+  }
+
+  if (dbCategorySlug && dbCategorySlug !== categoryParam) {
+    redirect(`/services/${dbCategorySlug}/${service.slug}`)
   }
 
   const mappedFeatures = asArray(service.service_details).map((detail) => ({

@@ -46,7 +46,9 @@ export default function Header() {
           .map((r: { category_id: string | null }) => r.category_id)
           .filter((id): id is string => Boolean(id))
       )
-      setServiceCategories(cats.filter((c) => withSvc.has(c.id)))
+      setServiceCategories(
+        cats.filter((c) => withSvc.has(c.id) && Boolean((c.slug ?? "").trim())),
+      )
     })()
     return () => {
       cancelled = true

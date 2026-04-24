@@ -32,8 +32,8 @@ export default function ServicesDirectoryHero() {
           </h1>
 
           <p className="text-subtitle max-w-2xl mx-auto text-balance text-grey-400">
-            From AI workflows and automation to performance web experiences — explore everything DigiiMark
-            delivers. Each card opens a full playbook for that capability.
+            From AI workflows and automation to performance web experiences — pick a category to open its
+            dedicated page, then drill into any service for methodology, stack, and proof.
           </p>
         </motion.div>
       </div>

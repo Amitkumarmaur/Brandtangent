@@ -96,7 +96,7 @@ export default function ServicesScroll() {
           ...c,
           services: svcs.filter((s) => s.category_id === c.id),
         }))
-        .filter((c) => c.services.length > 0)
+        .filter((c) => c.services.length > 0 && Boolean((c.slug ?? "").trim()))
 
       setCategories(grouped)
       setActiveId(grouped[0]?.id ?? null)
@@ -153,13 +153,12 @@ export default function ServicesScroll() {
               const Icon = categoryIcon(cat)
               const isActive = active.id === cat.id
               return (
-                <button
+                <Link
                   key={cat.id}
-                  type="button"
-                  onClick={() => setActiveId(cat.id)}
+                  href={categoryHref(cat)}
                   onMouseEnter={() => setActiveId(cat.id)}
-                  className="relative flex items-center cursor-pointer group w-max py-2 text-left"
-                  aria-pressed={isActive}
+                  onFocus={() => setActiveId(cat.id)}
+                  className="relative flex items-center cursor-pointer group w-max py-2 text-left no-underline"
                 >
                   <div className="absolute -left-12 md:-left-16 flex items-center justify-center w-10 h-10">
                     <AnimatePresence>
@@ -187,7 +186,7 @@ export default function ServicesScroll() {
                   >
                     {cat.name}
                   </h3>
-                </button>
+                </Link>
               )
             })}
           </div>

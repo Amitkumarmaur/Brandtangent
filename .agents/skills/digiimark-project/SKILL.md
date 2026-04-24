@@ -92,7 +92,7 @@ components/
 │   └── case-studies-grid.tsx   # Index grid + Supabase topic filters
 └── services/             # Service pages + directory
     ├── services-directory-hero.tsx
-    ├── services-directory.tsx   # Index grid (grouped by service_categories)
+    ├── services-directory.tsx   # /services index: category cards → /services/[slug]; uncategorized services
     └── …                 # web-dev-hero, service-features, etc.
 
 .agents/skills/

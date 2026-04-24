@@ -11,6 +11,7 @@ export type ServiceCategoryRow = {
   name: string
   slug: string
   display_order: number | null
+  hero_description?: string | null
 }
 
 export type ServiceListRow = {
@@ -30,29 +31,39 @@ function sortByDisplayOrder<T extends { display_order: number | null }>(rows: T[
   return [...rows].sort((a, b) => (a.display_order ?? 999) - (b.display_order ?? 999))
 }
 
-function buildSections(categories: ServiceCategoryRow[], services: ServiceListRow[]) {
-  const sortedCats = sortByDisplayOrder(categories)
-  const assigned = new Set<string>()
-  const sections: { heading: string; slug: string | null; services: ServiceListRow[] }[] = []
+type CategoryIndexEntry = {
+  category: ServiceCategoryRow
+  slug: string
+  services: ServiceListRow[]
+}
 
-  for (const c of sortedCats) {
+function categoriesForDirectory(
+  categories: ServiceCategoryRow[],
+  services: ServiceListRow[],
+): CategoryIndexEntry[] {
+  const sorted = sortByDisplayOrder(categories)
+  const out: CategoryIndexEntry[] = []
+  for (const c of sorted) {
+    const slug = (c.slug ?? "").trim()
     const list = sortByDisplayOrder(services.filter((s) => s.category_id === c.id))
-    list.forEach((s) => assigned.add(s.id))
-    if (list.length > 0) {
-      sections.push({ heading: c.name, slug: c.slug, services: list })
-    }
+    if (!slug || list.length === 0) continue
+    out.push({ category: c, slug, services: list })
   }
+  return out
+}
 
-  const rest = sortByDisplayOrder(services.filter((s) => !assigned.has(s.id)))
-  if (rest.length > 0) {
-    sections.push({ heading: "More capabilities", slug: null, services: rest })
-  }
-
-  if (sections.length === 0 && services.length > 0) {
-    return [{ heading: "All services", slug: null, services: sortByDisplayOrder(services) }]
-  }
-
-  return sections
+function uncategorizedServices(
+  categories: ServiceCategoryRow[],
+  services: ServiceListRow[],
+): ServiceListRow[] {
+  const slugByCatId = new Map(categories.map((c) => [c.id, (c.slug ?? "").trim()] as const))
+  return sortByDisplayOrder(
+    services.filter((s) => {
+      if (!s.category_id) return true
+      const slug = slugByCatId.get(s.category_id)
+      return !slug
+    }),
+  )
 }
 
 function ServiceCard({
@@ -80,7 +91,10 @@ function ServiceCard({
           className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" aria-hidden />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80"
+          aria-hidden
+        />
         <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
           <span className="text-xs font-semibold uppercase tracking-wider text-white/90 line-clamp-1">
             {service.name}
@@ -106,6 +120,67 @@ function ServiceCard({
   )
 }
 
+function CategoryDirectoryCard({ entry }: { entry: CategoryIndexEntry }) {
+  const { category, slug, services } = entry
+  const title = (category.name ?? "").trim() || "Category"
+  const blurb = ((category.hero_description ?? "").trim() || "").slice(0, 220)
+  const previewImage =
+    (services[0]?.hero_image ?? "").trim() || FALLBACK_IMAGE
+  const count = services.length
+
+  return (
+    <Link
+      href={categoryUrl(slug)}
+      className="group flex flex-col h-full rounded-[1.5rem] overflow-hidden border border-grey-200 bg-white shadow-sm hover:shadow-md hover:border-grey-300 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
+    >
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-grey-100">
+        <Image
+          src={previewImage}
+          alt={`${title} — category preview`}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-90"
+          aria-hidden
+        />
+        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
+          <span className="text-xs font-semibold uppercase tracking-wider text-white/90">
+            {count} service{count === 1 ? "" : "s"}
+          </span>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/95 text-foreground group-hover:bg-ignite-orange group-hover:text-white transition-colors">
+            <ArrowUpRight className="w-4 h-4" aria-hidden />
+          </span>
+        </div>
+      </div>
+      <div className="flex flex-col flex-grow p-6 md:p-7">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-2 h-2 rounded-full bg-ignite-orange" />
+          <span className="text-sm uppercase tracking-wider text-ignite-orange font-medium">Category</span>
+        </div>
+        <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground leading-snug group-hover:text-ignite-orange transition-colors">
+          {title}
+        </h2>
+        {blurb ? (
+          <p className="mt-4 text-body text-grey-400 line-clamp-3 flex-grow">{blurb}</p>
+        ) : (
+          <p className="mt-4 text-body text-grey-400 flex-grow">
+            Open the full category page for methodology, stack, industries, and every capability we ship in this
+            lane.
+          </p>
+        )}
+        <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-foreground group-hover:gap-3 transition-all">
+          View category
+          <span className="text-ignite-orange" aria-hidden>
+            →
+          </span>
+        </span>
+      </div>
+    </Link>
+  )
+}
+
 export default function ServicesDirectory({
   categories,
   services,
@@ -113,7 +188,9 @@ export default function ServicesDirectory({
   categories: ServiceCategoryRow[]
   services: ServiceListRow[]
 }) {
-  const sections = buildSections(categories, services)
+  const categoryEntries = categoriesForDirectory(categories, services)
+  const uncategorized = uncategorizedServices(categories, services)
+  const hasAnyServices = services.length > 0
 
   return (
     <div className="bg-grey-100 pb-20 md:pb-24">
@@ -143,7 +220,7 @@ export default function ServicesDirectory({
           ))}
         </div>
 
-        {services.length === 0 ? (
+        {!hasAnyServices ? (
           <div className="rounded-2xl border border-grey-200 bg-white p-12 text-center">
             <p className="font-heading text-2xl text-foreground mb-3">Services are on the way</p>
             <p className="text-body text-grey-400 max-w-lg mx-auto mb-8">
@@ -159,39 +236,57 @@ export default function ServicesDirectory({
           </div>
         ) : (
           <div className="space-y-16 md:space-y-20">
-            {sections.map((section) => (
-              <section key={section.heading} className="scroll-mt-28">
+            {categoryEntries.length > 0 ? (
+              <section className="scroll-mt-28">
+                <div className="mb-10 md:mb-12 max-w-3xl">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-2 h-2 rounded-full bg-ignite-orange" />
+                    <span className="text-sm uppercase tracking-wider text-grey-400 font-medium">Browse</span>
+                  </div>
+                  <h2 className="heading-h2 text-foreground">Service categories</h2>
+                  <p className="mt-5 text-subtitle text-grey-400 max-w-2xl">
+                    Each category opens its own page with hero, capabilities, process, tech stack, and proof — all
+                    driven from your Supabase content.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+                  {categoryEntries.map((entry) => (
+                    <CategoryDirectoryCard key={entry.category.id} entry={entry} />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            {uncategorized.length > 0 ? (
+              <section className="scroll-mt-28">
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 md:mb-10">
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-                      <span className="text-sm uppercase tracking-wider text-grey-400 font-medium">
-                        {section.slug ? "Category" : "Portfolio"}
-                      </span>
+                      <span className="text-sm uppercase tracking-wider text-grey-400 font-medium">Portfolio</span>
                     </div>
-                    <h2 className="heading-h2 text-foreground">{section.heading}</h2>
+                    <h2 className="heading-h2 text-foreground">More capabilities</h2>
+                    <p className="mt-3 text-body text-grey-400 max-w-2xl">
+                      These offerings are not grouped under a category yet in the database. Each card still opens
+                      the full service detail page.
+                    </p>
                   </div>
-                  {section.slug ? (
-                    <Link
-                      href={categoryUrl(section.slug)}
-                      className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-ignite-orange transition-colors"
-                    >
-                      View {section.heading} page
-                      <ArrowUpRight className="w-4 h-4" aria-hidden />
-                    </Link>
-                  ) : null}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-                  {section.services.map((s) => (
-                    <ServiceCard key={s.id} service={s} categorySlug={section.slug} />
+                  {uncategorized.map((s) => (
+                    <ServiceCard
+                      key={s.id}
+                      service={s}
+                      categorySlug={categories.find((c) => c.id === s.category_id)?.slug?.trim() || null}
+                    />
                   ))}
                 </div>
               </section>
-            ))}
+            ) : null}
           </div>
         )}
 
-        {services.length > 0 ? (
+        {hasAnyServices ? (
           <div className="mt-20 md:mt-24 rounded-[2rem] bg-foreground px-8 py-12 md:px-14 md:py-14 text-center">
             <h2 className="font-heading text-2xl md:text-3xl font-semibold text-white mb-4 text-balance">
               Not sure which service fits first?

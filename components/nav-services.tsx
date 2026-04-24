@@ -13,7 +13,7 @@ export type NavServiceCategoryRow = {
 }
 
 function categoryHref(cat: NavServiceCategoryRow): string {
-  return categoryUrl(cat.slug)
+  return categoryUrl((cat.slug ?? "").trim() || null)
 }
 
 export function NavServicesDesktop({ categories }: { categories: NavServiceCategoryRow[] }) {

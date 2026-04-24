@@ -12,6 +12,9 @@ import ClientsSection from "@/components/clients-section"
 import FAQSection from "@/components/faq-section"
 import Footer from "@/components/footer"
 
+/** Refresh homepage data (including `ProjectsSection` case studies) periodically from Supabase. */
+export const revalidate = 120
+
 export default function Home() {
   return (
     <main className="relative overflow-hidden">
