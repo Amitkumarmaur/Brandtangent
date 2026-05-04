@@ -7,6 +7,7 @@ import { Menu, X, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase"
 import { NavServicesDesktop, NavServicesMobile, type NavServiceCategoryRow } from "@/components/nav-services"
+import { DigiimarkLogo } from "@/components/digiimark-logo"
 
 const navItems = [
   { name: "Our Work", href: "/case-studies" },
@@ -72,11 +73,13 @@ export default function Header() {
           }`}>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#0A0A0A] transition-colors duration-500">
-              <span className="font-bold text-xl text-white transition-colors duration-500">D</span>
-            </div>
-            <span className="font-heading text-xl md:text-[1.35rem] font-bold text-[#0A0A0A] transition-colors duration-500">DigiiMark</span>
+          <Link href="/" aria-label="DigiiMark — home" className="flex items-center">
+            <DigiimarkLogo
+              variant="dark"
+              className={`w-auto transition-all duration-500 ${
+                isScrolled && !isMobileMenuOpen ? "h-7 md:h-8" : "h-8 md:h-10"
+              }`}
+            />
           </Link>
 
           {/* Desktop Navigation */}

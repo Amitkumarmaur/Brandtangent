@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Linkedin, Twitter, Youtube, Instagram } from "lucide-react"
+import { DigiimarkLogo } from "@/components/digiimark-logo"
 
 const socialLinks = [
   { icon: Twitter, href: "#", label: "Twitter" },
@@ -57,11 +58,8 @@ const DigitalGravityMenu = () => (
       
       {/* Top centered logo */}
       <div className="mb-6">
-        <Link href="/" className="flex flex-col items-center gap-2">
-          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-1">
-            <span className="text-foreground font-black text-2xl">D</span>
-          </div>
-          <span className="font-heading text-3xl font-light tracking-tight">digii<strong className="font-bold">mark</strong></span>
+        <Link href="/" aria-label="DigiiMark — home" className="inline-flex items-center">
+          <DigiimarkLogo variant="light" className="h-12 md:h-14 w-auto" />
         </Link>
       </div>
 
