@@ -14,6 +14,7 @@ from google.genai import errors as genai_errors
 from google.genai import types
 
 import config
+from agents_shared import build_system_prompt
 from gemini_client import client as _client
 from rag import retriever as rag_retriever
 from rag.indexer import VectorStore
@@ -104,8 +105,11 @@ class ChatEngine:
         self._genai_tools = _build_genai_tools(tool_registry)
 
     def _system_instruction(self, rag_block: str) -> str:
-        base = config.SYSTEM_INSTRUCTION.format(agent_name=config.AGENT_NAME)
-        return f"{base}\n\n## Retrieved knowledge (for your reasoning only; do not cite filenames in replies)\n{rag_block}"
+        return build_system_prompt(
+            channel="chat",
+            agent_name=config.AGENT_NAME,
+            rag_context=rag_block,
+        )
 
     def _append_model_text(self, session: ChatSessionState, text: str) -> None:
         session.contents.append(
@@ -129,12 +133,6 @@ class ChatEngine:
             for c in chunks
         ]
         rag_block = rag_retriever.format_rag_context(chunks)
-        if not rag_block.strip():
-            rag_block = (
-                "(No knowledge base excerpts matched this query — rely on DigiiMark "
-                "positioning from prior turns, ask a clarifying question, or call web_search_tool.)"
-            )
-
         system_instruction = self._system_instruction(rag_block)
 
         self._tm.add_user_turn(session.session_id, user_message)

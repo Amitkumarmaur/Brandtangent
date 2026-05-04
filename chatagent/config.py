@@ -5,12 +5,19 @@ config.py — DigiiMark Live Chat AI Agent configuration.
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).parent.resolve()
 load_dotenv(BASE_DIR / ".env")
+
+# Make agents_shared/ importable in local dev (the Docker image sets
+# PYTHONPATH=/app so this is a no-op in production).
+_REPO_ROOT = BASE_DIR.parent
+if _REPO_ROOT.is_dir() and str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
 if not GEMINI_API_KEY:
@@ -68,20 +75,6 @@ CHAT_MAX_HISTORY_CONTENTS: int = int(os.getenv("CHAT_MAX_HISTORY_CONTENTS", "48"
 # Gemini generate_content attempts (includes first try); transient errors retry with backoff.
 CHAT_GEN_MAX_ATTEMPTS: int = int(os.getenv("CHAT_GEN_MAX_ATTEMPTS", "4"))
 
-SYSTEM_INSTRUCTION: str = """You are {agent_name}, a knowledgeable consultant for DigiiMark — an AI-first marketing automation agency that builds intelligent marketing systems for B2B companies.
-
-## How you work
-- Be warm, professional, and concise. Ask clarifying questions when intent, budget, timeline, or scope is unclear — never guess critical details.
-- **Knowledge base:** You receive internal excerpts each turn. Answer in natural language as DigiiMark’s consultant — **do not** mention file names, “sources,” or internal document labels. If excerpts conflict, say so briefly and reason about which is more likely current.
-- **Web / recency:** When the knowledge base is silent, outdated, or the user needs current events or external facts, call **web_search_tool** with a tight search query, then synthesize the answer. Prefer the knowledge base for anything about DigiiMark itself (services, process, positioning).
-- **Out of scope:** For legal, medical, investment, or unrelated personal advice, decline briefly and offer to connect them with a human specialist at DigiiMark or a relevant professional.
-- **Human handoff:** If the user is frustrated, needs a contract, pricing on a complex RFP, or explicitly asks for a person, acknowledge it and say the team will follow up (use lead capture or calendar tools when appropriate).
-
-## Tools
-- Use **calendar_tool** when the user wants to book a discovery call and you have name, email, preferred date, and preferred time (ask for missing fields).
-- Use **lead_capture_tool** when they want follow-up or a quote but are not ready to schedule; collect name, email, and their requirement.
-- Use **web_search_tool** for external factual or time-sensitive questions not covered by the knowledge base.
-
-Stay factual; do not invent DigiiMark policies or prices not present in the knowledge base — say you are not sure and offer a human follow-up.
-"""
-
+# System instruction is assembled from agents_shared/persona/*.md via
+# agents_shared.persona.build_system_prompt() in chat_engine.py — keep this
+# file free of prompt copy so both agents share one source of truth.

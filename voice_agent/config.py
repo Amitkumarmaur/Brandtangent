@@ -9,6 +9,7 @@ the knowledge base and transcripts live in Supabase.
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -16,6 +17,12 @@ from dotenv import load_dotenv
 # ─── Resolve paths ────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).parent.resolve()
 load_dotenv(BASE_DIR / ".env")
+
+# Make agents_shared/ importable in local dev (the Docker image sets
+# PYTHONPATH=/app so this is a no-op in production).
+_REPO_ROOT = BASE_DIR.parent
+if _REPO_ROOT.is_dir() and str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 # ─── Required API keys ───────────────────────────────────────────────────────
 GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
