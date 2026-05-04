@@ -4,7 +4,7 @@ import { Play, Zap, Rocket } from "lucide-react"
 
 export default function HeroSection() {
   return (
-    <section className="relative bg-white flex items-center justify-center p-4 sm:p-5 lg:p-6 overflow-hidden font-sans pt-24 lg:pt-[105px] pb-6">
+    <section className="relative bg-white flex items-center justify-center p-4 sm:p-5 lg:p-6 overflow-hidden font-sans pt-28 sm:pt-32 lg:pt-[140px] pb-10 md:pb-14 lg:pb-16">
       
       <div className="max-w-[1300px] w-full mx-auto">
         
