@@ -22,6 +22,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Python (chat agent)
+__pycache__/
+*.py[cod]
+.venv/
+
 # typescript
 *.tsbuildinfo
 next-env.d.tslogo-samples/generate-logos.ts

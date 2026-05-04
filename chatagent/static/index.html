@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DigiiMark — Live Chat (demo)</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; background: #0a0a0a; color: #e8e8e8; }
+    body { max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+    h1 { font-size: 1.25rem; font-weight: 600; }
+    #log { min-height: 200px; border: 1px solid #333; border-radius: 8px; padding: 1rem; margin: 1rem 0; background: #111; white-space: pre-wrap; }
+    .row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    input, textarea, button { font: inherit; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid #444; background: #1a1a1a; color: #eee; }
+    textarea { flex: 1; min-height: 80px; resize: vertical; }
+    button { cursor: pointer; background: #e85d04; border-color: #e85d04; color: #0a0a0a; font-weight: 600; }
+    button.secondary { background: #333; border-color: #555; color: #ccc; }
+    small { color: #888; }
+    .cites { font-size: 0.8rem; color: #999; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>DigiiMark — Live Chat (local demo)</h1>
+  <p><small>Session: <span id="sid">—</span> · End session to write <code>transcripts/</code> + <code>call_logs.json</code></small></p>
+  <div id="log"></div>
+  <div class="row">
+    <textarea id="msg" placeholder="Ask about DigiiMark services…"></textarea>
+  </div>
+  <div class="row">
+    <button type="button" id="send">Send</button>
+    <button type="button" class="secondary" id="end">End session</button>
+  </div>
+  <script>
+    const log = document.getElementById("log");
+    const sidEl = document.getElementById("sid");
+    let sessionId = null;
+
+    function append(role, text) {
+      log.textContent += (role === "user" ? "\nYou: " : "\nAgent: ") + text + "\n";
+      log.scrollTop = log.scrollHeight;
+    }
+
+    document.getElementById("send").onclick = async () => {
+      const msg = document.getElementById("msg").value.trim();
+      if (!msg) return;
+      append("user", msg);
+      document.getElementById("msg").value = "";
+      const body = { message: msg, session_id: sessionId };
+      const r = await fetch("/v1/chat/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const j = await r.json();
+      if (!r.ok) {
+        append("agent", "Error: " + (j.detail || JSON.stringify(j)));
+        return;
+      }
+      sessionId = j.session_id;
+      sidEl.textContent = sessionId;
+      append("agent", j.reply);
+      if (j.citations && j.citations.length) {
+        const names = j.citations.map((c) => c.file_name).join(", ");
+        log.textContent += "\n[Sources: " + names + "]\n";
+      }
+    };
+
+    document.getElementById("end").onclick = async () => {
+      if (!sessionId) return;
+      const r = await fetch("/v1/chat/session/" + encodeURIComponent(sessionId) + "/end", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ outcome: "completed" }),
+      });
+      const j = await r.json();
+      if (!r.ok) {
+        append("agent", "End error: " + (j.detail || JSON.stringify(j)));
+        return;
+      }
+      append("agent", "Session ended. Transcript: " + j.transcript_file);
+      sessionId = null;
+      sidEl.textContent = "—";
+    };
+  </script>
+</body>
+</html>

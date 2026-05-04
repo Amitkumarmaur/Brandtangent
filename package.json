@@ -5,6 +5,9 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev -p 3000",
+    "chat-agent:deps": "pip install -r chatagent/requirements.txt",
+    "chat-agent": "cd chatagent && python main.py",
+    "dev:with-chat": "concurrently -k -n site,chat -c blue,magenta \"pnpm dev\" \"pnpm chat-agent\"",
     "lint": "eslint .",
     "start": "next start"
   },
@@ -81,6 +84,7 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
