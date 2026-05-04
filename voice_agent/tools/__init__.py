@@ -6,6 +6,7 @@ from tools.content_lookup_tool import (
     FindFaqTool,
     FindServiceTool,
 )
+from tools.end_call_tool import EndCallTool
 from tools.lead_capture_tool import LeadCaptureTool
 
 # Build the global tool registry.
@@ -15,5 +16,6 @@ registry.register(LeadCaptureTool())
 registry.register(FindServiceTool())
 registry.register(FindCaseStudyTool())
 registry.register(FindFaqTool())
+registry.register(EndCallTool())
 
 __all__ = ["registry"]

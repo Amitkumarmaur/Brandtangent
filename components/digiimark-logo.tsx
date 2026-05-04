@@ -37,7 +37,7 @@ export function DigiimarkLogo({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 35 375 90"
+      viewBox="0 35 375 105"
       role="img"
       aria-label={title}
       className={className}

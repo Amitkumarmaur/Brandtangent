@@ -17,7 +17,7 @@ import config
 from agents_shared import build_system_prompt
 from gemini_client import client as _client
 from rag import retriever as rag_retriever
-from rag.indexer import VectorStore
+from rag.indexer import KBIndex
 from tools.base import ToolRegistry
 from transcript_manager import ChatTranscriptManager
 
@@ -95,11 +95,11 @@ class ChatSessionState:
 class ChatEngine:
     def __init__(
         self,
-        vector_store: VectorStore,
+        kb_index: KBIndex,
         tool_registry: ToolRegistry,
         transcripts: ChatTranscriptManager,
     ) -> None:
-        self._store = vector_store
+        self._kb = kb_index
         self._tools = tool_registry
         self._tm = transcripts
         self._genai_tools = _build_genai_tools(tool_registry)
@@ -123,12 +123,17 @@ class ChatEngine:
 
         recent_users = _recent_user_texts(session.contents)
         q = rag_retriever.build_retrieval_query(user_message, recent_users)
-        chunks = rag_retriever.retrieve_chunks(q, self._store)
+        chunks = rag_retriever.retrieve_chunks(q)
         citations = [
             {
-                "file_name": c["file_name"],
-                "score": round(float(c["score"]), 4),
-                "excerpt": (c["text"][:600] + "…") if len(c["text"]) > 600 else c["text"],
+                "title": c.get("document_title"),
+                "category": c.get("document_category"),
+                "score": round(float(c.get("similarity", 0.0)), 4),
+                "excerpt": (
+                    (c.get("content", "")[:600] + "…")
+                    if len(c.get("content", "")) > 600
+                    else c.get("content", "")
+                ),
             }
             for c in chunks
         ]
@@ -234,7 +239,7 @@ class ChatEngine:
             self._append_model_text(session, final_text)
             appended_model = True
 
-        self._tm.add_model_turn(session.session_id, final_text)
+        self._tm.add_model_turn(session.session_id, final_text, citations=citations)
 
         return {
             "reply": final_text,

@@ -71,6 +71,11 @@ app/
 components/
 ├── header.tsx            # Site header/nav
 ├── footer.tsx            # Site footer
+├── contact-widget.tsx    # Floating "Get in touch" launcher (form + chat + voice)
+├── contact/              # Sub-panels for the contact widget
+│   ├── contact-form.tsx  # Lead form → POSTs /api/contact
+│   ├── chat-panel.tsx    # Live chat UI → /api/chat-agent proxy
+│   └── voice-panel.tsx   # Voice agent iframe (NEXT_PUBLIC_VOICE_AGENT_URL)
 ├── hero-section.tsx      # Homepage hero (H1)
 ├── trust-indicators.tsx  # Tech stack + globe + logos
 ├── about-us.tsx          # Founders + achievements
@@ -213,6 +218,38 @@ If you add, remove, or change any CSS custom property in `app/globals.css`:
 |----------|---------|------|
 | `GEMINI_API_KEY` | Google Nano Banana 2 image generation | `.env.local` |
 | `CHAT_AGENT_URL` | Base URL of the Python live-chat API (production). Dev defaults to `http://127.0.0.1:8010` in the Next proxy. | Vercel / `.env.local` |
+| `NEXT_PUBLIC_VOICE_AGENT_URL` | Public URL of the deployed voice agent. Used as the iframe `src` in the contact widget's voice panel. | Vercel / `.env.local` |
+| `CONTACT_INQUIRY_WEBHOOK_URL` | Webhook the contact form posts to (Make / n8n / Zapier). | Vercel / `.env.local` |
+
+## AI agents — chat + voice (unified on Supabase)
+
+Both Python agents share **one persona** through `agents_shared/persona/*.md`,
+assembled at runtime by `agents_shared.persona.build_system_prompt(channel,
+agent_name, rag_context)`. Edit the markdown there — never duplicate prompt
+copy back into either agent's `config.py`. Channel-specific format rules and
+tool descriptions live in `channel_chat.md` / `channel_voice.md`.
+
+Both agents also share **one Supabase project** for storage:
+
+| What | Tables |
+|---|---|
+| Knowledge base (read by both) | `knowledge_base_documents`, `knowledge_base_chunks` |
+| Voice call transcripts | `voice_calls`, `voice_call_turns`, `voice_call_tool_calls` |
+| Chat session transcripts | `chat_sessions`, `chat_session_turns`, `chat_session_tool_calls` |
+
+The KB is populated by `python voice_agent/scripts/sync_voice_kb.py` (which
+syncs from the live `services` / `faq` / `case_studies` / `blogs` tables plus
+manual markdown in `voice_agent/knowledge_base/`). Both agents query it via
+the `match_kb_chunks` RPC. Migrations:
+- `scripts/voice-agent-supabase-migration.sql`
+- `scripts/chat-agent-supabase-migration.sql`
+
+Both agent images build from the **repo root** (`voice_agent/Dockerfile`,
+`chatagent/Dockerfile`) so `agents_shared/` is included. The Next.js site is
+deployed on Vercel; both agents are deployed on Railway and surfaced inside
+the floating "Get in touch" widget (`components/contact-widget.tsx`). Both
+are stateless: there is no FAISS file, no on-disk transcripts, no file
+watcher — restart-safe by design.
 
 ## Deployment
 

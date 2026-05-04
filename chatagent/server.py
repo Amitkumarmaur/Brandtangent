@@ -1,5 +1,10 @@
 """
 FastAPI server: chat session lifecycle, RAG-backed turns, static demo UI.
+
+The chat agent now reads from the shared Supabase knowledge base
+(`knowledge_base_chunks`) and persists transcripts to `chat_sessions` /
+`chat_session_turns` / `chat_session_tool_calls`. There is no FAISS file,
+no `watchdog` watcher — both have been retired.
 """
 
 from __future__ import annotations
@@ -16,7 +21,7 @@ from pydantic import BaseModel, Field
 
 import config
 from chat_engine import ChatEngine, ChatSessionState
-from rag.indexer import build_vector_store, start_watcher
+from rag.indexer import build_kb_index
 from tools import build_tool_registry
 from transcript_manager import ChatTranscriptManager
 
@@ -26,20 +31,21 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    store = build_vector_store()
-    watcher = start_watcher(store)
+    kb_index = build_kb_index()
     transcripts = ChatTranscriptManager()
     registry = build_tool_registry()
-    engine = ChatEngine(store, registry, transcripts)
-    app.state.vector_store = store
-    app.state.watcher = watcher
+    engine = ChatEngine(kb_index, registry, transcripts)
+    app.state.kb_index = kb_index
     app.state.transcripts = transcripts
     app.state.tool_registry = registry
     app.state.chat_engine = engine
     app.state.sessions: Dict[str, ChatSessionState] = {}
-    logger.info("Chat agent ready | model=%s | kb=%s", config.CHAT_MODEL, config.KNOWLEDGE_BASE_DIR)
+    logger.info(
+        "Chat agent ready | model=%s | shared kb chunks=%d",
+        config.CHAT_MODEL,
+        kb_index.total_chunks,
+    )
     yield
-    watcher.stop()
 
 
 app = FastAPI(title="DigiiMark Live Chat Agent", lifespan=lifespan)
@@ -85,9 +91,17 @@ def root():
 
 @app.get("/health")
 def health() -> Dict[str, Any]:
-    store = getattr(app.state, "vector_store", None)
-    chunks = store.total_chunks if store else 0
-    return {"status": "ok", "indexed_chunks": chunks, "model": config.CHAT_MODEL}
+    kb = getattr(app.state, "kb_index", None)
+    chunks = kb.total_chunks if kb else 0
+    registry = getattr(app.state, "tool_registry", None)
+    tool_names = [t.name for t in registry.all_tools()] if registry else []
+    return {
+        "status": "ok",
+        "agent": config.AGENT_NAME,
+        "model": config.CHAT_MODEL,
+        "knowledge_chunks": chunks,
+        "tools": tool_names,
+    }
 
 
 @app.post("/v1/chat/session")
@@ -133,11 +147,11 @@ def end_session(session_id: str, body: EndSessionBody) -> Dict[str, Any]:
     tm: ChatTranscriptManager = app.state.transcripts
     if session_id not in app.state.sessions:
         raise HTTPException(status_code=404, detail="Unknown session_id")
-    path = tm.end_session(session_id, topics=body.topics, outcome=body.outcome)
-    if not path:
+    summary = tm.end_session(session_id, topics=body.topics, outcome=body.outcome)
+    if not summary:
         raise HTTPException(status_code=500, detail="Could not finalize session")
     app.state.sessions.pop(session_id, None)
-    return {"ok": True, "transcript_file": f"transcripts/{path.name}"}
+    return {"ok": True, **summary}
 
 
 @app.post("/v1/chat/session/{session_id}/message")
@@ -145,3 +159,21 @@ def chat_message_scoped(session_id: str, body: MessageBody) -> Dict[str, Any]:
     """Same as /v1/chat/message with session_id in path."""
     body.session_id = session_id
     return chat_message(body)
+
+
+# ─── Admin / dashboards (Supabase-backed; service role bypasses RLS) ─────────
+
+
+@app.get("/api/sessions")
+def list_sessions(limit: int = 50) -> Any:
+    """Return the most recent chat sessions from Supabase."""
+    return ChatTranscriptManager.list_sessions(limit=limit)
+
+
+@app.get("/api/sessions/{session_id}")
+def get_session(session_id: str) -> Any:
+    """Return one session + its turns + tool calls."""
+    row = ChatTranscriptManager.get_session(session_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return row

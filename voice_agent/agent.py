@@ -43,7 +43,8 @@ except ImportError as exc:  # pragma: no cover — terminal-mode-only dep
         "  Windows: pip install pyaudio"
     ) from exc
 
-import config
+import config  # noqa: E402  (config.py also adds the repo root to sys.path)
+from agents_shared import build_system_prompt
 from rag.retriever import retrieve_context_for_turn
 from tools import registry as tool_registry
 from transcript_manager import TranscriptManager
@@ -89,10 +90,10 @@ class DigiiMarkVoiceAgent:
 
     def _build_system_prompt(self) -> str:
         rag_ctx = retrieve_context_for_turn(self._history)
-        return config.SYSTEM_PROMPT_TEMPLATE.format(
+        return build_system_prompt(
+            channel="voice",
             agent_name=config.AGENT_NAME,
-            rag_context=rag_ctx
-            or "(Knowledge base empty — answer from general knowledge.)",
+            rag_context=rag_ctx,
         )
 
     # ── Gemini session config ──────────────────────────────────────────────

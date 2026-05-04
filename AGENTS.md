@@ -36,6 +36,53 @@ When you modify `app/globals.css` (add/remove/change tokens), you **must** also 
 When you add a new page or major component, update the file structure section in
 `.agents/skills/digiimark-project/SKILL.md`.
 
+## AI agents — chat, voice, and shared persona
+
+The site ships with a unified "Get in touch" widget (`components/contact-widget.tsx`)
+that exposes three channels: contact form, live chat (Alex), live voice (Maya).
+
+- **Chat agent** — Python service at `chatagent/` (FastAPI). Browser hits
+  `/api/chat-agent/v1/...` which proxies to `CHAT_AGENT_URL` (Railway).
+- **Voice agent** — Python service at `voice_agent/` (FastAPI + WebSocket +
+  Gemini Live API). Embedded inside the contact widget via an iframe pointing
+  at `NEXT_PUBLIC_VOICE_AGENT_URL`.
+- **Shared persona** — both agents derive their system prompt from
+  `agents_shared/persona/*.md` via `agents_shared.persona.build_system_prompt()`.
+  **Edit the markdown there** — never duplicate prompt copy back into
+  `chatagent/config.py` or `voice_agent/config.py`. Channel-specific format
+  rules and tool descriptions live in `channel_chat.md` / `channel_voice.md`.
+- **Shared Supabase** — both agents read from one knowledge base
+  (`knowledge_base_documents` + `knowledge_base_chunks`, populated by
+  `scripts/sync_voice_kb.py`) and write transcripts to mirrored tables:
+  - Voice: `voice_calls` / `voice_call_turns` / `voice_call_tool_calls`
+  - Chat: `chat_sessions` / `chat_session_turns` / `chat_session_tool_calls`
+  Both stores have RLS denying anon reads; the agents use the service role key.
+
+Both agent Docker images build from the **repo root** so they can copy
+`agents_shared/` into the image. See `voice_agent/Dockerfile`,
+`chatagent/Dockerfile`, and the per-service `railway.json` files. Both agents
+are stateless and survive Railway restarts.
+
+### Required env vars (Vercel + `.env.local`)
+
+| Variable | Purpose |
+|---|---|
+| `CHAT_AGENT_URL` | URL of the deployed chat agent (e.g. `https://chat.digiimark.com`). The proxy at `app/api/chat-agent/[...path]/route.ts` forwards there. |
+| `NEXT_PUBLIC_VOICE_AGENT_URL` | URL of the deployed voice agent (e.g. `https://voice.digiimark.com`). Used as the iframe `src` in the voice panel. |
+| `CONTACT_INQUIRY_WEBHOOK_URL` | Webhook the contact form posts to (Make / n8n / Zapier). |
+
+### Required env vars on each agent's server (Railway)
+
+| Variable | Used by |
+|---|---|
+| `GEMINI_API_KEY` | Both agents (LLM + embeddings) |
+| `SUPABASE_URL` | Both agents (RAG + transcripts) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Both agents (writes bypass RLS) |
+| `CALCOM_API_KEY`, `CALCOM_EVENT_TYPE_ID` | Voice agent (booking) |
+| `LEAD_CAPTURE_WEBHOOK_URL` | Both agents (lead webhook) |
+| `CALENDAR_WEBHOOK_URL` | Chat agent (booking via webhook) |
+| `CORS_ORIGINS` | Voice agent (CORS + iframe frame-ancestors) |
+
 ## Available Skills
 
 Skills are in `.agents/skills/`. Read the relevant SKILL.md before using:

@@ -25,19 +25,22 @@ import asyncio
 import json
 import logging
 import sys
+import time
 from pathlib import Path
 
-from fastapi import FastAPI, Response, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 import google.genai as genai
 import google.genai.types as genai_types
 
 # ─── Bootstrap ────────────────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).parent))
-import config
+import config  # noqa: E402  (config.py also adds the repo root to sys.path)
+from agents_shared import build_system_prompt
 from rag.retriever import retrieve_context_for_turn
 from supabase_client import get_client
 from tools import registry as tool_registry
@@ -84,6 +87,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ─── Frame-ancestors (so the marketing site can embed us via iframe) ──────────
+# CORS_ORIGINS is the source of truth: any origin allowed to talk to us is also
+# allowed to embed us. `'self'` keeps the standalone console working too.
+_FRAME_ANCESTORS = " ".join(["'self'", *config.CORS_ORIGINS])
+
+
+class FrameAncestorsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["Content-Security-Policy"] = (
+            f"frame-ancestors {_FRAME_ANCESTORS}"
+        )
+        # X-Frame-Options is legacy and conflicts with frame-ancestors; drop it
+        # if anything upstream set it. Starlette's MutableHeaders has no pop().
+        if "x-frame-options" in response.headers:
+            del response.headers["x-frame-options"]
+        return response
+
+
+app.add_middleware(FrameAncestorsMiddleware)
 
 WEB_DIR = Path(__file__).parent / "web"
 WEB_DIR.mkdir(exist_ok=True)
@@ -230,12 +255,13 @@ async def voice_ws(ws: WebSocket):
         }
     )
 
-    # Build system prompt with RAG context.
+    # Build system prompt with RAG context (assembled from agents_shared/).
     def build_prompt() -> str:
         rag_ctx = retrieve_context_for_turn(conversation_history)
-        return config.SYSTEM_PROMPT_TEMPLATE.format(
+        return build_system_prompt(
+            channel="voice",
             agent_name=config.AGENT_NAME,
-            rag_context=rag_ctx or "(Knowledge base empty.)",
+            rag_context=rag_ctx,
         )
 
     session_config = genai_types.LiveConnectConfig(
@@ -260,11 +286,31 @@ async def voice_ws(ws: WebSocket):
     # word-by-word as it speaks).
     pending = {"user": "", "assistant": ""}
 
+    # Shared call lifecycle state, mutated by all three concurrent tasks below
+    # (forward_audio, receive_gemini, watchdog_silence). Plain dict keeps
+    # `nonlocal` ceremony down.
+    call_state: dict = {
+        "last_activity": time.time(),
+        # Set when Maya invokes the end_call tool. The recv loop ends the
+        # call after the next turn_complete so the goodbye audio plays out.
+        "end_after_turn": False,
+        # Set when the silence watchdog or end_call signal fires. Any of the
+        # three tasks may set this to ask the others to wind down.
+        "should_stop": False,
+        # Reason recorded on the transcript when ending automatically.
+        "end_reason": None,
+    }
+
+    def touch_activity() -> None:
+        call_state["last_activity"] = time.time()
+
     async def _flush_pending(role: str) -> None:
         text = pending[role].strip()
         pending[role] = ""
         if not text:
             return
+        # Real spoken content from either side counts as activity.
+        touch_activity()
         if role == "user":
             conversation_history.append(f"Caller: {text}")
         else:
@@ -411,12 +457,37 @@ async def voice_ws(ws: WebSocket):
                                     logger.debug("Call %s: Turn complete.", call_id)
                                     await _flush_pending("user")
                                     await _flush_pending("assistant")
+                                    # Maya called end_call earlier in this
+                                    # turn; her goodbye audio has now flushed.
+                                    # Wind the call down.
+                                    if call_state["end_after_turn"]:
+                                        logger.info(
+                                            "Call %s: end_call tool fired, "
+                                            "closing after goodbye.",
+                                            call_id,
+                                        )
+                                        call_state["should_stop"] = True
+                                        should_stop = True
+                                        break
 
                             if response.tool_call:
+                                # Any tool invocation is real activity — keep
+                                # the silence watchdog from pulling the rug.
+                                touch_activity()
                                 for fc in response.tool_call.function_calls:
                                     args = dict(fc.args) if fc.args else {}
                                     result = tool_registry.execute(fc.name, **args)
                                     tm.add_tool_call(call_id, fc.name, args, result)
+
+                                    if (
+                                        isinstance(result, dict)
+                                        and result.get("action") == "end_call"
+                                    ):
+                                        call_state["end_after_turn"] = True
+                                        call_state["end_reason"] = (
+                                            result.get("reason")
+                                            or "wrapped_up"
+                                        )
 
                                     try:
                                         await ws.send_json(
@@ -448,6 +519,12 @@ async def voice_ws(ws: WebSocket):
                                             "Failed to send tool response: %s", e
                                         )
 
+                            # Honour a stop signal raised by the silence
+                            # watchdog (or any other task) between iterations.
+                            if call_state["should_stop"]:
+                                should_stop = True
+                                break
+
                         if not should_stop:
                             logger.debug(
                                 "Call %s: Turn iterator exhausted, re-entering.",
@@ -457,12 +534,47 @@ async def voice_ws(ws: WebSocket):
                 except Exception as exc:
                     logger.error("receive_gemini error: %s", exc)
 
-            # Run both tasks concurrently.
+            # ── Task: silence watchdog ──────────────────────────────────
+            # Auto-end the call after SILENCE_TIMEOUT_SEC of no activity in
+            # either direction. Activity = any flushed transcript turn or
+            # tool call (raw audio frames don't count — the browser sends
+            # those constantly even during quiet moments).
+            async def watchdog_silence():
+                if config.SILENCE_TIMEOUT_SEC <= 0:
+                    return  # disabled
+                try:
+                    while not call_state["should_stop"]:
+                        await asyncio.sleep(2)
+                        idle = time.time() - call_state["last_activity"]
+                        if idle >= config.SILENCE_TIMEOUT_SEC:
+                            logger.info(
+                                "Call %s: %.1fs of silence — auto-ending.",
+                                call_id,
+                                idle,
+                            )
+                            call_state["should_stop"] = True
+                            call_state["end_reason"] = "silence_timeout"
+                            try:
+                                await ws.send_json(
+                                    {
+                                        "type": "status",
+                                        "message": "Ending after a long pause.",
+                                    }
+                                )
+                            except Exception:
+                                pass
+                            return
+                except asyncio.CancelledError:
+                    pass
+
+            # Run all three tasks concurrently. Whichever finishes first
+            # winds the call down; the other two are cancelled.
             send_task = asyncio.create_task(forward_audio(), name="forward_audio")
             recv_task = asyncio.create_task(receive_gemini(), name="receive_gemini")
+            watch_task = asyncio.create_task(watchdog_silence(), name="watchdog_silence")
 
             done, pending = await asyncio.wait(
-                [send_task, recv_task],
+                [send_task, recv_task, watch_task],
                 return_when=asyncio.FIRST_COMPLETED,
             )
 

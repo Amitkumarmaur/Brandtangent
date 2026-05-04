@@ -22,10 +22,17 @@ yarn-error.log*
 # vercel
 .vercel
 
-# Python (chat agent)
+# Python (chat agent + voice agent)
 __pycache__/
 *.py[cod]
 .venv/
+venv/
+
+# Local agent state (regenerated on first run)
+voice_agent/transcripts/
+chatagent/transcripts/
+chatagent/rag/vector_store.faiss
+chatagent/rag/vector_metadata.json
 
 # typescript
 *.tsbuildinfo
