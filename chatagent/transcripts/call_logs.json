@@ -1,0 +1,57 @@
+[
+  {
+    "session_id": "9542632483a3",
+    "started_at": "2026-04-24T07:57:08.429216+00:00",
+    "ended_at": "2026-04-24T07:57:27.987394+00:00",
+    "duration_seconds": 19,
+    "user_identifier": "anonymous",
+    "topics": [
+      "DigiiMark overview",
+      "AI-first agency",
+      "Marketing automation",
+      "Intelligent systems",
+      "B2B marketing",
+      "Agency services"
+    ],
+    "tools_used": [],
+    "outcome": "completed",
+    "transcript_file": "transcripts/2026-04-24_07-57-08_session-9542632483a3.md",
+    "turn_count": 2
+  },
+  {
+    "session_id": "8f6fa5302ed0",
+    "started_at": "2026-04-25T03:52:57.401946+00:00",
+    "ended_at": "2026-04-25T06:15:26.142841+00:00",
+    "duration_seconds": 8548,
+    "user_identifier": "anonymous",
+    "topics": [
+      "SEO services",
+      "Appointment scheduling",
+      "Marketing automation",
+      "Organic traffic",
+      "B2B companies"
+    ],
+    "tools_used": [],
+    "outcome": "completed",
+    "transcript_file": "transcripts/2026-04-25_03-52-57_session-8f6fa5302ed0.md",
+    "turn_count": 8
+  },
+  {
+    "session_id": "bdb4ca5ac3c4",
+    "started_at": "2026-05-01T10:06:39.092766+00:00",
+    "ended_at": "2026-05-01T10:13:54.590378+00:00",
+    "duration_seconds": 435,
+    "user_identifier": "anonymous",
+    "topics": [
+      "SEO services",
+      "Pricing information",
+      "Custom solutions",
+      "B2B clients",
+      "Next steps"
+    ],
+    "tools_used": [],
+    "outcome": "completed",
+    "transcript_file": "transcripts/2026-05-01_10-06-39_session-bdb4ca5ac3c4.md",
+    "turn_count": 8
+  }
+]

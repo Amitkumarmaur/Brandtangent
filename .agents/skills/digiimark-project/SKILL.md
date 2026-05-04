@@ -212,6 +212,7 @@ If you add, remove, or change any CSS custom property in `app/globals.css`:
 | Variable | Purpose | File |
 |----------|---------|------|
 | `GEMINI_API_KEY` | Google Nano Banana 2 image generation | `.env.local` |
+| `CHAT_AGENT_URL` | Base URL of the Python live-chat API (production). Dev defaults to `http://127.0.0.1:8010` in the Next proxy. | Vercel / `.env.local` |
 
 ## Deployment
 

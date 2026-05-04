@@ -1,0 +1,17 @@
+[
+  {
+    "name": "notify_internal_slack",
+    "description": "Post a short internal notification to the team Slack incoming webhook.",
+    "url_env": "SLACK_INCOMING_WEBHOOK_URL",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Plain-text summary to post."
+        }
+      },
+      "required": ["message"]
+    }
+  }
+]
