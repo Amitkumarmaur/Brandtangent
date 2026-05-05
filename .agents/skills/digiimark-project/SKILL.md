@@ -218,4 +218,4 @@ If you add, remove, or change any CSS custom property in `app/globals.css`:
 
 - **Platform:** Vercel
 - **Build:** `pnpm build` (runs `next build`)
-- **Dev:** `pnpm dev` (default port 3000)
+- **Dev:** `pnpm dev` (default port 3001)

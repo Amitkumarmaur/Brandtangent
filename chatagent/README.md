@@ -58,7 +58,7 @@ See `.env.example`. **GEMINI_API_KEY** is required at import time.
 
 ## Website widget (Next.js)
 
-The main site proxies requests to this service via **`CHAT_AGENT_URL`** (server-side only), e.g. `https://chat-api.yourdomain.com`. The UI calls **`/api/chat-agent/...`**; see `app/api/chat-agent/[...path]/route.ts` in the repo. In local dev, the proxy defaults to `http://127.0.0.1:8010` when `CHAT_AGENT_URL` is unset—run `python main.py` in `chatagent/` while `pnpm dev` is on port 3000.
+The main site proxies requests to this service via **`CHAT_AGENT_URL`** (server-side only), e.g. `https://chat-api.yourdomain.com`. The UI calls **`/api/chat-agent/...`**; see `app/api/chat-agent/[...path]/route.ts` in the repo. In local dev, the proxy defaults to `http://127.0.0.1:8010` when `CHAT_AGENT_URL` is unset—run `python main.py` in `chatagent/` while `pnpm dev` is on port 3001.
 
 ## Production notes
 

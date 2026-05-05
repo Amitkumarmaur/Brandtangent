@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -104,6 +105,7 @@ function TiltCard({
 }
 
 export default function CaseStudiesGrid() {
+  const searchParams = useSearchParams()
   const [query, setQuery] = useState("")
   const [activeIndustrySlug, setActiveIndustrySlug] = useState<string | null>(null)
   const [activeServiceSlug, setActiveServiceSlug] = useState<string | null>(null)
@@ -145,6 +147,16 @@ export default function CaseStudiesGrid() {
     }
   }, [])
 
+  useEffect(() => {
+    const raw = searchParams.get("industry")?.trim()
+    if (!raw) return
+    try {
+      setActiveIndustrySlug(decodeURIComponent(raw))
+    } catch {
+      setActiveIndustrySlug(raw)
+    }
+  }, [searchParams])
+
   /**
    * Industry options for the sidebar. Only includes industries that actually
    * have at least one published case study, and narrows further when the user
@@ -179,6 +191,13 @@ export default function CaseStudiesGrid() {
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((o) => includesCaseInsensitive(o.name, query))
   }, [allStudies, query])
+
+  useEffect(() => {
+    if (!activeIndustrySlug || loading) return
+    if (industryOptions.length === 0) return
+    const valid = industryOptions.some((o) => o.slug === activeIndustrySlug)
+    if (!valid) setActiveIndustrySlug(null)
+  }, [loading, industryOptions, activeIndustrySlug])
 
   /**
    * Visible case studies. Combines three facets with AND logic:

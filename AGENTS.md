@@ -48,7 +48,7 @@ Skills are in `.agents/skills/`. Read the relevant SKILL.md before using:
 ## Quick Commands
 
 ```bash
-pnpm dev          # Start dev server (port 3000)
+pnpm dev          # Start dev server (port 3001)
 pnpm build        # Production build
 pnpm lint         # Run ESLint
 ```
