@@ -1,39 +1,41 @@
 """
-rag/retriever.py — Semantic search over the vector store.
+rag/retriever.py — Semantic search over the Supabase knowledge base.
 
-Given a text query, retrieve the most relevant document chunks
-and format them as a context string for the agent's system prompt.
+Given a text query, embed it and call the `match_kb_chunks` RPC to retrieve
+the most relevant document chunks, then format them as a context block for
+the agent's system prompt.
 """
 
 from __future__ import annotations
 
 import logging
-from typing import List
+import os
+import sys
+from typing import List, Optional
 
-import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import config
 from rag.embedder import embed_query
-from rag.indexer import VectorStore
+from supabase_client import get_client
 
 logger = logging.getLogger(__name__)
 
 
-def retrieve_context(query: str, store: VectorStore) -> str:
+def retrieve_context(query: str, category: Optional[str] = None) -> str:
     """
-    Embed the query, search the vector store, and return a formatted
-    context string ready to inject into the agent system prompt.
+    Embed the query, call the Supabase match_kb_chunks RPC, and return a
+    formatted context string ready to inject into the agent system prompt.
 
     Args:
-        query:  The user's current query / conversation turn.
-        store:  The initialized VectorStore instance.
+        query:    The user's current query / recent conversation turn.
+        category: Optional document category filter (e.g. 'service', 'faq').
 
     Returns:
-        A multi-line string of retrieved document excerpts, or an empty
-        string if no relevant chunks are found.
+        A multi-line string of retrieved excerpts, or an empty string when
+        nothing matches.
     """
-    if store.total_chunks == 0:
-        return "(No knowledge base documents indexed yet.)"
+    if not query or not query.strip():
+        return ""
 
     try:
         vec = embed_query(query)
@@ -41,36 +43,52 @@ def retrieve_context(query: str, store: VectorStore) -> str:
         logger.warning("Could not embed query for RAG retrieval: %s", exc)
         return ""
 
-    results = store.search(vec, top_k=config.TOP_K_RETRIEVAL)
+    if not vec:
+        return ""
 
-    if not results:
+    try:
+        response = get_client().rpc(
+            "match_kb_chunks",
+            {
+                "query_embedding": vec,
+                "match_count": config.TOP_K_RETRIEVAL,
+                "filter_category": category,
+            },
+        ).execute()
+    except Exception as exc:
+        logger.error("match_kb_chunks RPC failed: %s", exc)
+        return ""
+
+    rows = response.data or []
+    if not rows:
         return ""
 
     parts: List[str] = []
-    for i, chunk in enumerate(results, 1):
+    for i, row in enumerate(rows, 1):
+        title = row.get("document_title", "Untitled")
+        cat = row.get("document_category") or "—"
+        sim = float(row.get("similarity", 0.0))
+        content = row.get("content", "").strip()
         parts.append(
-            f"[Source {i}: {chunk['file_name']} | relevance {chunk['score']:.2f}]\n"
-            f"{chunk['text']}"
+            f"[Source {i}: {title} | category {cat} | relevance {sim:.2f}]\n{content}"
         )
 
-    context = "\n\n---\n\n".join(parts)
-    logger.debug("Retrieved %d RAG chunks for query: %s…", len(results), query[:60])
-    return context
+    logger.debug("Retrieved %d RAG chunk(s) for query: %s...", len(rows), query[:60])
+    return "\n\n---\n\n".join(parts)
 
 
-def retrieve_context_for_turn(conversation_history: List[str], store: VectorStore) -> str:
+def retrieve_context_for_turn(
+    conversation_history: List[str],
+    store=None,  # kept for backward compatibility with old call sites; unused
+) -> str:
     """
-    Build a query from the last few turns of conversation and retrieve context.
+    Build a retrieval query from the last few conversation turns and return
+    a formatted context block.
 
-    Args:
-        conversation_history: List of recent conversation messages (strings).
-        store: The initialized VectorStore.
-
-    Returns:
-        Formatted context string.
+    The `store` parameter is deprecated (was the in-memory FAISS VectorStore)
+    but is retained so existing imports in server.py / agent.py keep working.
     """
-    # Use the last 3 turns as the retrieval query
     recent = " ".join(conversation_history[-3:]) if conversation_history else ""
     if not recent.strip():
         return ""
-    return retrieve_context(recent, store)
+    return retrieve_context(recent)

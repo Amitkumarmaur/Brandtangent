@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Poppins } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { ChatWidget } from "@/components/chat-widget"
+import { ContactWidget } from "@/components/contact-widget"
 import ScrollToTop from "@/components/scroll-to-top"
 import "./globals.css"
 
@@ -52,7 +52,7 @@ export default function RootLayout({
           <ScrollToTop />
         </Suspense>
         {children}
-        <ChatWidget />
+        <ContactWidget />
         <Analytics />
       </body>
     </html>

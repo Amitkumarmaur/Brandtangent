@@ -1,5 +1,14 @@
 """
-rag/embedder.py — Gemini embeddings for chunk indexing and retrieval queries.
+rag/embedder.py — Gemini embedding wrapper for the chat agent.
+
+Uses `gemini-embedding-001` with Matryoshka Representation Learning truncated
+to 1536 dimensions, matching the voice agent and the `vector(1536)` column
+in Supabase. We set `task_type` on every request so the model applies the
+right embedding strategy — query vs document — which measurably improves
+retrieval quality.
+
+The chat agent only embeds queries (documents are embedded by
+`scripts/sync_voice_kb.py` and stored in `knowledge_base_chunks`).
 """
 
 from __future__ import annotations
@@ -9,36 +18,38 @@ import os
 import sys
 from typing import List
 
+import google.genai as genai
+import google.genai.types as genai_types
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import config
-from gemini_client import client as _client
 
 logger = logging.getLogger(__name__)
 
+_client = genai.Client(api_key=config.GEMINI_API_KEY)
 
-def embed_texts(texts: List[str]) -> List[List[float]]:
-    if not texts:
-        return []
-
-    embeddings: List[List[float]] = []
-    batch_size = 100
-    for i in range(0, len(texts), batch_size):
-        batch = texts[i : i + batch_size]
-        try:
-            response = _client.models.embed_content(
-                model=config.EMBEDDING_MODEL,
-                contents=batch,
-            )
-            for emb in response.embeddings:
-                embeddings.append(emb.values)
-        except Exception as exc:
-            logger.error("Embedding request failed for batch %d: %s", i // batch_size, exc)
-            raise
-
-    logger.debug("Embedded %d texts.", len(texts))
-    return embeddings
+# Task types supported by gemini-embedding-001.
+# https://ai.google.dev/gemini-api/docs/embeddings#task-types
+_TASK_QUERY = "RETRIEVAL_QUERY"
 
 
 def embed_query(query: str) -> List[float]:
-    results = embed_texts([query])
-    return results[0] if results else []
+    """Embed a single retrieval query. Returns a 1536-dim vector."""
+    if not query or not query.strip():
+        return []
+    try:
+        response = _client.models.embed_content(
+            model=config.EMBEDDING_MODEL,
+            contents=[query],
+            config=genai_types.EmbedContentConfig(
+                task_type=_TASK_QUERY,
+                output_dimensionality=config.EMBEDDING_DIMENSION,
+            ),
+        )
+    except Exception as exc:
+        logger.error("Embedding failed: %s", exc)
+        raise
+
+    if not response.embeddings:
+        return []
+    return list(response.embeddings[0].values)

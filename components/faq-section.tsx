@@ -1,56 +1,39 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, X } from "lucide-react"
+import { supabase } from "@/lib/supabase"
 
-const faqs = [
-  {
-    id: 1,
-    question: "Can you create a content management system for my website?",
-    answer: "Yes, we specialize in building highly scalable and customized Content Management Systems (CMS) tailored to your specific operational needs, allowing your team to seamlessly update and oversee content without needing technical skills."
-  },
-  {
-    id: 2,
-    question: "May I know the name of some of the biggest brands you have worked with?",
-    answer: "In the last few years, our client base has grown substantially. We work confidentially with leading global enterprises and innovative startups spanning tech, real estate, healthcare, and e-commerce. Due to NDAs, we selectively share enterprise case studies on request."
-  },
-  {
-    id: 3,
-    question: "I'm looking for a content marketing agency. Do you have writers in your agency?",
-    answer: "Absolutely! DigiiMark houses a dedicated team of expert copywriters and content strategists who specialize in SEO-driven web copy, engaging blog content, and high-converting marketing materials."
-  },
-  {
-    id: 4,
-    question: "Why should I choose you as my web design agency?",
-    answer: "Our approach bridges aesthetic design with engineering precision. We don't just build beautiful sites; we build high-performance, conversion-focused digital experiences engineered using cutting-edge frameworks like React and Next.js."
-  },
-  {
-    id: 5,
-    question: "Can you create a theme-based WordPress website?",
-    answer: "While our expertise lies heavily in modern, custom-coded web applications (like Next.js), we absolutely provide highly optimized, secure, and beautiful theme-based CMS solutions when it fits your business requirements best."
-  },
-  {
-    id:  6,
-    question: "Do I need to hire a web designer to develop my business site?",
-    answer: "When working with DigiiMark, you get an entire end-to-end team. We provide the UX researchers, UI designers, and frontend/backend developers needed to successfully launch your platform without any external hiring."
-  }
-]
+/** Shape we render in the accordion — mirrors `public.faq`. */
+type FAQ = {
+  id: string
+  question: string
+  answer: string
+}
 
-function AccordionItem({ 
-  question, 
-  answer, 
-  isOpen, 
-  onClick 
-}: { 
-  question: string, 
-  answer: string, 
-  isOpen: boolean, 
-  onClick: () => void 
+type RawFaqRow = {
+  id: string
+  question: string
+  answer: string
+  sort_order: number | null
+  is_active: boolean | null
+}
+
+function AccordionItem({
+  question,
+  answer,
+  isOpen,
+  onClick,
+}: {
+  question: string
+  answer: string
+  isOpen: boolean
+  onClick: () => void
 }) {
   return (
     <div className={`border rounded-[1.5rem] mb-4 overflow-hidden transition-all duration-300 ${isOpen ? 'border-ignite-orange bg-background shadow-lg' : 'border-grey-200 bg-transparent hover:border-ignite-orange/40'}`}>
-      <button 
+      <button
         onClick={onClick}
         className="w-full flex justify-between items-center p-6 md:p-8 text-left"
       >
@@ -80,23 +63,66 @@ function AccordionItem({
 }
 
 export default function FAQSection() {
-  const [openId, setOpenId] = useState<number | null>(2)
+  const [faqs, setFaqs] = useState<FAQ[]>([])
+  const [openId, setOpenId] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      const { data, error } = await supabase
+        .from("faq")
+        .select("id, question, answer, sort_order, is_active")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true, nullsFirst: false })
+
+      if (cancelled) return
+      if (error) {
+        setLoadError(error.message)
+        return
+      }
+
+      const rows = (data as RawFaqRow[] | null) ?? []
+      const mapped = rows.map((r) => ({
+        id: r.id,
+        question: r.question,
+        answer: r.answer,
+      }))
+      setFaqs(mapped)
+      // Open the second FAQ by default, matching the previous UX.
+      if (mapped.length > 1) {
+        setOpenId(mapped[1].id)
+      } else if (mapped.length === 1) {
+        setOpenId(mapped[0].id)
+      }
+    }
+
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (loadError || faqs.length === 0) {
+    return null
+  }
 
   return (
     <section className="bg-background relative py-16 md:py-20 overflow-hidden border-t border-grey-200">
-      
+
       {/* Background Subtle Grid Pattern */}
-      <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
           backgroundSize: '40px 40px',
           backgroundImage: `linear-gradient(to right, var(--color-foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--color-foreground) 1px, transparent 1px)`
         }}
       />
-      
+
       <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
-          
+
           {/* Left Column: Sticky Header */}
           <div className="lg:w-5/12 lg:sticky lg:top-24 h-max">
             <div className="flex items-center gap-2 mb-4">
@@ -115,7 +141,7 @@ export default function FAQSection() {
           {/* Right Column: Accordion */}
           <div className="lg:w-7/12 mt-4 lg:mt-0">
             {faqs.map((faq) => (
-              <AccordionItem 
+              <AccordionItem
                 key={faq.id}
                 question={faq.question}
                 answer={faq.answer}

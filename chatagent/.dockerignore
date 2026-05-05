@@ -1,0 +1,14 @@
+venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.env
+.env.local
+.git
+.gitignore
+.DS_Store
+node_modules
+*.log
+# (FAISS index + on-disk transcripts retired — chat agent is now stateless,
+# everything lives in Supabase. Nothing to ignore here any more.)

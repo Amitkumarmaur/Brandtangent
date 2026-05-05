@@ -1,34 +1,51 @@
 """
-Persist chat transcripts (Markdown) and append session metadata to call_logs.json.
+transcript_manager.py — Persist chat sessions to Supabase.
+
+Writes three tables (mirrors the voice agent's pattern):
+  * chat_sessions            — one row per session
+  * chat_session_turns       — one row per conversation turn (with citations)
+  * chat_session_tool_calls  — one row per tool invocation
+
+Sessions are inserted on start_session() (so they appear in dashboards while
+still live). Turns and tool calls stream into Supabase as they happen so a
+crashed session still leaves a usable transcript. The end_session() call
+finalises the chat_sessions row with duration / topics / tools_used.
+
+Public interface preserved from the previous file-based implementation:
+the server only had to swap the import.
 """
 
 from __future__ import annotations
 
 import json
 import logging
+import os
+import sys
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import sys
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, os.path.dirname(__file__))
 import config
+from supabase_client import get_client
 
 logger = logging.getLogger(__name__)
 
 
 def _session_id() -> str:
+    """12-char hex id; matches the previous format for cross-referencing."""
     return uuid.uuid4().hex[:12]
 
 
 class ChatTranscriptManager:
-    """In-memory session state; on end_session writes .md and updates call_logs.json."""
+    """In-memory bookkeeping for live sessions; everything is also persisted to Supabase."""
 
     def __init__(self) -> None:
-        config.TRANSCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
+        # Per-session counters / state we need locally:
+        #   {session_id: {started_at, turns: [...], tool_calls: [...], turn_count}}
         self._sessions: Dict[str, Dict[str, Any]] = {}
+
+    # ── Lifecycle ──────────────────────────────────────────────────────────
 
     def start_session(self, user_identifier: Optional[str] = None) -> str:
         sid = _session_id()
@@ -39,38 +56,87 @@ class ChatTranscriptManager:
             "started_at": now,
             "turns": [],
             "tool_calls": [],
+            "turn_count": 0,
         }
+
+        try:
+            get_client().table("chat_sessions").insert({
+                "session_id": sid,
+                "started_at": now.isoformat(),
+                "agent_name": config.AGENT_NAME,
+                "model": config.CHAT_MODEL,
+                "user_identifier": user_identifier or None,
+            }).execute()
+        except Exception as exc:
+            logger.warning(
+                "Could not insert chat_sessions row (session will still be buffered): %s",
+                exc,
+            )
+
         logger.info("Chat session started | %s", sid)
         return sid
 
     def set_user_identifier(self, session_id: str, user_identifier: str) -> None:
         s = self._sessions.get(session_id)
-        if s and user_identifier.strip():
-            s["user_identifier"] = user_identifier.strip()
+        if not s or not user_identifier.strip():
+            return
+        s["user_identifier"] = user_identifier.strip()
+        try:
+            get_client().table("chat_sessions").update({
+                "user_identifier": user_identifier.strip(),
+            }).eq("session_id", session_id).execute()
+        except Exception as exc:
+            logger.debug("Could not update user_identifier: %s", exc)
+
+    # ── Turns ──────────────────────────────────────────────────────────────
 
     def add_user_turn(self, session_id: str, content: str) -> None:
-        s = self._sessions.get(session_id)
-        if not s:
-            return
-        s["turns"].append(
-            {
-                "role": "user",
-                "content": content,
-                "ts": datetime.now(tz=timezone.utc).isoformat(),
-            }
-        )
+        self._add_turn(session_id, role="user", content=content, citations=None)
 
-    def add_model_turn(self, session_id: str, content: str) -> None:
+    def add_model_turn(
+        self,
+        session_id: str,
+        content: str,
+        citations: Optional[List[Dict[str, Any]]] = None,
+    ) -> None:
+        self._add_turn(session_id, role="assistant", content=content, citations=citations)
+
+    def _add_turn(
+        self,
+        session_id: str,
+        role: str,
+        content: str,
+        citations: Optional[List[Dict[str, Any]]],
+    ) -> None:
         s = self._sessions.get(session_id)
         if not s:
+            logger.warning("_add_turn: unknown session %s", session_id)
             return
-        s["turns"].append(
-            {
-                "role": "assistant",
+
+        turn_index = s["turn_count"]
+        s["turn_count"] += 1
+        ts = datetime.now(tz=timezone.utc)
+        s["turns"].append({
+            "role": role,
+            "content": content,
+            "ts": ts,
+            "turn_index": turn_index,
+            "citations": citations or [],
+        })
+
+        try:
+            get_client().table("chat_session_turns").insert({
+                "session_id": session_id,
+                "turn_index": turn_index,
+                "role": role,
                 "content": content,
-                "ts": datetime.now(tz=timezone.utc).isoformat(),
-            }
-        )
+                "citations": citations or [],
+                "created_at": ts.isoformat(),
+            }).execute()
+        except Exception as exc:
+            logger.warning("Could not persist chat turn (still buffered): %s", exc)
+
+    # ── Tool calls ─────────────────────────────────────────────────────────
 
     def add_tool_call(
         self,
@@ -82,21 +148,38 @@ class ChatTranscriptManager:
         s = self._sessions.get(session_id)
         if not s:
             return
-        s["tool_calls"].append(
-            {
-                "tool": tool_name,
-                "args": args,
-                "result": result,
-                "ts": datetime.now(tz=timezone.utc).isoformat(),
-            }
-        )
+        ts = datetime.now(tz=timezone.utc)
+        s["tool_calls"].append({
+            "tool": tool_name,
+            "args": args or {},
+            "result": result or {},
+            "ts": ts,
+        })
+        try:
+            get_client().table("chat_session_tool_calls").insert({
+                "session_id": session_id,
+                "tool_name": tool_name,
+                "args": args or {},
+                "result": result or {},
+                "called_at": ts.isoformat(),
+            }).execute()
+        except Exception as exc:
+            logger.warning("Could not persist chat tool call: %s", exc)
+
+    # ── End / finalise ─────────────────────────────────────────────────────
 
     def end_session(
         self,
         session_id: str,
         topics: Optional[List[str]] = None,
         outcome: str = "completed",
-    ) -> Optional[Path]:
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Finalise the chat_sessions row (duration, turn_count, topics, tools_used).
+
+        Returns the final row dict on success, or None if the session was
+        unknown.  No file is written — the source of truth is Supabase.
+        """
         s = self._sessions.pop(session_id, None)
         if not s:
             logger.error("end_session: unknown session %s", session_id)
@@ -106,103 +189,48 @@ class ChatTranscriptManager:
         started: datetime = s["started_at"]
         duration = int((ended - started).total_seconds())
 
-        date_str = started.strftime("%Y-%m-%d")
-        time_str = started.strftime("%H-%M-%S")
-        filename = f"{date_str}_{time_str}_session-{session_id}.md"
-        path = config.TRANSCRIPTS_DIR / filename
-
-        turns_blob = "\n".join(f"{t['role']}: {t['content']}" for t in s["turns"])
-        if topics is not None:
-            topic_list = list(topics)
+        if topics is None:
+            transcript_blob = "\n".join(f"{t['role']}: {t['content']}" for t in s["turns"])
+            topic_list = self.infer_topics(transcript_blob)
         else:
-            topic_list = self.infer_topics(turns_blob)
-        md = self._render_md(s, date_str, time_str, duration, topic_list, outcome)
-        try:
-            path.write_text(md, encoding="utf-8")
-            logger.info("Transcript saved: %s", filename)
-        except OSError as exc:
-            logger.error("Transcript write failed: %s", exc)
-            return None
+            topic_list = list(topics)
 
-        tools_used = list({tc["tool"] for tc in s["tool_calls"]})
-        entry = {
-            "session_id": session_id,
-            "started_at": started.isoformat(),
+        tools_used = sorted({tc["tool"] for tc in s["tool_calls"]})
+
+        update_payload: Dict[str, Any] = {
             "ended_at": ended.isoformat(),
             "duration_seconds": duration,
-            "user_identifier": s["user_identifier"],
+            "topics": topic_list,
+            "tools_used": tools_used,
+            "turn_count": len(s["turns"]),
+            "outcome": outcome,
+        }
+
+        try:
+            get_client().table("chat_sessions").update(update_payload).eq(
+                "session_id", session_id
+            ).execute()
+        except Exception as exc:
+            logger.error("Failed to finalise chat_sessions row %s: %s", session_id, exc)
+            return None
+
+        logger.info(
+            "Session %s ended | duration=%ds | turns=%d | tools=%s | outcome=%s",
+            session_id, duration, len(s["turns"]), tools_used, outcome,
+        )
+        return {
+            "session_id": session_id,
+            "duration_seconds": duration,
+            "turn_count": len(s["turns"]),
             "topics": topic_list,
             "tools_used": tools_used,
             "outcome": outcome,
-            "transcript_file": f"transcripts/{filename}",
-            "turn_count": len(s["turns"]),
         }
-        self._append_call_log(entry)
-        return path
 
-    def _render_md(
-        self,
-        s: Dict[str, Any],
-        date_str: str,
-        time_str: str,
-        duration_seconds: int,
-        topics: List[str],
-        outcome: str,
-    ) -> str:
-        lines = [
-            "# DigiiMark Live Chat — Session Transcript",
-            "",
-            f"**Session ID:** `{s['session_id']}`  ",
-            f"**User:** {s['user_identifier']}  ",
-            f"**Date:** {date_str}  ",
-            f"**Time (UTC):** {time_str.replace('-', ':')}  ",
-            f"**Duration:** {duration_seconds // 60}m {duration_seconds % 60}s  ",
-            f"**Topics:** {', '.join(topics) if topics else 'N/A'}  ",
-            f"**Outcome:** {outcome}  ",
-            "",
-            "---",
-            "",
-            "## Conversation",
-            "",
-        ]
-        for t in s["turns"]:
-            label = "**User**" if t["role"] == "user" else f"**{config.AGENT_NAME}**"
-            lines.append(f"{label}: {t['content']}")
-            lines.append("")
-
-        if s["tool_calls"]:
-            lines += ["---", "", "## Tool calls", ""]
-            for tc in s["tool_calls"]:
-                lines.append(f"### `{tc['tool']}`")
-                lines.append("")
-                lines.append("```json")
-                lines.append(json.dumps({"args": tc["args"], "result": tc["result"]}, indent=2, ensure_ascii=False))
-                lines.append("```")
-                lines.append("")
-
-        lines.append(f"*DigiiMark Chat Agent — {date_str}*")
-        return "\n".join(lines)
-
-    def _append_call_log(self, entry: Dict[str, Any]) -> None:
-        log_path = config.CALL_LOGS_PATH
-        existing: List[Dict[str, Any]] = []
-        if log_path.exists():
-            try:
-                existing = json.loads(log_path.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, OSError):
-                existing = []
-
-        if not isinstance(existing, list):
-            existing = []
-
-        existing.append(entry)
-        try:
-            log_path.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
-        except OSError as exc:
-            logger.error("call_logs.json update failed: %s", exc)
+    # ── Topic inference (best-effort) ──────────────────────────────────────
 
     def infer_topics(self, transcript_text: str) -> List[str]:
-        """Lightweight topic tags from transcript (optional)."""
+        """Lightweight topic tags from transcript via a quick Gemini call."""
         if not transcript_text.strip():
             return []
         try:
@@ -229,3 +257,56 @@ class ChatTranscriptManager:
         except Exception as exc:
             logger.debug("Topic inference skipped: %s", exc)
         return []
+
+    # ── Query helpers (used by /api/sessions endpoints) ────────────────────
+
+    @staticmethod
+    def list_sessions(limit: int = 50) -> List[Dict[str, Any]]:
+        try:
+            res = (
+                get_client()
+                .table("chat_sessions")
+                .select("*")
+                .order("started_at", desc=True)
+                .limit(limit)
+                .execute()
+            )
+            return res.data or []
+        except Exception as exc:
+            logger.error("list_sessions failed: %s", exc)
+            return []
+
+    @staticmethod
+    def get_session(session_id: str) -> Optional[Dict[str, Any]]:
+        try:
+            client = get_client()
+            sess = (
+                client.table("chat_sessions")
+                .select("*")
+                .eq("session_id", session_id)
+                .limit(1)
+                .execute()
+            )
+            if not sess.data:
+                return None
+            row = sess.data[0]
+            turns = (
+                client.table("chat_session_turns")
+                .select("turn_index, role, content, citations, created_at")
+                .eq("session_id", session_id)
+                .order("turn_index")
+                .execute()
+            )
+            tools = (
+                client.table("chat_session_tool_calls")
+                .select("tool_name, args, result, called_at")
+                .eq("session_id", session_id)
+                .order("called_at")
+                .execute()
+            )
+            row["turns"] = turns.data or []
+            row["tool_calls"] = tools.data or []
+            return row
+        except Exception as exc:
+            logger.error("get_session failed: %s", exc)
+            return None

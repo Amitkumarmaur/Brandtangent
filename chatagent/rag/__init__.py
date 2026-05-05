@@ -1,1 +1,1 @@
-"""RAG: embeddings, FAISS index, knowledge base watcher."""
+"""RAG: Gemini query embedder + Supabase-backed retrieval."""

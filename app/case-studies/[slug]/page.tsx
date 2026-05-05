@@ -12,7 +12,6 @@ import CaseStudyTechStack from "@/components/case-studies/case-study-tech-stack"
 import CaseStudyResults from "@/components/case-studies/case-study-results"
 import CaseStudyTestimonial from "@/components/case-studies/case-study-testimonial"
 import CaseStudyCTA from "@/components/case-studies/case-study-cta"
-import { fetchCaseStudyContentCategories } from "@/lib/content-categories"
 
 export const revalidate = 0
 
@@ -58,10 +57,6 @@ export default async function CaseStudyPage({
   if (error || !cs) return notFound()
 
   const industryName: string | null = cs.industries?.name ?? null
-
-  const contentCategories = await fetchCaseStudyContentCategories(cs.id)
-  const contentTopicNames =
-    contentCategories.length > 0 ? contentCategories.map((c) => c.name) : null
 
   // Fetch linked client info if available
   const { data: client } = await supabase
@@ -126,13 +121,12 @@ export default async function CaseStudyPage({
           clientName={client?.client_name}
         />
 
-        {/* 2. OVERVIEW ROW — industry, service, client */}
+        {/* 2. OVERVIEW ROW — industry, service, client, website (each only if set in Supabase) */}
         <CaseStudyOverview
           industry={industryName}
           serviceName={serviceName}
           clientName={client?.client_name}
           clientWebsite={client?.website_url}
-          contentTopics={contentTopicNames}
         />
 
         {/* 3. ABOUT THE CLIENT */}
