@@ -105,16 +105,31 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const { data: pub } = admin.storage.from("resumes").getPublicUrl(objectPath)
-  /** Stored for recruiters; use Supabase Storage if the bucket is private. */
-  const resumeUrl = pub?.publicUrl ?? objectPath
+  // Resumes bucket is private — store only the storage path and use a signed
+  // URL when we need to share access (e.g. via the n8n webhook below).
+  const resumeStoragePath = objectPath
+
+  const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 90
+  const { data: signed, error: signedErr } = await admin.storage
+    .from("resumes")
+    .createSignedUrl(objectPath, SIGNED_URL_TTL_SECONDS)
+
+  if (signedErr || !signed?.signedUrl) {
+    await admin.storage.from("resumes").remove([objectPath]).catch(() => {})
+    return NextResponse.json(
+      { error: `Could not generate resume access URL: ${signedErr?.message ?? "unknown error"}` },
+      { status: 500 }
+    )
+  }
+
+  const resumeSignedUrl = signed.signedUrl
 
   const { error: insErr } = await admin.from("applications").insert({
     career_id,
     full_name,
     email,
     phone: phone?.trim() || null,
-    resume_url: resumeUrl,
+    resume_url: resumeStoragePath,
     cover_letter: cover_letter?.trim() || null,
   })
 
@@ -136,8 +151,11 @@ export async function POST(req: NextRequest) {
     email,
     phone: phone?.trim() || null,
     cover_letter: cover_letter?.trim() || null,
-    resume_url: resumeUrl,
-    resume_storage_path: objectPath,
+    resume_url: resumeSignedUrl,
+    resume_storage_path: resumeStoragePath,
+    resume_signed_url_expires_at: new Date(
+      Date.now() + SIGNED_URL_TTL_SECONDS * 1000
+    ).toISOString(),
     resume_file_name: safeName,
     resume_mime_type: resume.type,
     resume_size_bytes: resume.size,
@@ -157,8 +175,11 @@ type ApplicationWebhookPayload = {
   email: string
   phone: string | null
   cover_letter: string | null
+  /** Time-limited signed URL for downloading the resume from the private bucket. */
   resume_url: string
+  /** Permanent storage path (bucket: `resumes`). Use to regenerate a signed URL after `resume_signed_url_expires_at`. */
   resume_storage_path: string
+  resume_signed_url_expires_at: string
   resume_file_name: string
   resume_mime_type: string
   resume_size_bytes: number
