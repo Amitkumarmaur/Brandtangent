@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev -p 3001",
+    "dev": "next dev -p 3000",
     "chat-agent:deps": "pip install -r chatagent/requirements.txt",
     "chat-agent": "cd chatagent && python main.py",
     "dev:with-chat": "concurrently -k -n site,chat -c blue,magenta \"pnpm dev\" \"pnpm chat-agent\"",

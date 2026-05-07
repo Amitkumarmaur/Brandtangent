@@ -190,13 +190,13 @@ export default async function ServiceDetailPage({
         />
       </div>
       <div data-theme="light">
-        <ProjectsSection />
+        <ServiceWebServices title={`Our ${service.name} Services`} services={mappedServices} />
       </div>
       <div data-theme="dark">
         <ServiceTechStack title={`${service.name}\nTechnology Stack`} techStack={techStackData} />
       </div>
       <div data-theme="light">
-        <ServiceWebServices title={`Our ${service.name} Services`} services={mappedServices} />
+        <ProjectsSection />
       </div>
       <div data-theme="light">
         <ServiceProcessGrid

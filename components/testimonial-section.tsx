@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
 import { Quote, Star } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 
@@ -67,6 +66,7 @@ export default function TestimonialSection() {
   }
 
   const duplicated = [...testimonials, ...testimonials, ...testimonials]
+  const marqueeDurationSec = Math.max(24, testimonials.length * 7)
 
   return (
     <section className="py-16 lg:py-20 bg-background overflow-hidden relative">
@@ -93,7 +93,28 @@ export default function TestimonialSection() {
         </div>
       </div>
 
-      <div className="relative flex overflow-hidden group">
+      <div className="relative flex overflow-hidden">
+        <style>{`
+          @keyframes testimonial-marquee {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(-33.333333%, 0, 0); }
+          }
+          .testimonial-marquee-track {
+            animation: testimonial-marquee ${marqueeDurationSec}s linear infinite;
+            will-change: transform;
+          }
+          @media (hover: hover) and (pointer: fine) {
+            .testimonial-marquee-track:hover {
+              animation-play-state: paused;
+            }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .testimonial-marquee-track {
+              animation: none;
+              transform: translate3d(0, 0, 0);
+            }
+          }
+        `}</style>
         {/* Soft fade edges to hint at the infinite loop */}
         <div
           className="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-24 z-10 bg-gradient-to-r from-background to-transparent"
@@ -104,20 +125,14 @@ export default function TestimonialSection() {
           aria-hidden
         />
 
-        <motion.div
-          animate={{ x: ["0%", "-33.3333%"] }}
-          transition={{
-            repeat: Infinity,
-            ease: "linear",
-            duration: Math.max(24, testimonials.length * 7),
-          }}
-          className="flex gap-6 px-3 w-max group-hover:[animation-play-state:paused]"
+        <div
+          className="testimonial-marquee-track flex gap-6 px-3 w-max"
           style={{ width: "max-content" }}
         >
           {duplicated.map((t, idx) => (
             <TestimonialCard key={`${t.id}-${idx}`} testimonial={t} />
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   )
