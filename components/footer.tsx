@@ -95,8 +95,27 @@ function FooterInner({ columns }: { columns: FooterColumnData[] }) {
   )
 }
 
+// Provide default footer data if async fetch fails
+const DEFAULT_COLUMNS: FooterColumnData[] = [
+  {
+    title: "Overview",
+    links: [
+      { label: "About Us", href: "/about" },
+      { label: "Services", href: "/services" },
+      { label: "Our Work", href: "/case-studies" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
+]
+
 export default async function Footer() {
-  const columns = await getFooterNavColumns()
+  let columns = DEFAULT_COLUMNS
+  try {
+    columns = await getFooterNavColumns()
+  } catch (e) {
+    console.warn("Failed to fetch footer columns, using defaults", e)
+  }
+
   return (
     <footer className="relative z-40 w-full">
       <FooterInner columns={columns} />

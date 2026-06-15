@@ -17,6 +17,7 @@ const createStubQuery = () => {
   const stub = {
     select: function() { return this },
     eq: function() { return this },
+    neq: function() { return this },
     in: function() { return this },
     gt: function() { return this },
     gte: function() { return this },
@@ -35,6 +36,8 @@ const createStubQuery = () => {
     delete: function() { return this },
     upsert: function() { return this },
     rpc: function() { return this },
+    maybeSingle: function() { return this },
+    single: function() { return this },
     then: function(resolve: any) { return resolve({ data: [], error: null }) },
     catch: function() { return Promise.resolve({ data: [], error: null }) },
   }
