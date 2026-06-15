@@ -12,14 +12,33 @@ const supabaseAnonKey =
 
 let _client: ReturnType<typeof createClient> | null = null
 
-// Stub query builder for build time when credentials aren't available
-const stubQuery = {
-  select: () => ({ data: [], error: null }),
-  insert: () => ({ data: [], error: null }),
-  update: () => ({ data: [], error: null }),
-  delete: () => ({ data: [], error: null }),
-  upsert: () => ({ data: [], error: null }),
-  rpc: () => ({ data: null, error: null }),
+// Stub query builder that supports method chaining
+const createStubQuery = () => {
+  const stub = {
+    select: function() { return this },
+    eq: function() { return this },
+    in: function() { return this },
+    gt: function() { return this },
+    gte: function() { return this },
+    lt: function() { return this },
+    lte: function() { return this },
+    like: function() { return this },
+    ilike: function() { return this },
+    is: function() { return this },
+    contains: function() { return this },
+    order: function() { return this },
+    limit: function() { return this },
+    offset: function() { return this },
+    range: function() { return this },
+    insert: function() { return this },
+    update: function() { return this },
+    delete: function() { return this },
+    upsert: function() { return this },
+    rpc: function() { return this },
+    then: function(resolve: any) { return resolve({ data: [], error: null }) },
+    catch: function() { return Promise.resolve({ data: [], error: null }) },
+  }
+  return stub as any
 }
 
 export const supabase = {
@@ -29,7 +48,7 @@ export const supabase = {
         // Return stub during build/SSR when env vars aren't available
         if (typeof window === "undefined") {
           console.warn(`[build] Supabase unavailable for table "${table}" - using stub`)
-          return stubQuery as any
+          return createStubQuery()
         }
         throw new Error(
           "Supabase not configured. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are set."
