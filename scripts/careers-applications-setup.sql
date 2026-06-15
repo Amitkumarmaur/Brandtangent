@@ -1,7 +1,7 @@
--- DigiiMark — careers + applications + resume storage
+-- Brandtangent — careers + applications + resume storage
 -- Run in Supabase SQL Editor after reviewing your existing schema.
 --
--- Requires tables (per playground/digiimark-supabase-schema.md):
+-- Requires tables (per playground/brandtangent-supabase-schema.md):
 --   careers (id uuid PK default gen_random_uuid(), job_title, description, location, type, status, created_at, …)
 --   applications (id, career_id FK → careers, full_name, email, phone, resume_url, cover_letter, created_at)
 --
