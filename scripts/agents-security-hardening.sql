@@ -13,7 +13,7 @@
 --     the voice migration; the original site policy `faqs_public_read`
 --     is preserved unchanged.
 --
--- Run in: https://supabase.com/dashboard/project/ulvinvuhajgzkpbycvtr/sql/new
+-- Run in: https://supabase.com/dashboard/project/xkmxdzzwslkttsptmajd/sql/new
 -- ================================================================
 
 ALTER FUNCTION public.match_kb_chunks(vector, integer, text)

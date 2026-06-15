@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
+import { ArrowRight } from "lucide-react"
+import { motion, AnimatePresence } from "motion/react"
 import {
   caseStudyRowToListItem,
   fetchAllPublishedCaseStudies,
@@ -45,28 +46,23 @@ function TiltCard({
     const rect = e.currentTarget.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
-    const centerX = rect.width / 2
-    const centerY = rect.height / 2
-    setRotateX(((y - centerY) / centerY) * -15)
-    setRotateY(((x - centerX) / centerX) * 15)
+    setRotateX(((y - rect.height / 2) / rect.height) * -8)
+    setRotateY(((x - rect.width / 2) / rect.width) * 8)
   }
 
-  const handleMouseLeave = () => {
-    setRotateX(0)
-    setRotateY(0)
-  }
+  const handleMouseLeave = () => { setRotateX(0); setRotateY(0) }
 
   return (
     <Link
       href={`/case-studies/${slug}`}
-      className="block h-full rounded-[1.5rem] outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
+      className="block h-full rounded-md outline-none focus-visible:shadow-[var(--shadow-accent-orange-soft)]"
     >
       <motion.div
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         animate={{ rotateX, rotateY, scale: rotateX === 0 && rotateY === 0 ? 1 : 1.02 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="group relative h-[380px] w-full cursor-pointer overflow-hidden rounded-[1.5rem] border border-grey-200 shadow-xl md:h-[440px]"
+        className="group relative h-[380px] w-full cursor-pointer overflow-hidden rounded-md border border-border md:h-[440px] hover:border-accent-orange/30 hover:shadow-[var(--shadow-accent-orange-soft)] transition-all duration-300"
         style={{ transformStyle: "preserve-3d", perspective: 1200 }}
       >
         <Image
@@ -74,29 +70,27 @@ function TiltCard({
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="pointer-events-none absolute inset-0 object-cover object-center transition-transform duration-700 group-hover:scale-105"
+          className="pointer-events-none absolute inset-0 object-cover object-center transition-transform duration-700 group-hover:scale-110"
         />
         <div
-          className="absolute inset-0 z-[1] bg-gradient-to-t from-black/85 via-black/35 to-transparent"
+          className="absolute inset-0 z-[1] bg-gradient-to-t from-[rgba(13,37,61,0.9)] via-[rgba(13,37,61,0.4)] to-transparent"
           aria-hidden
         />
         <div className="absolute bottom-0 left-0 right-0 z-[2] flex flex-col p-6 md:p-8">
-          <span className="mb-2 text-xs font-medium uppercase tracking-wide text-ignite-orange">
+          <span className="mb-3 inline-flex items-center gap-2 bg-accent-orange text-white text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg w-fit">
             {category}
           </span>
-          <h3 className="font-heading text-2xl font-semibold leading-tight tracking-tight text-white md:text-[1.65rem]">
+          <h3 className="text-2xl font-semibold leading-tight tracking-tight text-white md:text-[1.65rem]">
             {title}
           </h3>
           {excerpt ? (
-            <p className="mt-3 text-sm text-white/70 line-clamp-2 md:opacity-90 md:group-hover:opacity-100 transition-opacity">
+            <p className="mt-3 text-sm text-white/80 line-clamp-2">
               {excerpt}
             </p>
           ) : null}
-          <span className="mt-4 flex items-center gap-2 text-sm font-medium text-white transition-all group-hover:gap-3">
+          <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-white group-hover:gap-3 transition-all">
             View case study
-            <span className="text-ignite-orange" aria-hidden>
-              →
-            </span>
+            <ArrowRight className="w-4 h-4" aria-hidden />
           </span>
         </div>
       </motion.div>
@@ -114,8 +108,6 @@ export default function CaseStudiesGrid() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // One-time fetch of every published case study with both FK joins
-  // (industry + service). All filtering is done client-side against this list.
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -141,37 +133,22 @@ export default function CaseStudiesGrid() {
       setIndustryOrder(sortIndustries(industries))
       setLoading(false)
     })()
-
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
     const raw = searchParams.get("industry")?.trim()
     if (!raw) return
-    try {
-      setActiveIndustrySlug(decodeURIComponent(raw))
-    } catch {
-      setActiveIndustrySlug(raw)
-    }
+    try { setActiveIndustrySlug(decodeURIComponent(raw)) }
+    catch { setActiveIndustrySlug(raw) }
   }, [searchParams])
 
-  /**
-   * Industry options for the sidebar. Only includes industries that actually
-   * have at least one published case study, and narrows further when the user
-   * types in the search box.
-   */
   const industryOptions = useMemo<FilterOption[]>(() => {
     const bySlug = new Map<string, { slug: string; name: string; order: number }>()
     for (const s of allStudies) {
       if (!s.industry_slug) continue
       const idx = industryOrder.findIndex((i) => i.slug === s.industry_slug)
-      bySlug.set(s.industry_slug, {
-        slug: s.industry_slug,
-        name: s.industry,
-        order: idx === -1 ? 999 : idx,
-      })
+      bySlug.set(s.industry_slug, { slug: s.industry_slug, name: s.industry, order: idx === -1 ? 999 : idx })
     }
     return [...bySlug.values()]
       .sort((a, b) => a.order - b.order)
@@ -183,79 +160,34 @@ export default function CaseStudiesGrid() {
     const bySlug = new Map<string, FilterOption>()
     for (const s of allStudies) {
       if (!s.service_slug || !s.service_name) continue
-      if (!bySlug.has(s.service_slug)) {
-        bySlug.set(s.service_slug, { slug: s.service_slug, name: s.service_name })
-      }
+      if (!bySlug.has(s.service_slug)) bySlug.set(s.service_slug, { slug: s.service_slug, name: s.service_name })
     }
-    return [...bySlug.values()]
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .filter((o) => includesCaseInsensitive(o.name, query))
+    return [...bySlug.values()].sort((a, b) => a.name.localeCompare(b.name)).filter((o) => includesCaseInsensitive(o.name, query))
   }, [allStudies, query])
 
   useEffect(() => {
-    if (!activeIndustrySlug || loading) return
-    if (industryOptions.length === 0) return
-    const valid = industryOptions.some((o) => o.slug === activeIndustrySlug)
-    if (!valid) setActiveIndustrySlug(null)
+    if (!activeIndustrySlug || loading || industryOptions.length === 0) return
+    if (!industryOptions.some((o) => o.slug === activeIndustrySlug)) setActiveIndustrySlug(null)
   }, [loading, industryOptions, activeIndustrySlug])
 
-  /**
-   * Visible case studies. Combines three facets with AND logic:
-   *   - active industry chip
-   *   - active service chip
-   *   - free-text search against industry name, service name, or title
-   */
   const studies = useMemo(() => {
     return allStudies.filter((s) => {
       if (activeIndustrySlug && s.industry_slug !== activeIndustrySlug) return false
       if (activeServiceSlug && s.service_slug !== activeServiceSlug) return false
       if (query) {
-        const matches =
-          includesCaseInsensitive(s.industry, query) ||
-          includesCaseInsensitive(s.service_name, query) ||
-          includesCaseInsensitive(s.title, query)
+        const matches = includesCaseInsensitive(s.industry, query) || includesCaseInsensitive(s.service_name, query) || includesCaseInsensitive(s.title, query)
         if (!matches) return false
       }
       return true
     })
   }, [allStudies, activeIndustrySlug, activeServiceSlug, query])
 
-  const activeCount =
-    (query ? 1 : 0) +
-    (activeIndustrySlug ? 1 : 0) +
-    (activeServiceSlug ? 1 : 0)
-
-  const handleClearAll = () => {
-    setQuery("")
-    setActiveIndustrySlug(null)
-    setActiveServiceSlug(null)
-  }
+  const activeCount = (query ? 1 : 0) + (activeIndustrySlug ? 1 : 0) + (activeServiceSlug ? 1 : 0)
+  const handleClearAll = () => { setQuery(""); setActiveIndustrySlug(null); setActiveServiceSlug(null) }
 
   return (
-    <section className="bg-grey-100 py-16 md:py-20">
+    <section id="portfolio-grid" className="bg-white py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Intro credibility strip — full-width before the filter / grid layout. */}
-        <div className="mb-12 grid grid-cols-1 gap-6 md:mb-14 md:grid-cols-3">
-          <div className="rounded-2xl border border-grey-200 bg-white p-6">
-            <p className="font-heading text-3xl font-semibold text-foreground">AI-first</p>
-            <p className="mt-2 text-body text-grey-400">
-              Workflows, agents, and integrations that scale with your GTM motion.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-grey-200 bg-white p-6">
-            <p className="font-heading text-3xl font-semibold text-foreground">Measurable</p>
-            <p className="mt-2 text-body text-grey-400">
-              Every engagement ties back to pipeline, retention, or efficiency you can report on.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-grey-200 bg-white p-6">
-            <p className="font-heading text-3xl font-semibold text-foreground">B2B depth</p>
-            <p className="mt-2 text-body text-grey-400">
-              Complex buying journeys, compliance-aware stacks, and stakeholder-ready storytelling.
-            </p>
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[18rem_1fr] lg:gap-10 xl:grid-cols-[20rem_1fr] xl:gap-12">
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <CaseStudiesFilterSidebar
@@ -274,61 +206,75 @@ export default function CaseStudiesGrid() {
           </aside>
 
           <div>
-            <div className="mb-6 flex items-baseline justify-between gap-4">
-              <p className="text-sm text-grey-500">
+            <div className="mb-8 flex items-baseline justify-between gap-4">
+              <p className="text-sm font-semibold text-muted-foreground">
                 {loading
-                  ? "Loading case studies…"
+                  ? "Loading case studiesâ€¦"
                   : studies.length === 1
                     ? "Showing 1 case study"
                     : `Showing ${studies.length} case studies`}
-                {activeCount > 0 && !loading ? ` · ${activeCount} filter${activeCount === 1 ? "" : "s"} applied` : ""}
+                {activeCount > 0 && !loading ? ` Â· ${activeCount} filter${activeCount === 1 ? "" : "s"} applied` : ""}
               </p>
             </div>
 
             {loadError && (
-              <p className="mb-8 text-sm text-red-600" role="alert">
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600 mb-8 bg-red-50 border border-red-200 rounded-lg p-4"
+                role="alert"
+              >
                 Could not load case studies: {loadError}
-              </p>
+              </motion.p>
             )}
 
             {loading ? (
               <div className="flex min-h-[360px] items-center justify-center">
-                <div
-                  className="h-10 w-10 animate-spin rounded-full border-4 border-ignite-orange border-t-transparent"
-                  role="status"
-                  aria-label="Loading case studies"
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="w-8 h-8 border-3 border-border border-t-accent-orange rounded-full"
                 />
               </div>
             ) : studies.length === 0 && !loadError ? (
-              <div className="rounded-2xl border border-grey-200 bg-white p-10 text-center">
-                <p className="font-heading text-xl font-semibold text-foreground mb-2">
-                  No case studies match your filters
-                </p>
-                <p className="text-body text-grey-400 mx-auto max-w-md">
-                  Try adjusting the search, picking a different industry / service, or clear all
-                  filters to see the full portfolio.
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-md border border-border bg-gradient-to-br from-secondary to-white p-10 text-center"
+              >
+                <p className="text-xl font-semibold text-foreground mb-2">No case studies match your filters</p>
+                <p className="text-sm text-muted-foreground mx-auto max-w-md leading-relaxed">
+                  Try adjusting the search, picking a different industry / service, or clear all filters to see the full portfolio.
                 </p>
                 {activeCount > 0 && (
-                  <button
+                  <motion.button
                     type="button"
                     onClick={handleClearAll}
-                    className="mt-6 inline-flex items-center justify-center rounded-full bg-foreground px-6 py-2.5 text-sm font-semibold text-white hover:bg-grey-800 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="mt-6 inline-flex items-center justify-center rounded-md bg-accent-orange px-6 h-10 text-sm font-semibold text-white shadow-[var(--shadow-accent-orange)] hover:shadow-[var(--shadow-accent-orange)] transition-all"
                   >
                     Clear all filters
-                  </button>
+                  </motion.button>
                 )}
-              </div>
+              </motion.div>
             ) : (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-7">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8"
+              >
                 <AnimatePresence mode="popLayout">
                   {studies.map((study, idx) => (
                     <motion.div
                       key={study.id}
                       layout
-                      initial={{ opacity: 0, scale: 0.96 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.96 }}
-                      transition={{ duration: 0.35, delay: Math.min(idx * 0.05, 0.25) }}
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.4, delay: Math.min(idx * 0.05, 0.25), ease: [0.22, 1, 0.36, 1] }}
+                      className="h-full"
                     >
                       <TiltCard
                         slug={study.slug}
@@ -340,7 +286,7 @@ export default function CaseStudiesGrid() {
                     </motion.div>
                   ))}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>

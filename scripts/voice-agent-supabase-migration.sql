@@ -1,6 +1,6 @@
 -- ================================================================
 -- DigiiMark — Voice Agent (Maya) Supabase Migration
--- Run in: https://supabase.com/dashboard/project/ulvinvuhajgzkpbycvtr/sql/new
+-- Run in: https://supabase.com/dashboard/project/xkmxdzzwslkttsptmajd/sql/new
 -- Idempotent: safe to re-run. Creates:
 --   * pgvector extension
 --   * knowledge_base_documents + knowledge_base_chunks (RAG storage)

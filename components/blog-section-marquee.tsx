@@ -53,23 +53,23 @@ function BlogCard({ item, pauseHandlers }: { item: BlogMarqueeItem; pauseHandler
     <Link
       href={`/blog/${item.slug}`}
       {...pauseHandlers}
-      className="w-[85vw] sm:w-[320px] md:w-[400px] h-[300px] md:h-[360px] flex-shrink-0 rounded-[2rem] overflow-hidden group cursor-pointer relative shadow-xl border border-grey-200 block"
+      className="w-[85vw] sm:w-[300px] md:w-[360px] h-[280px] md:h-[340px] flex-shrink-0 rounded-md overflow-hidden group cursor-pointer relative border border-border block shadow-[var(--shadow-layered)] hover:shadow-[rgba(0,55,112,0.10)_0_8px_24px] transition-shadow duration-300"
     >
       <Image
         src={item.image}
         alt={item.title}
         fill
-        sizes="(max-width: 768px) 85vw, 400px"
-        className="object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+        sizes="(max-width: 768px) 85vw, 360px"
+        className="object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="bg-ignite-orange text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(13,37,61,0.90)] via-[rgba(13,37,61,0.35)] to-transparent flex flex-col justify-end p-5 opacity-90 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="bg-accent-orange/80 text-white text-[11px] px-2.5 py-0.5 rounded-full font-normal">
             {item.category}
           </span>
-          <span className="text-grey-200 text-sm font-medium">{item.date}</span>
+          <span className="text-white/50 text-[11px] font-normal">{item.date}</span>
         </div>
-        <h3 className="font-heading text-white text-xl md:text-2xl font-semibold tracking-tight leading-snug group-hover:-translate-y-1 transition-transform duration-300">
+        <h3 className="text-white text-base md:text-[17px] font-normal leading-snug group-hover:-translate-y-0.5 transition-transform duration-200">
           {item.title}
         </h3>
       </div>
@@ -112,19 +112,19 @@ export default function BlogSectionMarquee({ items }: BlogSectionMarqueeProps) {
         }}
       />
 
-      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-32 bg-gradient-to-r from-grey-100 to-transparent z-10 pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-32 bg-gradient-to-l from-grey-100 to-transparent z-10 pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
       <div
         className={`blog-marquee-track flex w-max ${paused ? "blog-marquee-paused" : ""}`}
         style={{ willChange: "transform" }}
       >
-        <div className="flex gap-6 md:gap-8 px-3 md:px-4">
+        <div className="flex gap-5 md:gap-6 px-3 md:px-4">
           {items.map((item) => (
             <BlogCard key={`a-${item.id}`} item={item} pauseHandlers={pauseHandlers} />
           ))}
         </div>
-        <div className="flex gap-6 md:gap-8 px-3 md:px-4" aria-hidden>
+        <div className="flex gap-5 md:gap-6 px-3 md:px-4" aria-hidden>
           {items.map((item) => (
             <BlogCard key={`b-${item.id}`} item={item} pauseHandlers={pauseHandlers} />
           ))}

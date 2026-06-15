@@ -1,7 +1,7 @@
 import type React from "react"
 import { Suspense } from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter, Poppins } from "next/font/google"
+import { Inter, Inconsolata } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ContactWidget } from "@/components/contact-widget"
 import ScrollToTop from "@/components/scroll-to-top"
@@ -11,31 +11,31 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+  weight: ["400", "500", "600"],
 })
 
-const poppins = Poppins({
+const inconsolata = Inconsolata({
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-inconsolata",
+  weight: ["400"],
 })
 
 export const metadata: Metadata = {
-  title: "DigiiMark | AI-First Marketing Automation Agency",
+  title: "Brandtangent | Brand Strategy & Creative Agency",
   description:
-    "We engineer intelligent marketing systems that scale without limits. AI-first automation that transforms how B2B companies grow.",
-  keywords: ["AI marketing", "marketing automation", "B2B growth", "automation agency"],
-  authors: [{ name: "DigiiMark" }],
+    "We craft brand identities and marketing systems that make businesses impossible to ignore. Strategy-led creative that drives real growth.",
+  keywords: ["brand strategy", "creative agency", "brand identity", "marketing", "design"],
+  authors: [{ name: "Brandtangent" }],
   openGraph: {
-    title: "DigiiMark | AI-First Marketing Automation Agency",
-    description: "We engineer intelligent marketing systems that scale without limits.",
+    title: "Brandtangent | Brand Strategy & Creative Agency",
+    description: "We craft brand identities and marketing systems that make businesses impossible to ignore.",
     type: "website",
   },
-    generator: 'v0.app'
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0A0A0A",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
 }
@@ -46,8 +46,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
-      <body className="font-sans antialiased">
+    <html lang="en" className={`${inter.variable} ${inconsolata.variable}`}>
+      <body className="font-sans antialiased bg-background text-foreground">
         <Suspense fallback={null}>
           <ScrollToTop />
         </Suspense>

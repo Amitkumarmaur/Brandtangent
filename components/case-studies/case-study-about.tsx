@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 
 interface CaseStudyAboutProps {
   heading: string
@@ -9,9 +9,9 @@ interface CaseStudyAboutProps {
 
 export default function CaseStudyAbout({ heading, description }: CaseStudyAboutProps) {
   return (
-    <section className="relative w-full py-20 lg:py-32 bg-background border-t border-grey-200 overflow-hidden">
-      {/* Large section number watermark */}
-      <div className="absolute right-8 top-8 font-heading text-[10rem] lg:text-[16rem] font-black text-grey-200 leading-none select-none pointer-events-none">
+    <section className="relative w-full py-20 lg:py-32 bg-white border-t border-border overflow-hidden">
+      {/* Watermark */}
+      <div className="absolute right-8 top-8 text-[10rem] lg:text-[16rem] font-semibold text-[rgba(28,28,28,0.05)] leading-none select-none pointer-events-none">
         01
       </div>
 
@@ -25,12 +25,12 @@ export default function CaseStudyAbout({ heading, description }: CaseStudyAboutP
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-              <span className="font-heading text-ignite-orange font-medium tracking-wider text-sm uppercase">
+              <div className="w-2 h-2 rounded-full bg-[rgba(28,28,28,0.4)]" />
+              <span className="text-muted-foreground font-semibold tracking-wider text-sm uppercase">
                 Background
               </span>
             </div>
-            <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground tracking-tight leading-tight">
+            <h2 className="display-sm text-foreground">
               {heading}
             </h2>
           </motion.div>
@@ -43,7 +43,7 @@ export default function CaseStudyAbout({ heading, description }: CaseStudyAboutP
             transition={{ duration: 0.6, delay: 0.15 }}
           >
             {description && (
-              <p className="text-lg md:text-xl text-grey-400 leading-relaxed border-l-2 border-ignite-orange pl-6">
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed border-l-2 border-border pl-6">
                 {description}
               </p>
             )}

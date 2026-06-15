@@ -6,7 +6,7 @@
 /** Strip site suffix from SEO titles for duplicate-heading checks. */
 export function normalizeTitleForCompare(title: string): string {
   return title
-    .replace(/\s*\|\s*DigiiMark\b.*$/i, "")
+    .replace(/\s*\|\s*Brandtangent\b.*$/i, "")
     .replace(/[#*_`]/g, "")
     .toLowerCase()
     .replace(/\s+/g, " ")

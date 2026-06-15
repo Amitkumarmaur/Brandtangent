@@ -1,6 +1,6 @@
 -- ================================================================
 -- DigiiMark — Testimonials Table + RLS + Storage Bucket Setup
--- Run this in: https://supabase.com/dashboard/project/ulvinvuhajgzkpbycvtr/sql/new
+-- Run this in: https://supabase.com/dashboard/project/xkmxdzzwslkttsptmajd/sql/new
 -- ================================================================
 
 -- 1. Create the testimonials table

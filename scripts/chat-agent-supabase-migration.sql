@@ -2,7 +2,7 @@
 -- DigiiMark — Chat Agent (Alex) Supabase Migration
 -- Mirrors the voice_calls / voice_call_turns / voice_call_tool_calls
 -- shape so both agents can be queried with one mental model.
--- Run in: https://supabase.com/dashboard/project/ulvinvuhajgzkpbycvtr/sql/new
+-- Run in: https://supabase.com/dashboard/project/xkmxdzzwslkttsptmajd/sql/new
 -- Idempotent: safe to re-run.
 -- ================================================================
 

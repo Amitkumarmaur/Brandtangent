@@ -2,16 +2,19 @@ import { notFound, redirect } from "next/navigation"
 import type { Metadata } from "next"
 import { supabase } from "@/lib/supabase"
 import { normalizeRouteSlug } from "@/lib/services-urls"
+import { fetchServiceBySlug } from "@/lib/service-catalog"
+import { resolveServiceSlug } from "@/lib/service-catalog-fallback"
 import { deviconLogoForPlatformName } from "@/lib/devicon-platform-logos"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import WebDevHero from "@/components/services/web-dev-hero"
+import ServiceDetailHero from "@/components/services/service-detail-hero"
 import ServiceFeatures from "@/components/services/service-features"
 import ProjectsSection from "@/components/projects-section"
 import ServiceTechStack from "@/components/services/service-tech-stack"
 import ServiceWebServices from "@/components/services/service-web-services"
 import ServiceProcessGrid from "@/components/services/service-process-grid"
 import ServiceIndustries from "@/components/services/service-industries"
+import ServiceDetailCta from "@/components/services/service-detail-cta"
 
 export const revalidate = 60
 export const dynamicParams = true
@@ -48,18 +51,29 @@ export async function generateMetadata({
   params: Promise<{ category: string; service: string }>
 }): Promise<Metadata> {
   const serviceSlugParam = normalizeRouteSlug((await params).service)
+  const resolvedSlug = resolveServiceSlug(serviceSlugParam)
   const { data } = await supabase
     .from("services")
     .select("seo_title, meta_description, name")
-    .eq("slug", serviceSlugParam)
+    .eq("slug", resolvedSlug)
     .maybeSingle()
 
-  if (!data) return { title: "Service | DigiiMark" }
+  if (!data) {
+    const { service: fallback } = await fetchServiceBySlug(resolvedSlug)
+    if (fallback) {
+      return {
+        title: fallback.seo_title || `${fallback.name} | Brandtangent`,
+        description:
+          fallback.meta_description || `Learn more about our ${fallback.name} services at Brandtangent.`,
+      }
+    }
+    return { title: "Service | Brandtangent" }
+  }
 
   return {
-    title: data.seo_title || `${data.name} | DigiiMark`,
+    title: data.seo_title || `${data.name} | Brandtangent`,
     description:
-      data.meta_description || `Learn more about our ${data.name} services at DigiiMark.`,
+      data.meta_description || `Learn more about our ${data.name} services at Brandtangent.`,
   }
 }
 
@@ -69,29 +83,16 @@ export default async function ServiceDetailPage({
   params: Promise<{ category: string; service: string }>
 }) {
   const categoryParam = normalizeRouteSlug((await params).category)
-  const serviceSlug = normalizeRouteSlug((await params).service)
+  const serviceSlug = resolveServiceSlug(normalizeRouteSlug((await params).service))
 
-  const { data: service } = await supabase
-    .from("services")
-    .select(
-      "id, category_id, name, slug, hero_h1, hero_description, hero_image, seo_title, meta_description, service_details, methodology, what_we_provide, platform_ids",
-    )
-    .eq("slug", serviceSlug)
-    .maybeSingle<ServiceDetailRow>()
+  const { service, category: fallbackCategory } = await fetchServiceBySlug(serviceSlug)
 
   if (!service) {
     notFound()
   }
 
-  let dbCategorySlug: string | null = null
-  if (service.category_id) {
-    const { data: cat } = await supabase
-      .from("service_categories")
-      .select("slug")
-      .eq("id", service.category_id)
-      .maybeSingle<{ slug: string | null }>()
-    dbCategorySlug = (cat?.slug ?? "").trim() || null
-  }
+  const dbCategorySlug = (fallbackCategory?.slug ?? "").trim() || null
+  const dbCategoryName = (fallbackCategory?.name ?? "").trim() || null
 
   if (dbCategorySlug && dbCategorySlug !== categoryParam) {
     redirect(`/services/${dbCategorySlug}/${service.slug}`)
@@ -116,7 +117,6 @@ export default async function ServiceDetailPage({
       }))
     : undefined
 
-  // Platforms → tech stack
   let techStackData: { name: string; logo: string | null; color: string }[] | undefined
   if (service.platform_ids && service.platform_ids.length > 0) {
     const { data: platformsData } = await supabase
@@ -163,25 +163,31 @@ export default async function ServiceDetailPage({
     }
   }
 
+  const heroTitle = service.hero_h1 || service.name
+  const heroDescription =
+    service.hero_description ||
+    "From concept to deployment, we build digital products that are fast, beautiful, and built to scale."
+
   return (
-    <main>
+    <main className="overflow-x-clip">
       <Header />
-      <div data-theme="dark">
-        <WebDevHero
-          title={service.hero_h1 || service.name}
-          description={service.hero_description ?? undefined}
-          image={service.hero_image ?? undefined}
+      <div data-theme="light">
+        <ServiceDetailHero
+          title={heroTitle}
+          description={heroDescription}
           badge={service.name}
+          image={service.hero_image}
+          categoryName={dbCategoryName}
+          categorySlug={dbCategorySlug ?? categoryParam}
         />
       </div>
+
       <div data-theme="light">
         <ServiceFeatures
+          sectionId="expertise"
           badge="Our Expertise"
           title={`End-to-End ${service.name}`}
-          subtitle={
-            service.hero_description ||
-            "From concept to deployment, we build digital products that are fast, beautiful, and built to scale."
-          }
+          subtitle={heroDescription}
           features={
             mappedFeatures.length > 0
               ? mappedFeatures
@@ -189,25 +195,40 @@ export default async function ServiceDetailPage({
           }
         />
       </div>
+
+      {mappedServices && mappedServices.length > 0 ? (
+        <div data-theme="light">
+          <ServiceWebServices title={`Our ${service.name} Services`} services={mappedServices} />
+        </div>
+      ) : null}
+
+      {techStackData && techStackData.length > 0 ? (
+        <div data-theme="dark">
+          <ServiceTechStack title={`${service.name}\nTechnology Stack`} techStack={techStackData} />
+        </div>
+      ) : null}
+
       <div data-theme="light">
         <ProjectsSection />
       </div>
-      <div data-theme="dark">
-        <ServiceTechStack title={`${service.name}\nTechnology Stack`} techStack={techStackData} />
-      </div>
-      <div data-theme="light">
-        <ServiceWebServices title={`Our ${service.name} Services`} services={mappedServices} />
-      </div>
+
       <div data-theme="light">
         <ServiceProcessGrid
+          sectionId="process"
           title={`Our ${service.name} Process`}
           description={`We follow a meticulous, transparent process that ensures your ${service.name.toLowerCase()} project is delivered flawlessly, securely, and completely tailored to your business goals.`}
           phases={mappedPhases.length > 0 ? mappedPhases : undefined}
         />
       </div>
+
       <div data-theme="dark">
         <ServiceIndustries />
       </div>
+
+      <div data-theme="light">
+        <ServiceDetailCta serviceName={service.name} />
+      </div>
+
       <Footer />
     </main>
   )

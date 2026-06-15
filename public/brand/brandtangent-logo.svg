@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 168" role="img" aria-label="Brandtangent">
+  <title>Brandtangent</title>
+
+  <g transform="translate(50, 50)">
+    <circle cx="60" cy="60" r="56" fill="#0F0F10"/>
+    <line x1="-16" y1="56.80" x2="56.80" y2="-16"
+          stroke="#FF5A36" stroke-width="6" stroke-linecap="round"/>
+    <g>
+      <circle cx="20.40" cy="20.40" r="6" fill="#FF5A36"/>
+      <circle cx="20.40" cy="20.40" r="2.4" fill="#0F0F10"/>
+    </g>
+  </g>
+
+  <g transform="translate(200, 0)">
+    <text x="0" y="138"
+          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+          font-weight="800"
+          font-size="92"
+          letter-spacing="-4"
+          fill="#0F0F10">brandtangent</text>
+  </g>
+
+  <g>
+    <text x="202" y="172"
+          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+          font-weight="500"
+          font-size="13"
+          letter-spacing="7"
+          fill="#0F0F10">DIGITAL  ù  MARKETING  ù  AGENCY</text>
+  </g>
+</svg>

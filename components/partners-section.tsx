@@ -1,6 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { SectionHeader } from "@/components/motion/section-reveal"
+import { TiltCard } from "@/components/motion/tilt-card"
 
 const partnersRow1 = [
   "Bloomberg",
@@ -61,14 +63,16 @@ function useRowPauseHandlers(setPaused: (v: boolean) => void) {
 
 function MarqueeItem({ text, pauseHandlers }: { text: string; pauseHandlers: PauseHandlers }) {
   return (
-    <div
-      {...pauseHandlers}
-      className="partner-logo w-[180px] h-[90px] md:w-[220px] md:h-[110px] rounded-2xl border border-grey-200 bg-grey-100 flex items-center justify-center flex-shrink-0 hover:border-ignite-orange/30 hover:shadow-lg transition-all duration-300 group cursor-default"
-    >
-      <span className="text-grey-400 font-semibold text-lg md:text-xl tracking-tight group-hover:text-foreground transition-colors">
-        {text}
-      </span>
-    </div>
+    <TiltCard intensity={4} className="flex-shrink-0">
+      <div
+        {...pauseHandlers}
+        className="w-[160px] h-[80px] md:w-[200px] md:h-[96px] rounded-md border border-border bg-background flex items-center justify-center hover:border-primary/30 hover:shadow-[var(--shadow-2)] transition-all duration-300 group cursor-default"
+      >
+        <span className="text-muted-foreground font-light text-base md:text-lg tracking-tight group-hover:text-foreground transition-colors">
+          {text}
+        </span>
+      </div>
+    </TiltCard>
   )
 }
 
@@ -79,7 +83,7 @@ export default function PartnersSection() {
   const row2Pause = useRowPauseHandlers(setRow2Paused)
 
   return (
-    <section className="bg-background relative py-16 md:py-20 overflow-hidden border-t border-grey-200">
+    <section className="bg-secondary relative py-16 md:py-20 overflow-hidden border-t border-border">
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -111,35 +115,30 @@ export default function PartnersSection() {
         }}
       />
 
-      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10 mb-8 md:mb-10 flex flex-col items-center">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-          <span className="font-heading text-ignite-orange font-medium tracking-wider uppercase text-sm">
-            Partners & Recognition
-          </span>
-        </div>
-
-        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-tight text-center">
-          Trusted by the Best in Business
-        </h2>
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 mb-10">
+        <SectionHeader
+          align="center"
+          eyebrow="Partners & recognition"
+          title="Trusted by the best in business"
+        />
       </div>
 
-      <div className="relative w-full flex flex-col gap-6 md:gap-8 mt-12 md:mt-16">
+      <div className="relative w-full flex flex-col gap-5 md:gap-6 mt-6">
         {/* Left to Right (Row 1) */}
         <div className="flex overflow-hidden w-full relative">
-          <div className="absolute top-0 bottom-0 left-0 w-16 md:w-40 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-          <div className="absolute top-0 bottom-0 right-0 w-16 md:w-40 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 left-0 w-16 md:w-32 bg-gradient-to-r from-secondary to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-16 md:w-32 bg-gradient-to-l from-secondary to-transparent z-10 pointer-events-none" />
 
           <div
             className={`partners-marquee-ltr flex w-max ${row1Paused ? "partners-marquee-paused" : ""}`}
             style={{ willChange: "transform" }}
           >
-            <div className="flex gap-6 md:gap-8 px-3 md:px-4">
+            <div className="flex gap-4 md:gap-6 px-2 md:px-3">
               {partnersRow1.map((partner, idx) => (
                 <MarqueeItem key={`row1-a-${idx}`} text={partner} pauseHandlers={row1Pause} />
               ))}
             </div>
-            <div className="flex gap-6 md:gap-8 px-3 md:px-4">
+            <div className="flex gap-4 md:gap-6 px-2 md:px-3">
               {partnersRow1.map((partner, idx) => (
                 <MarqueeItem key={`row1-b-${idx}`} text={partner} pauseHandlers={row1Pause} />
               ))}
@@ -149,19 +148,19 @@ export default function PartnersSection() {
 
         {/* Right to Left (Row 2) */}
         <div className="flex overflow-hidden w-full relative">
-          <div className="absolute top-0 bottom-0 left-0 w-16 md:w-40 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-          <div className="absolute top-0 bottom-0 right-0 w-16 md:w-40 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 left-0 w-16 md:w-32 bg-gradient-to-r from-secondary to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-16 md:w-32 bg-gradient-to-l from-secondary to-transparent z-10 pointer-events-none" />
 
           <div
             className={`partners-marquee-rtl flex w-max ${row2Paused ? "partners-marquee-paused" : ""}`}
             style={{ willChange: "transform" }}
           >
-            <div className="flex gap-6 md:gap-8 px-3 md:px-4">
+            <div className="flex gap-4 md:gap-6 px-2 md:px-3">
               {partnersRow2.map((partner, idx) => (
                 <MarqueeItem key={`row2-a-${idx}`} text={partner} pauseHandlers={row2Pause} />
               ))}
             </div>
-            <div className="flex gap-6 md:gap-8 px-3 md:px-4">
+            <div className="flex gap-4 md:gap-6 px-2 md:px-3">
               {partnersRow2.map((partner, idx) => (
                 <MarqueeItem key={`row2-b-${idx}`} text={partner} pauseHandlers={row2Pause} />
               ))}

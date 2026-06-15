@@ -5,21 +5,20 @@ import BlogGrid from "@/components/blog/blog-grid"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Blog & Insights | DigiiMark",
-  description: "Explore our thoughts, strategies, and systems for scaling B2B companies with AI-first marketing automation.",
+  title: "Blog & Insights | Brandtangent",
+  description:
+    "Explore our thoughts, strategies, and perspectives on brand strategy, creative direction, and what makes brands lead their category.",
 }
 
 export default function BlogPage() {
   return (
-    <main className="bg-grey-100 min-h-screen">
+    <main className="min-h-screen bg-background">
       <Header />
-      
-      {/* Hero Section */}
+
       <div data-theme="light">
         <BlogHero />
       </div>
 
-      {/* Blog Grid */}
       <BlogGrid />
 
       <Footer />

@@ -1,15 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import ProjectCard from "./project-card"
 
-const industries = ["All Status", "Ecommerce", "Fintech", "Real Estate", "Healthcare", "Education"]
-const services = ["All Services", "Web Design", "Development", "UI/UX", "Mobile App"]
+const industries = ["All", "Ecommerce", "Fintech", "Real Estate", "Healthcare", "Education"]
+const services = ["All", "Web Design", "Development", "UI/UX", "Mobile App"]
 
 const sampleProjects = [
   {
-    title: "Mighty Buildings — Sustainable 3D Printed Houses",
+    title: "Mighty Buildings â€” Sustainable 3D Printed Houses",
     industry: "Real Estate",
     year: "2024",
     image: "/images/project-mighty.png",
@@ -17,7 +17,7 @@ const sampleProjects = [
     service: "Web Design"
   },
   {
-    title: "NexPay — Next-Gen Decentralized Payments",
+    title: "NexPay â€” Next-Gen Decentralized Payments",
     industry: "Fintech",
     year: "2023",
     image: "/images/project-nexpay.png",
@@ -25,7 +25,7 @@ const sampleProjects = [
     service: "Development"
   },
   {
-    title: "E-Store Pro — Modern Shopping Experience",
+    title: "E-Store Pro â€” Modern Shopping Experience",
     industry: "Ecommerce",
     year: "2024",
     image: "/images/project-estore.png",
@@ -35,32 +35,33 @@ const sampleProjects = [
 ]
 
 export default function ProjectGrid() {
-  const [activeIndustry, setActiveIndustry] = useState("All Status")
-  const [activeService, setActiveService] = useState("All Services")
+  const [activeIndustry, setActiveIndustry] = useState("All")
+  const [activeService, setActiveService] = useState("All")
 
   const filteredProjects = sampleProjects.filter(project => {
-    const industryMatch = activeIndustry === "All Status" || project.industry === activeIndustry
-    const serviceMatch = activeService === "All Services" || project.service === activeService
+    const industryMatch = activeIndustry === "All" || project.industry === activeIndustry
+    const serviceMatch = activeService === "All" || project.service === activeService
     return industryMatch && serviceMatch
   })
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-20 bg-black">
-      <div className="flex flex-col lg:flex-row gap-16">
-        
-        {/* Sticky Sidebar (Filters) */}
-        <aside className="lg:w-1/4">
-          <div className="lg:sticky lg:top-32 space-y-12">
-            
-            {/* Industries Filter */}
+    <div className="max-w-[1200px] mx-auto px-6 lg:px-8 py-16 bg-white">
+      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+
+        {/* Sidebar filters */}
+        <aside className="lg:w-56 shrink-0">
+          <div className="lg:sticky lg:top-32 space-y-10">
+
             <div>
-              <h4 className="text-white/20 text-xs font-bold tracking-[0.3em] uppercase mb-8">Industries</h4>
-              <ul className="space-y-4">
+              <p className="micro-cap text-muted-foreground mb-5">Industries</p>
+              <ul className="space-y-2">
                 {industries.map(industry => (
                   <li key={industry}>
                     <button
                       onClick={() => setActiveIndustry(industry)}
-                      className={`text-sm md:text-base font-semibold transition-all duration-300 hover:translate-x-2 ${activeIndustry === industry ? 'text-ignite-orange' : 'text-white/40 hover:text-white'}`}
+                      className={`text-[14px] font-normal transition-colors duration-200 hover:text-accent-orange ${
+                        activeIndustry === industry ? "text-accent-orange" : "text-muted-foreground"
+                      }`}
                     >
                       {industry}
                     </button>
@@ -69,15 +70,16 @@ export default function ProjectGrid() {
               </ul>
             </div>
 
-            {/* Services Filter */}
             <div>
-              <h4 className="text-white/20 text-xs font-bold tracking-[0.3em] uppercase mb-8">Services</h4>
-              <ul className="space-y-4">
+              <p className="micro-cap text-muted-foreground mb-5">Services</p>
+              <ul className="space-y-2">
                 {services.map(service => (
                   <li key={service}>
                     <button
                       onClick={() => setActiveService(service)}
-                      className={`text-sm md:text-base font-semibold transition-all duration-300 hover:translate-x-2 ${activeService === service ? 'text-ignite-orange' : 'text-white/40 hover:text-white'}`}
+                      className={`text-[14px] font-normal transition-colors duration-200 hover:text-accent-orange ${
+                        activeService === service ? "text-accent-orange" : "text-muted-foreground"
+                      }`}
                     >
                       {service}
                     </button>
@@ -86,34 +88,35 @@ export default function ProjectGrid() {
               </ul>
             </div>
 
-            {/* Total Count */}
-            <div className="pt-8 border-t border-white/5">
-                <span className="text-white/10 text-xs font-mono">SHOWING {filteredProjects.length} OF {sampleProjects.length} PROJECT</span>
+            <div className="pt-6 border-t border-border">
+              <span className="text-muted-foreground text-xs font-normal font-mono">
+                {filteredProjects.length} / {sampleProjects.length} projects
+              </span>
             </div>
           </div>
         </aside>
 
-        {/* Project List */}
-        <div className="lg:w-3/4">
+        {/* Project list */}
+        <div className="flex-1">
           <AnimatePresence mode="popLayout">
             {filteredProjects.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-10">
                 {filteredProjects.map((project, index) => (
-                  <ProjectCard 
-                    key={project.title} 
-                    project={project} 
-                    index={index} 
+                  <ProjectCard
+                    key={project.title}
+                    project={project}
+                    index={index}
                   />
                 ))}
               </div>
             ) : (
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="h-[60vh] flex items-center justify-center text-white/30 font-mono tracking-widest uppercase text-sm border border-dashed border-white/10 rounded-3xl"
-                >
-                    No projects found for this selection
-                </motion.div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="h-[40vh] flex items-center justify-center text-muted-foreground font-normal tracking-widest uppercase text-sm border border-dashed border-border rounded-md"
+              >
+                No projects found for this selection
+              </motion.div>
             )}
           </AnimatePresence>
         </div>

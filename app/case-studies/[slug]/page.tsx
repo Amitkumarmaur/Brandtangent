@@ -29,13 +29,13 @@ export async function generateMetadata({
     .eq("slug", resolvedParams.slug)
     .single()
 
-  if (!cs) return { title: "Case Study | DigiiMark" }
+  if (!cs) return { title: "Case Study | Brandtangent" }
 
   return {
-    title: `${cs.h1_title} | DigiiMark`,
+    title: `${cs.h1_title} | Brandtangent`,
     description:
       cs.brief_description ||
-      `Read how DigiiMark delivered results in this case study.`,
+      `Read how Brandtangent delivered results in this case study.`,
   }
 }
 
@@ -107,11 +107,10 @@ export default async function CaseStudyPage({
   }[] = Array.isArray(cs.tech_stack_used) ? cs.tech_stack_used : []
 
   return (
-    <main className="bg-white min-h-screen text-foreground overflow-hidden font-sans selection:bg-ignite-orange selection:text-white">
+    <main className="bg-white min-h-screen text-foreground bg-background bg-background bg-background overflow-hidden font-sans">
       <Header />
 
       <div className="w-full bg-white relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,87,34,0.05),transparent_50%)] pointer-events-none" />
 
         {/* 1. HERO — kept from existing design */}
         <CaseStudyHero

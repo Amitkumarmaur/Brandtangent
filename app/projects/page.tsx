@@ -5,13 +5,13 @@ import ProjectGrid from "@/components/projects/project-grid"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Industries Projects | DigiiMark — Our Best Works",
-  description: "Explore our diverse portfolio of high-impact digital solutions across various industries, from manufacturing to fintech.",
+  title: "Our Work | Brandtangent — Portfolio",
+  description: "Explore our portfolio of brand strategy, identity, and creative work across industries — from fintech to consumer and B2B.",
 }
 
 export default function ProjectsPage() {
   return (
-    <main className="bg-grey-100 min-h-screen">
+    <main className="bg-white min-h-screen">
       <Header />
       
       {/* Hero Section */}

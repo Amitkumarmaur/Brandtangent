@@ -9,11 +9,8 @@ import Link from "next/link"
 type Props = {
   careers: CareerRow[]
   listError: string | null
-  /** When no `careers` rows exist, optional server env UUID for a “general” open role. */
   fallbackCareerId: string | null
-  /** When set and present in `careers`, pre-select this role (e.g. job detail page). */
   preferredCareerId?: string | null
-  /** Tighter spacing and no duplicate “Apply” heading when the page already introduces the form. */
   compact?: boolean
 }
 
@@ -38,13 +35,12 @@ export default function CareersApplicationForm({
     return fallbackCareerId
   }, [openCareers, fallbackCareerId, preferredCareerId])
 
-  const [careerId, setCareerId] = useState<string>(initialCareerId ?? "")
-
-  /** When rendered on a specific job page, lock the selector to that role so candidates cannot apply to a different one by accident. */
   const lockedRole = useMemo(() => {
     if (!preferredCareerId) return null
     return openCareers.find((c) => c.id === preferredCareerId) ?? null
   }, [openCareers, preferredCareerId])
+
+  const [careerId, setCareerId] = useState<string>(initialCareerId ?? "")
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
@@ -98,9 +94,9 @@ export default function CareersApplicationForm({
 
   if (!careerId) {
     return (
-      <div className="rounded-2xl border border-grey-200 bg-white p-8 md:p-10 shadow-sm">
-        <h2 className="font-heading text-2xl font-semibold text-foreground mb-3">We are not accepting files yet</h2>
-        <p className="text-body text-grey-400 mb-6">
+      <div className="rounded-md border border-border bg-white p-8 md:p-10">
+        <h2 className="text-2xl font-semibold text-foreground mb-3">We are not accepting files yet</h2>
+        <p className="text-sm text-muted-foreground mb-6">
           {listError
             ? `We could not load open roles (${listError}).`
             : "There are no open roles in the database yet, and no fallback role id is configured."}{" "}
@@ -110,27 +106,27 @@ export default function CareersApplicationForm({
           <code className="text-sm font-mono">scripts/careers-applications-setup.sql</code>.
         </p>
         <a
-          href="mailto:careers@digiimark.com?subject=Resume%20submission"
-          className="inline-flex items-center justify-center rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-white hover:bg-grey-800 transition-colors"
+          href="mailto:careers@brandtangent.com?subject=Resume%20submission"
+          className="inline-flex items-center justify-center rounded-sm bg-primary px-6 h-11 text-sm font-semibold text-primary-foreground shadow-[rgba(255,255,255,0.2)_0px_0.5px_0px_0px_inset,rgba(0,0,0,0.2)_0px_0px_0px_0.5px_inset,rgba(0,0,0,0.05)_0px_1px_2px_0px] hover:opacity-90 transition-opacity"
         >
-          Email careers@digiimark.com
+          Email careers@brandtangent.com
         </a>
       </div>
     )
   }
 
   const formShell = compact
-    ? "rounded-2xl border border-grey-200 bg-white p-6 md:p-8 shadow-sm space-y-4"
-    : "rounded-2xl border border-grey-200 bg-white p-8 md:p-10 shadow-sm space-y-6"
+    ? "rounded-md border border-border bg-white p-6 md:p-8 space-y-4"
+    : "rounded-md border border-border bg-white p-8 md:p-10 space-y-6"
 
   return (
     <form onSubmit={onSubmit} className={formShell}>
       {!compact ? (
         <div>
-          <h2 className="font-heading text-2xl font-semibold text-foreground mb-2">Apply</h2>
-          <p className="text-sm text-grey-400">
+          <h2 className="text-2xl font-semibold text-foreground mb-2">Apply</h2>
+          <p className="text-sm text-muted-foreground">
             PDF or Word, up to 5 MB. By submitting, you agree we store your details to evaluate hiring — see our{" "}
-            <Link href="/privacy-policy" className="text-ignite-orange font-medium hover:underline">
+            <Link href="/privacy-policy" className="text-foreground font-medium underline decoration-[rgba(28,28,28,0.3)] hover:decoration-primary">
               Privacy Policy
             </Link>
             .
@@ -142,10 +138,10 @@ export default function CareersApplicationForm({
         lockedRole ? (
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Applying for</label>
-            <div className="rounded-xl border border-grey-200 bg-grey-50 px-4 py-3">
+            <div className="rounded-sm border border-border bg-[rgba(28,28,28,0.03)] px-4 py-3">
               <p className="text-sm font-semibold text-foreground">{lockedRole.job_title}</p>
               {lockedRole.location || lockedRole.type ? (
-                <p className="mt-0.5 text-xs text-grey-400">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   {[lockedRole.location, lockedRole.type].filter(Boolean).join(" · ")}
                 </p>
               ) : null}
@@ -163,7 +159,7 @@ export default function CareersApplicationForm({
               value={careerId}
               onChange={(e) => setCareerId(e.target.value)}
               required
-              className="w-full rounded-xl border border-grey-200 bg-white px-4 py-3 text-foreground text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
+              className="w-full rounded-sm border border-border bg-white px-4 py-3 text-foreground text-sm font-medium outline-none focus-visible:border-[rgba(28,28,28,0.4)] focus-visible:shadow-[rgba(0,0,0,0.1)_0px_4px_12px]"
             >
               {openCareers.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -176,7 +172,7 @@ export default function CareersApplicationForm({
           </div>
         )
       ) : (
-        <div className="rounded-xl bg-grey-100 border border-grey-200 px-4 py-3 text-sm text-grey-600">
+        <div className="rounded-sm bg-[rgba(28,28,28,0.04)] border border-border px-4 py-3 text-sm text-muted-foreground">
           Applying to the <strong className="text-foreground">general talent pool</strong> (configured fallback role).
         </div>
       )}
@@ -194,7 +190,7 @@ export default function CareersApplicationForm({
             required
             autoComplete="name"
             placeholder="Jane Doe"
-            className="h-11 rounded-xl border-grey-200"
+            className="h-11 rounded-sm border-border bg-white text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <div className="space-y-2">
@@ -210,14 +206,14 @@ export default function CareersApplicationForm({
             required
             autoComplete="email"
             placeholder="you@example.com"
-            className="h-11 rounded-xl border-grey-200"
+            className="h-11 rounded-sm border-border bg-white text-foreground placeholder:text-muted-foreground"
           />
         </div>
       </div>
 
       <div className="space-y-2">
         <label htmlFor="phone" className="text-sm font-medium text-foreground">
-          Phone <span className="text-grey-400 font-normal">(optional)</span>
+          Phone <span className="text-muted-foreground font-normal">(optional)</span>
         </label>
         <Input
           id="phone"
@@ -227,13 +223,13 @@ export default function CareersApplicationForm({
           onChange={(e) => setPhone(e.target.value)}
           autoComplete="tel"
           placeholder="+971 …"
-          className="h-11 rounded-xl border-grey-200 max-w-md"
+          className="h-11 rounded-sm border-border bg-white text-foreground placeholder:text-muted-foreground max-w-md"
         />
       </div>
 
       <div className="space-y-2">
         <label htmlFor="cover_letter" className="text-sm font-medium text-foreground">
-          Cover note <span className="text-grey-400 font-normal">(optional)</span>
+          Cover note <span className="text-muted-foreground font-normal">(optional)</span>
         </label>
         <textarea
           id="cover_letter"
@@ -241,8 +237,8 @@ export default function CareersApplicationForm({
           value={coverLetter}
           onChange={(e) => setCoverLetter(e.target.value)}
           rows={compact ? 3 : 5}
-          placeholder="What you want to work on, links to portfolio or GitHub, availability…"
-          className="w-full rounded-xl border border-grey-200 bg-white px-4 py-3 text-sm text-foreground placeholder:text-grey-400 outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
+          placeholder="What you want to work on, links to portfolio, availability…"
+          className="w-full rounded-sm border border-border bg-white px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus-visible:border-[rgba(28,28,28,0.4)] focus-visible:shadow-[rgba(0,0,0,0.1)_0px_4px_12px]"
         />
       </div>
 
@@ -258,24 +254,24 @@ export default function CareersApplicationForm({
           accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           required
-          className="h-auto py-3 rounded-xl border-grey-200 file:mr-4"
+          className="h-auto py-3 rounded-sm border-border bg-white file:mr-4"
         />
-        {file ? <p className="text-xs text-grey-400">{file.name}</p> : null}
+        {file ? <p className="text-xs text-muted-foreground">{file.name}</p> : null}
       </div>
 
       {message ? (
         <p
           role={status === "error" ? "alert" : "status"}
-          className={`text-sm font-medium ${status === "success" ? "text-success" : "text-red-600"}`}
+          className={`text-sm font-medium ${status === "success" ? "text-green-700" : "text-red-600"}`}
         >
           {message}
         </p>
       ) : null}
 
       {compact ? (
-        <p className="text-xs text-grey-400 leading-relaxed">
+        <p className="text-xs text-muted-foreground leading-relaxed">
           PDF or Word, up to 5 MB. By submitting you agree we store your details for hiring — see our{" "}
-          <Link href="/privacy-policy" className="text-ignite-orange font-medium hover:underline">
+          <Link href="/privacy-policy" className="text-foreground font-medium underline decoration-[rgba(28,28,28,0.3)] hover:decoration-primary">
             Privacy Policy
           </Link>
           .
@@ -285,11 +281,6 @@ export default function CareersApplicationForm({
       <Button
         type="submit"
         disabled={!canSubmit || status === "submitting"}
-        className={
-          compact
-            ? "w-full md:w-auto rounded-full bg-ignite-orange hover:bg-ignite-orange/90 text-white px-8 py-5 text-sm font-semibold shadow-[0_4px_14px_rgba(255,87,34,0.25)]"
-            : "w-full md:w-auto rounded-full bg-ignite-orange hover:bg-ignite-orange/90 text-white px-10 py-6 text-base font-semibold shadow-[0_4px_14px_rgba(255,87,34,0.25)]"
-        }
       >
         {status === "submitting" ? "Sending…" : "Submit application"}
       </Button>

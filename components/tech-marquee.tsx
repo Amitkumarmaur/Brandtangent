@@ -8,7 +8,7 @@ interface Props {
 
 function PlatformItem({ platform }: { platform: Platform }) {
   const ds = platform.display_style ?? {}
-  const weightClass = ds.weight === 'black' ? 'font-black' : 'font-bold'
+  const weightClass = ds.weight === 'black' ? 'font-black' : 'font-semibold'
   const trackingClass = ds.tracking === 'tighter' ? 'tracking-tighter' : 'tracking-tight'
 
   const handleClick = () => {
@@ -28,10 +28,10 @@ function PlatformItem({ platform }: { platform: Platform }) {
         title={`Visit ${platform.platform_name}`}
         className="flex items-center gap-1 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-pointer mx-8 focus:outline-none focus:opacity-100 focus:grayscale-0"
       >
-        <span className="w-8 h-8 bg-[#0A0A0A] rounded-sm text-white flex items-center justify-center font-bold text-sm select-none">
+        <span className="w-8 h-8 bg-primary rounded-sm text-white flex items-center justify-center font-semibold text-sm select-none">
           {ds.prefix_icon}
         </span>
-        <span className={`${weightClass} text-2xl md:text-3xl text-[#0A0A0A] tracking-tight`}>
+        <span className={`${weightClass} text-2xl md:text-3xl text-foreground tracking-tight`}>
           {platform.platform_name.split(' ')[0].toLowerCase()}
         </span>
       </div>
@@ -49,10 +49,10 @@ function PlatformItem({ platform }: { platform: Platform }) {
         title={`Visit ${platform.platform_name}`}
         className="flex items-center gap-2 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-pointer mx-8 focus:outline-none focus:opacity-100 focus:grayscale-0"
       >
-        <span className="w-8 h-8 border-[3px] border-[#0A0A0A] rounded-full flex items-center justify-center text-lg select-none">
+        <span className="w-8 h-8 border-[3px] border-foreground rounded-full flex items-center justify-center text-lg select-none">
           {ds.prefix_icon}
         </span>
-        <span className={`${weightClass} text-2xl md:text-3xl text-[#0A0A0A] tracking-tight`}>
+        <span className={`${weightClass} text-2xl md:text-3xl text-foreground tracking-tight`}>
           {platform.platform_name}
         </span>
       </div>
@@ -76,7 +76,7 @@ function PlatformItem({ platform }: { platform: Platform }) {
       style={colorStyle}
       className={`flex items-center justify-center grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-pointer mx-8 focus:outline-none focus:opacity-100 focus:grayscale-0`}
     >
-      <span className={`text-2xl md:text-3xl ${trackingClass} text-[#0A0A0A] ${weightClass}`}>
+      <span className={`text-2xl md:text-3xl ${trackingClass} text-foreground ${weightClass}`}>
         {displayName}
       </span>
     </div>

@@ -2,7 +2,8 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { ArrowRight } from "lucide-react"
+import { motion } from "motion/react"
 import type { RelatedBlogPostCard } from "@/lib/blog-related-by-category"
 
 interface BlogRelatedPostsProps {
@@ -13,17 +14,10 @@ export default function BlogRelatedPosts({ items }: BlogRelatedPostsProps) {
   if (!items.length) return null
 
   return (
-    <section className="relative w-full py-16 md:py-20 bg-grey-100 border-t border-grey-200 overflow-hidden">
-      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-2 h-2 rounded-full bg-ignite-orange shrink-0" />
-          <span className="text-sm uppercase tracking-wider text-grey-600 font-medium">
-            Same topic
-          </span>
-        </div>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold font-heading text-foreground mb-10 md:mb-12">
-          Related articles
-        </h2>
+    <section className="relative w-full py-16 md:py-20 bg-white border-t border-border overflow-hidden">
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8">
+        <p className="micro-cap text-muted-foreground mb-4">Same topic</p>
+        <h2 className="display-xl text-foreground mb-10 md:mb-12">Related articles</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {items.map((post, i) => (
@@ -37,9 +31,9 @@ export default function BlogRelatedPosts({ items }: BlogRelatedPostsProps) {
             >
               <Link
                 href={`/blog/${post.slug}`}
-                className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-grey-200 shadow-sm hover:shadow-md transition-shadow h-full"
+                className="group flex flex-col bg-white rounded-md overflow-hidden border border-border hover:border-[rgba(28,28,28,0.3)] transition-all duration-300 h-full"
               >
-                <div className="relative w-full h-56 m-2 rounded-[1.5rem] overflow-hidden bg-grey-200 shrink-0">
+                <div className="relative w-full h-56 flex-shrink-0 overflow-hidden bg-muted">
                   {post.image_url ? (
                     <Image
                       src={post.image_url}
@@ -48,39 +42,26 @@ export default function BlogRelatedPosts({ items }: BlogRelatedPostsProps) {
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-grey-200" aria-hidden />
+                    <div className="absolute inset-0 bg-muted" aria-hidden />
                   )}
                   <div className="absolute top-4 left-4 z-10">
-                    <span className="bg-foreground/50 backdrop-blur-md text-white border border-white/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    <span className="bg-[rgba(28,28,28,0.6)] backdrop-blur-sm text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-[rgba(255,255,255,0.15)]">
                       {post.categoryLabel}
                     </span>
                   </div>
                 </div>
-                <div className="px-6 pb-6 pt-2 flex flex-col flex-grow">
-                  <h3 className="heading-h3 text-foreground mb-3 group-hover:text-ignite-orange transition-colors line-clamp-2">
+                <div className="px-6 pb-6 pt-4 flex flex-col flex-grow">
+                  <h3 className="text-lg font-semibold text-foreground mb-3 line-clamp-2 leading-snug">
                     {post.title}
                   </h3>
                   {post.excerpt ? (
-                    <p className="text-body text-grey-400 line-clamp-3 mb-4 flex-grow">
+                    <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 mb-4 flex-grow">
                       {post.excerpt}
                     </p>
                   ) : null}
                   <span className="text-foreground font-medium text-sm flex items-center gap-2 group-hover:gap-3 transition-all mt-auto">
                     Read article
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-ignite-orange"
-                    >
-                      <path d="M5 12h14" />
-                      <path d="m12 5 7 7-7 7" />
-                    </svg>
+                    <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
               </Link>

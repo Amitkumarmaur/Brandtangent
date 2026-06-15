@@ -11,9 +11,9 @@ import { supabase } from "@/lib/supabase"
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: "Services | DigiiMark",
+  title: "Services | Brandtangent",
   description:
-    "Explore DigiiMark services — AI, automation, web, SEO, paid media, and full-funnel B2B marketing systems. Open any capability for methodology, stack, and proof.",
+    "Explore Brandtangent services — brand strategy, identity systems, web design, digital marketing, and creative campaigns. Open any capability for methodology and proof.",
 }
 
 export default async function ServicesIndexPage() {
@@ -34,7 +34,7 @@ export default async function ServicesIndexPage() {
   const categories = (categoriesRes.data ?? []) as ServiceCategoryRow[]
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-white">
       <Header />
       <ServicesDirectoryHero />
       <ServicesDirectory categories={categories} services={services} />
