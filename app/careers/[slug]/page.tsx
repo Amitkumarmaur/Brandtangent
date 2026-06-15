@@ -20,15 +20,15 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const { career } = await fetchCareerPageData(slug)
-  if (!career) return { title: "Role | DigiiMark" }
+  if (!career) return { title: "Role | Brandtangent" }
 
   const plain = career.description ? stripHtml(career.description).slice(0, 155) : null
   return {
-    title: `${career.job_title} | Careers — DigiiMark`,
+    title: `${career.job_title} | Careers — Brandtangent`,
     description:
       plain && plain.length > 0
         ? plain
-        : `Apply for ${career.job_title} at DigiiMark — AI-first marketing systems for B2B.`,
+        : `Apply for ${career.job_title} at Brandtangent — Brand strategy, design, and creative work at Brandtangent.`,
   }
 }
 
@@ -40,7 +40,7 @@ export default async function CareerJobPage({ params }: { params: Promise<{ slug
   const fallbackCareerId = process.env.CAREERS_FALLBACK_CAREER_ID?.trim() || null
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-white">
       <Header />
       <CareerJobDetailView
         career={career}

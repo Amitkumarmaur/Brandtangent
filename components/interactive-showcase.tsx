@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { motion, useScroll, useTransform, useInView } from "framer-motion"
+import { motion, useScroll, useTransform, useInView } from "motion/react"
 import { TrendingUp, Users, Zap, BarChart3 } from "lucide-react"
 
 const showcaseItems = [
@@ -58,10 +58,10 @@ export default function InteractiveShowcase() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-5xl font-bold text-[#0A0A0A] text-balance">
+          <h2 className="display-lg text-foreground text-balance">
             Experience Intelligence in Motion
           </h2>
-          <p className="mt-4 text-lg text-[#7D7D7D] max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
             Discover how our AI-powered automations transform industries
           </p>
         </motion.div>
@@ -78,27 +78,27 @@ export default function InteractiveShowcase() {
                 scale: 1.05,
                 boxShadow: "0 20px 40px rgba(255, 87, 34, 0.15)",
               }}
-              className="group relative bg-white rounded-2xl p-6 border border-[#E5E5E5] hover:border-[#FF5722]/30 transition-all duration-300 cursor-pointer"
+              className="group relative bg-white rounded-md p-6 border border-border hover:border-accent-orange/30 transition-all duration-300 cursor-pointer"
             >
               {/* Glow effect on hover */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#FF5722]/0 to-[#FF5722]/0 group-hover:from-[#FF5722]/5 group-hover:to-transparent transition-all duration-300" />
+              <div className="absolute inset-0 rounded-md bg-gradient-to-br from-accent-orange/0 to-accent-orange/0 group-hover:from-accent-orange/5 group-hover:to-transparent transition-all duration-300" />
 
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-medium text-[#7D7D7D] bg-[#F8F8F8] px-3 py-1 rounded-full">
+                  <span className="text-xs font-medium text-muted-foreground bg-secondary px-3 py-1 rounded-full">
                     {item.industry}
                   </span>
-                  <item.icon className="w-5 h-5 text-[#FF5722]" />
+                  <item.icon className="w-5 h-5 text-accent-orange" />
                 </div>
 
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-[#0A0A0A] group-hover:text-[#FF5722] transition-colors">
+                  <span className="display-md text-foreground group-hover:text-accent-orange transition-colors">
                     {item.metric}
                   </span>
-                  <p className="text-sm font-medium text-[#4A4A4A] mt-1">{item.title}</p>
+                  <p className="text-sm font-medium text-body mt-1">{item.title}</p>
                 </div>
 
-                <p className="text-sm text-[#7D7D7D]">{item.description}</p>
+                <p className="text-sm text-muted-foreground">{item.description}</p>
               </div>
             </motion.div>
           ))}

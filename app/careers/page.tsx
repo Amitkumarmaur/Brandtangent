@@ -6,9 +6,9 @@ import CareersOpeningsLive from "@/components/careers/careers-openings-live"
 import { fetchOpenCareers } from "@/lib/careers"
 
 export const metadata: Metadata = {
-  title: "Careers | DigiiMark",
+  title: "Careers | Brandtangent",
   description:
-    "Join DigiiMark — submit your resume for open roles or our general talent pool. AI-first marketing and engineering team.",
+    "Join Brandtangent — submit your resume for open roles or our general talent pool. Brand strategy, design, and creative team.",
 }
 
 /** Always read fresh `careers` rows so closed roles disappear as soon as status is updated in Supabase. */
@@ -19,13 +19,18 @@ export default async function CareersPage() {
   const fallbackCareerId = process.env.CAREERS_FALLBACK_CAREER_ID?.trim() || null
 
   return (
-    <main className="min-h-screen bg-grey-100">
+    <main className="min-h-screen bg-background">
       <Header />
-      <div className="bg-background">
-        <CareersHero />
+
+      <div data-theme="light">
+        <CareersHero careers={careers} />
       </div>
 
-      <CareersOpeningsLive initialCareers={careers} initialListError={error} fallbackCareerId={fallbackCareerId} />
+      <CareersOpeningsLive
+        initialCareers={careers}
+        initialListError={error}
+        fallbackCareerId={fallbackCareerId}
+      />
 
       <Footer />
     </main>

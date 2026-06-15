@@ -21,11 +21,11 @@ export function NavServicesDesktop({ categories }: { categories: NavServiceCateg
     <div className="relative group">
       <Link
         href="/services"
-        className="font-heading text-base md:text-[1.05rem] font-medium tracking-[0.01em] text-foreground transition-colors hover:text-ignite-orange inline-flex items-center gap-1 py-2"
+        className="text-base text-foreground transition-colors hover:underline inline-flex items-center gap-1 py-2"
       >
         Services
         <ChevronDown
-          className="w-4 h-4 opacity-60 transition-transform duration-200 group-hover:rotate-180"
+          className="w-4 h-4 opacity-40 transition-transform duration-200 group-hover:rotate-180"
           aria-hidden
         />
       </Link>
@@ -36,24 +36,24 @@ export function NavServicesDesktop({ categories }: { categories: NavServiceCateg
         aria-label="Service categories"
       >
         <div className="h-2 w-full shrink-0" aria-hidden />
-        <div className="rounded-2xl border border-grey-200 bg-white py-2 shadow-xl ring-1 ring-black/5 max-h-[min(70vh,24rem)] overflow-y-auto">
+        <div className="rounded-md border border-border bg-white py-2 shadow-[rgba(0,55,112,0.08)_0px_4px_16px] max-h-[min(70vh,24rem)] overflow-y-auto">
           <Link
             href="/services"
-            className="flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-grey-50 hover:text-ignite-orange transition-colors"
+            className="flex items-center justify-between px-4 py-2.5 text-sm font-normal text-foreground hover:bg-secondary transition-colors"
           >
             All services
-            <ChevronRight className="w-4 h-4 text-grey-400" aria-hidden />
+            <ChevronRight className="w-4 h-4 text-muted-foreground" aria-hidden />
           </Link>
-          <div className="mx-3 h-px bg-grey-200" />
+          <div className="mx-3 h-px bg-border my-1" />
           {categories.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-grey-400">Loading…</p>
+            <p className="px-4 py-3 text-sm text-muted-foreground">Loading…</p>
           ) : (
             <ul className="py-1">
               {categories.map((c) => (
                 <li key={c.id}>
                   <Link
                     href={categoryHref(c)}
-                    className="block px-4 py-2.5 text-sm text-grey-600 hover:bg-grey-50 hover:text-foreground transition-colors"
+                    className="block px-4 py-2.5 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                   >
                     {(c.name ?? "").trim() || "Category"}
                   </Link>
@@ -81,7 +81,7 @@ export function NavServicesMobile({
       <div className="flex w-full items-center justify-between gap-2 py-1">
         <Link
           href="/services"
-          className="font-heading text-lg font-semibold text-foreground hover:text-ignite-orange transition-colors"
+          className="text-lg font-normal text-foreground hover:text-accent-orange transition-colors"
           onClick={onNavigate}
         >
           Services
@@ -89,7 +89,7 @@ export function NavServicesMobile({
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="flex items-center gap-1 rounded-lg px-2 py-1 text-grey-500 hover:bg-grey-100 hover:text-foreground transition-colors"
+          className="flex items-center gap-1 rounded-sm px-2 py-1 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
           aria-expanded={open}
           aria-label={open ? "Hide categories" : "Show categories"}
         >
@@ -100,11 +100,11 @@ export function NavServicesMobile({
         </button>
       </div>
       {open && categories.length > 0 && (
-        <ul className="mt-2 ml-1 space-y-1 border-l-2 border-grey-200 pl-3 mb-2">
+        <ul className="mt-2 ml-1 space-y-1 border-l border-border pl-3 mb-2">
           <li>
             <Link
               href="/services"
-              className="block py-1.5 text-sm font-medium text-ignite-orange"
+              className="block py-1.5 text-sm font-normal text-foreground"
               onClick={onNavigate}
             >
               View all services
@@ -114,7 +114,7 @@ export function NavServicesMobile({
             <li key={c.id}>
               <Link
                 href={categoryHref(c)}
-                className="block py-1.5 text-sm text-grey-600 hover:text-foreground transition-colors"
+                className="block py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 onClick={onNavigate}
               >
                 {(c.name ?? "").trim() || "Category"}

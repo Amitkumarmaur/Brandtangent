@@ -5,28 +5,42 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none rounded-sm",
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        /* Primary — near-black CTA (Webflow canonical) */
+        default:
+          'bg-primary text-primary-foreground hover:bg-ink-strong active:opacity-90 transition-colors',
+        /* Secondary outline — white + hairline border */
         outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+          'bg-background text-foreground border border-border hover:bg-secondary hover:border-muted-foreground/30 transition-colors',
+        /* On dark — white fill, ink text */
         secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          'bg-background text-foreground border border-border hover:bg-secondary transition-colors',
+        /* Ghost — no border, subtle hover */
         ghost:
-          'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline',
+          'bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors',
+        /* Cream — warm surface button */
+        cream:
+          'bg-secondary text-foreground border border-border hover:bg-muted transition-colors',
+        /* Destructive */
+        destructive:
+          'bg-destructive text-destructive-foreground hover:opacity-90',
+        /* Link */
+        link:
+          'text-foreground underline-offset-4 hover:underline rounded-none px-0',
+        /* Dark band CTA */
+        dark:
+          'bg-primary text-primary-foreground hover:bg-ink-strong transition-colors',
       },
       size: {
-        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
-        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
-        icon: 'size-9',
-        'icon-sm': 'size-8',
-        'icon-lg': 'size-10',
+        default: 'h-11 px-5 py-3 text-base tracking-[-0.16px]',
+        sm:      'h-9 px-4 py-2 text-sm',
+        lg:      'h-12 px-7 py-3 text-base tracking-[-0.16px]',
+        icon:    'size-11 rounded-full',
+        'icon-sm': 'size-9 rounded-full',
+        'icon-lg': 'size-12 rounded-full',
       },
     },
     defaultVariants: {

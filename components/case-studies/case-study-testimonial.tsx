@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 
 interface CaseStudyTestimonialProps {
   quote: string
@@ -10,9 +10,9 @@ interface CaseStudyTestimonialProps {
 
 export default function CaseStudyTestimonial({ quote, clientName, clientRole }: CaseStudyTestimonialProps) {
   return (
-    <section className="relative w-full py-24 lg:py-36 bg-background border-t border-grey-200 overflow-hidden">
-      {/* Large decorative quote mark */}
-      <div className="absolute left-6 lg:left-16 top-12 font-heading text-[16rem] lg:text-[22rem] font-black text-grey-100 leading-none select-none pointer-events-none">
+    <section className="relative w-full py-24 lg:py-36 bg-white border-t border-border overflow-hidden">
+      {/* Decorative quote mark */}
+      <div className="absolute left-6 lg:left-16 top-12 text-[16rem] lg:text-[22rem] font-semibold text-[rgba(28,28,28,0.06)] leading-none select-none pointer-events-none">
         &ldquo;
       </div>
 
@@ -24,25 +24,24 @@ export default function CaseStudyTestimonial({ quote, clientName, clientRole }: 
           transition={{ duration: 0.7 }}
         >
           <div className="flex items-center gap-2 mb-10">
-            <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-            <span className="font-heading text-ignite-orange font-medium tracking-wider text-sm uppercase">
+            <div className="w-2 h-2 rounded-full bg-[rgba(28,28,28,0.4)]" />
+            <span className="text-muted-foreground font-semibold tracking-wider text-sm uppercase">
               Client Voice
             </span>
           </div>
 
-          <blockquote className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground leading-[1.35] tracking-tight mb-12">
+          <blockquote className="display-md text-foreground mb-8">
             {quote}
           </blockquote>
 
           {clientName && (
             <div className="flex items-center gap-4">
-              {/* Orange accent line */}
-              <div className="w-12 h-0.5 bg-ignite-orange flex-shrink-0" />
+              <div className="w-12 h-0.5 bg-muted flex-shrink-0" />
               <div>
-                <p className="font-heading text-sm font-bold uppercase tracking-widest text-ignite-orange">
+                <p className="text-sm font-semibold text-foreground tracking-tight">
                   {clientName}
                 </p>
-                <p className="text-xs text-grey-400 uppercase tracking-widest mt-0.5">
+                <p className="text-xs text-muted-foreground uppercase tracking-widest mt-0.5">
                   {clientRole || "Client"}
                 </p>
               </div>

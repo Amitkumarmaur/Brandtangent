@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 
 interface Result {
   metric: string
@@ -12,19 +12,18 @@ interface CaseStudyResultsProps {
   results: Result[]
 }
 
-// Fix corrupted arrow characters that come from the DB
 function sanitizeMetric(metric: string): string {
   return metric
-    .replace(/\?/g, "→")      // ? is a corrupted → in some encodings
-    .replace(/→/g, " → ")     // ensure spacing around arrows
+    .replace(/\?/g, "â†’")
+    .replace(/â†’/g, " â†’ ")
     .trim()
 }
 
 export default function CaseStudyResults({ results }: CaseStudyResultsProps) {
   return (
-    <section className="relative w-full py-20 lg:py-32 bg-background border-t border-grey-200 overflow-hidden">
-      {/* Large "04" watermark */}
-      <div className="absolute right-6 top-6 font-heading text-[8rem] lg:text-[14rem] font-black text-grey-100 leading-none select-none pointer-events-none">
+    <section className="relative w-full py-20 lg:py-32 bg-white border-t border-border overflow-hidden">
+      {/* Watermark */}
+      <div className="absolute right-6 top-6 text-[8rem] lg:text-[14rem] font-semibold text-[rgba(28,28,28,0.05)] leading-none select-none pointer-events-none">
         04
       </div>
 
@@ -38,14 +37,12 @@ export default function CaseStudyResults({ results }: CaseStudyResultsProps) {
           className="mb-14 md:mb-20"
         >
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-            <span className="font-heading text-ignite-orange font-medium tracking-wider text-sm uppercase">
+            <div className="w-2 h-2 rounded-full bg-[rgba(28,28,28,0.4)]" />
+            <span className="text-muted-foreground font-semibold tracking-wider text-sm uppercase">
               Impact
             </span>
           </div>
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-tight">
-            The Results
-          </h2>
+          <h2 className="display-xl text-foreground">The Results</h2>
         </motion.div>
 
         {/* Results grid */}
@@ -57,29 +54,29 @@ export default function CaseStudyResults({ results }: CaseStudyResultsProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group relative bg-grey-50 border border-grey-200 rounded-2xl p-7 md:p-8 flex flex-col gap-3 overflow-hidden hover:border-ignite-orange/40 hover:shadow-lg transition-all"
+              className="group relative bg-white border border-border rounded-md p-7 md:p-8 flex flex-col gap-3 overflow-hidden hover:border-[rgba(28,28,28,0.3)] hover:shadow-sm transition-all"
             >
-              {/* Orange top accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-ignite-orange opacity-0 group-hover:opacity-100 transition-opacity" />
+              {/* Top accent bar on hover */}
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
 
-              {/* Index number — subtle */}
-              <span className="font-mono text-xs text-grey-300 font-bold">
+              {/* Index */}
+              <span className="font-mono text-xs text-[rgba(28,28,28,0.3)] font-semibold">
                 {String(i + 1).padStart(2, "0")}
               </span>
 
               {/* Metric */}
-              <p className="font-heading text-3xl md:text-4xl xl:text-5xl font-black text-ignite-orange tracking-tight leading-tight">
+              <p className="display-lg text-foreground leading-tight">
                 {sanitizeMetric(res.metric)}
               </p>
 
               {/* Label */}
-              <h4 className="font-heading text-sm md:text-base font-semibold text-foreground leading-snug">
+              <h4 className="text-sm md:text-base font-semibold text-foreground leading-snug">
                 {res.label}
               </h4>
 
               {/* Description */}
               {res.description && (
-                <p className="text-sm text-grey-400 leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {res.description}
                 </p>
               )}

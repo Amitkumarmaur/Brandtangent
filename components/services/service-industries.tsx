@@ -1,8 +1,10 @@
 "use client"
 
 import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
+import { motion, useInView } from "motion/react"
 import Image from "next/image"
+import Link from "next/link"
+import { ArrowUpRight } from "lucide-react"
 
 interface IndustryCard {
   industry: string
@@ -19,51 +21,96 @@ const defaultIndustries: IndustryCard[] = [
   {
     industry: "Government",
     headline: "We Have Helped Leading Government Sectors In The UAE",
-    services: "Web Design & Development, Mobile App Development, Digital Marketing, SEO ,Social Media Marketing, ERP Software Solutions.",
-    yearsExp: 10, clients: 55, clientLabel: "Clients across various government sectors.",
+    services:
+      "Web Design & Development, Mobile App Development, Digital Marketing, SEO, Social Media Marketing, ERP Software Solutions.",
+    yearsExp: 10,
+    clients: 55,
+    clientLabel: "Clients across various government sectors.",
     image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=900&q=80",
-    caseStudies: [{ name: "Gov Portal", bg: "#1a1a2e" }, { name: "Smart City", bg: "#16213e" }, { name: "UAE Digital", bg: "#111827" }],
+    caseStudies: [
+      { name: "Gov Portal", bg: "#1a1a2e" },
+      { name: "Smart City", bg: "#16213e" },
+      { name: "UAE Digital", bg: "#111827" },
+    ],
   },
   {
     industry: "Real Estate",
     headline: "We Are Your Go-To Company Among Famed Real Estate Companies In The UAE",
-    services: "Web Design & Development, Mobile App Development, Digital Marketing, SEO ,Social Media Marketing, ERP Software Solutions.",
-    yearsExp: 10, clients: 53, clientLabel: "Clients across various real estate sectors.",
+    services:
+      "Web Design & Development, Mobile App Development, Digital Marketing, SEO, Social Media Marketing, ERP Software Solutions.",
+    yearsExp: 10,
+    clients: 53,
+    clientLabel: "Clients across various real estate sectors.",
     image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=900&q=80",
-    caseStudies: [{ name: "AVELON", bg: "#111" }, { name: "Emaar", bg: "#1a1206" }, { name: "Damac", bg: "#0d1b2a" }],
+    caseStudies: [
+      { name: "AVELON", bg: "#111" },
+      { name: "Emaar", bg: "#1a1206" },
+      { name: "Damac", bg: "#0d1b2a" },
+    ],
   },
   {
     industry: "Education",
     headline: "Our Clients' Substantial Growth Through These Channels Reflects The Impact",
-    services: "Web Design & Development, Mobile App Development, Digital Marketing, SEO ,Social Media Marketing, ERP Software Solutions.",
-    yearsExp: 10, clients: 59, clientLabel: "Clients across various education sectors.",
+    services:
+      "Web Design & Development, Mobile App Development, Digital Marketing, SEO, Social Media Marketing, ERP Software Solutions.",
+    yearsExp: 10,
+    clients: 59,
+    clientLabel: "Clients across various education sectors.",
     image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=900&q=80",
-    caseStudies: [{ name: "Manipal", bg: "#1a0a0a" }, { name: "Amity", bg: "#0a0a1a" }, { name: "Skillbridge", bg: "#0a1a0a" }],
+    caseStudies: [
+      { name: "Manipal", bg: "#1a0a0a" },
+      { name: "Amity", bg: "#0a0a1a" },
+      { name: "Skillbridge", bg: "#0a1a0a" },
+    ],
   },
   {
     industry: "Home & Living",
     headline: "We Have Worked With Leading Home & Living Industries Across The Region",
-    services: "Web Design & Development, Mobile App Development, Digital Marketing, SEO ,Social Media Marketing, ERP Software Solutions.",
-    yearsExp: 10, clients: 51, clientLabel: "Clients across various home & living sectors.",
+    services:
+      "Web Design & Development, Mobile App Development, Digital Marketing, SEO, Social Media Marketing, ERP Software Solutions.",
+    yearsExp: 10,
+    clients: 51,
+    clientLabel: "Clients across various home & living sectors.",
     image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=80",
-    caseStudies: [{ name: "Enzo", bg: "#111" }, { name: "The Fretman", bg: "#0d1017" }, { name: "Dilara", bg: "#120d17" }],
+    caseStudies: [
+      { name: "Enzo", bg: "#111" },
+      { name: "The Fretman", bg: "#0d1017" },
+      { name: "Dilara", bg: "#120d17" },
+    ],
   },
   {
     industry: "Fashion",
     headline: "We Have Helped Several Fashion Industries In Dubai Grow Their Digital Presence",
-    services: "Web Design & Development, Mobile App Development, Digital Marketing, SEO ,Social Media Marketing, ERP Software Solutions.",
-    yearsExp: 10, clients: 58, clientLabel: "Clients across various fashion sectors.",
+    services:
+      "Web Design & Development, Mobile App Development, Digital Marketing, SEO, Social Media Marketing, ERP Software Solutions.",
+    yearsExp: 10,
+    clients: 58,
+    clientLabel: "Clients across various fashion sectors.",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=900&q=80",
-    caseStudies: [{ name: "Surjuman", bg: "#111" }, { name: "Sephora", bg: "#0a0a1a" }, { name: "Rivoli", bg: "#1a0a00" }],
+    caseStudies: [
+      { name: "Surjuman", bg: "#111" },
+      { name: "Sephora", bg: "#0a0a1a" },
+      { name: "Rivoli", bg: "#1a0a00" },
+    ],
   },
 ]
 
-// Peek height between stacked cards (px each card tabs above next)
-const PEEK = 14
-// Nav/header height
-const NAV = 80
-// Extra scroll space for each card so the transition feels smooth
-const CARD_SCROLL_HEIGHT = 120
+/** Sticky stack offsets — scaled for compact cards. */
+const STICKY_TOP_BASE_REM = 5
+const STICKY_TOP_STEP_REM = 2.25
+/** Scroll runway between cards so each transition has time to stick. */
+const CARD_SCROLL_HEIGHT = 80
+const CARD_MIN_HEIGHT = "26rem"
+
+const CARD_SURFACES = [
+  "rgb(52, 52, 56)",
+  "rgb(65, 65, 69)",
+  "rgb(77, 77, 83)",
+  "rgb(89, 89, 96)",
+  "rgb(101, 101, 109)",
+  "rgb(114, 114, 122)",
+  "rgb(126, 126, 135)",
+]
 
 interface ServiceIndustriesProps {
   title?: string
@@ -78,146 +125,130 @@ export default function ServiceIndustries({
   const titleInView = useInView(titleRef, { once: true, margin: "-100px" })
 
   return (
-    <section className="relative w-full bg-foreground pt-16 md:pt-20 pb-24 md:pb-32 lg:pb-40 mb-8 md:mb-12">
-
-      {/* Section Title */}
+    <section className="relative w-full bg-black pt-14 md:pt-16 pb-20 md:pb-28 lg:pb-32">
       <motion.h2
         ref={titleRef}
         initial={{ opacity: 0, y: 30 }}
         animate={titleInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.7 }}
-        className="text-3xl md:text-5xl font-light text-white text-center mb-20 md:mb-24 px-6 tracking-tight leading-tight"
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="mx-auto mb-12 max-w-3xl px-6 text-center text-3xl font-light leading-tight tracking-tight text-white md:mb-16 md:text-4xl lg:text-5xl"
       >
         {title}
       </motion.h2>
 
-      {/*
-        Stacking cards:
-        - All cards are `position: sticky`
-        - Each card's `top` increases by PEEK px (e.g. 80, 94, 108…)
-        - So each previous card shows a PEEK-height tab above the current card
-        - paddingBottom gives the section enough scroll room
-      */}
-      <div>
+      <div
+        className="mx-auto w-full max-w-[1200px] px-4 md:px-[clamp(16px,4vw,60px)]"
+      >
         {industries.map((card, index) => (
           <div
             key={card.industry}
+            className="relative mb-8 lg:sticky lg:mb-0"
             style={{
-              position: "sticky",
-              top: `${NAV + index * PEEK}px`,
+              top: `${STICKY_TOP_BASE_REM + index * STICKY_TOP_STEP_REM}rem`,
               zIndex: 10 + index,
             }}
           >
-            {/* Centered container — max 1200px like reference */}
-            <div
-              className="mx-auto"
-              style={{ maxWidth: "1200px", paddingLeft: "clamp(16px, 4vw, 60px)", paddingRight: "clamp(16px, 4vw, 60px)" }}
+            <article
+              className="overflow-hidden rounded-2xl border border-white/5 md:rounded-3xl"
+              style={{
+                backgroundColor: CARD_SURFACES[index] ?? CARD_SURFACES[CARD_SURFACES.length - 1],
+                boxShadow: "0 -8px 24px rgba(0,0,0,0.22)",
+                minHeight: CARD_MIN_HEIGHT,
+              }}
             >
               <div
-                className="rounded-2xl md:rounded-3xl overflow-hidden relative bg-grey-50 border border-grey-200"
-                style={{
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.04)",
-                }}
+                className="grid grid-cols-1 lg:grid-cols-[35%_35%_30%]"
+                style={{ minHeight: CARD_MIN_HEIGHT }}
               >
-                {/* Card index badge */}
-                <div className="absolute top-5 right-5 w-8 h-8 rounded-full bg-grey-200 flex items-center justify-center text-grey-400 text-xs font-mono z-10">
-                  {String(index + 1).padStart(2, '0')}
-                </div>
-                {/* 3-column grid: 35% | 35% | 30% */}
-                <div
-                  className="grid grid-cols-1 lg:grid-cols-[35%_35%_30%]"
-                  style={{ minHeight: "420px" }}
-                >
+                {/* Left — title, headline, CTA, services */}
+                <div className="flex flex-col justify-between p-8 md:p-10 lg:p-12">
+                  <div>
+                    <h3 className="mb-3 text-2xl font-semibold leading-tight text-white md:text-3xl">
+                      {card.industry}
+                    </h3>
+                    <p className="text-sm font-medium capitalize leading-snug text-white/90 md:text-base">
+                      {card.headline}
+                    </p>
+                    <Link
+                      href="/projects"
+                      className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent-orange px-5 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:text-sm"
+                    >
+                      Explore More
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
 
-                  {/* LEFT — Title + Headline + Services */}
-                  <div className="flex flex-col justify-between p-10 md:p-14">
+                  <div className="mt-6">
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-accent-orange" />
+                      <span className="text-xs text-white/60 md:text-sm">Our Services Include</span>
+                    </div>
+                    <p className="text-xs leading-relaxed text-white/55 md:text-sm">{card.services}</p>
+                  </div>
+                </div>
+
+                {/* Center — image */}
+                <div className="flex items-center justify-center p-6 md:p-8">
+                  <div className="relative h-52 w-full overflow-hidden rounded-xl sm:h-56 lg:h-full lg:min-h-[240px] lg:max-h-[300px]">
+                    <Image
+                      src={card.image}
+                      alt={card.industry}
+                      fill
+                      sizes="(max-width: 1200px) 35vw, 360px"
+                      className="object-cover object-center"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                  </div>
+                </div>
+
+                {/* Right — stats + case studies */}
+                <div className="flex flex-col justify-between border-t border-white/10 p-8 md:p-10 lg:border-l lg:border-t-0 lg:p-12">
+                  <div className="space-y-5">
                     <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-5 leading-tight">
-                        {card.industry}
-                      </h3>
-                      <p className="text-foreground text-base md:text-lg font-bold leading-snug">
-                        {card.headline}
+                      <p className="tnum text-4xl font-light leading-none text-white md:text-5xl">
+                        {card.yearsExp}
+                        <span className="text-white/50"> +</span>
+                      </p>
+                      <p className="mt-2 text-xs leading-relaxed text-white/55 md:text-sm">
+                        Years of experience in the {card.industry.toLowerCase()} sectors.
                       </p>
                     </div>
-                    <div className="mt-8">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-                        <span className="text-grey-400 text-sm">Our Services Include</span>
-                      </div>
-                      <p className="text-grey-400 text-sm leading-relaxed">{card.services}</p>
+                    <div>
+                      <p className="tnum text-4xl font-light leading-none text-white md:text-5xl">
+                        {card.clients}
+                        <span className="text-white/50"> +</span>
+                      </p>
+                      <p className="mt-2 text-xs leading-relaxed text-white/55 md:text-sm">{card.clientLabel}</p>
                     </div>
                   </div>
 
-                  {/* CENTER — Inset image with rounded corners + gradient overlay */}
-                  <div className="flex items-center justify-center p-8 md:p-10">
-                    <div
-                      className="relative w-full rounded-2xl overflow-hidden"
-                      style={{ minHeight: "280px", height: "100%" }}
-                    >
-                      <Image
-                        src={card.image}
-                        alt={card.industry}
-                        fill
-                        sizes="(max-width: 1200px) 35vw, 420px"
-                        className="object-cover object-center hover:scale-105 transition-transform duration-700"
-                      />
-                      {/* Subtle bottom gradient on image */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none rounded-2xl" />
+                  <div className="mt-6">
+                    <div className="mb-3 flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-accent-orange" />
+                      <span className="text-xs text-white/60 md:text-sm">See Case Studies</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {card.caseStudies.map((cs) => (
+                        <div
+                          key={cs.name}
+                          className="flex h-11 min-w-[72px] flex-1 cursor-pointer items-center justify-center rounded-xl px-3 text-[11px] font-semibold uppercase tracking-wide text-white/75 transition-colors hover:text-white md:h-12 md:text-xs"
+                          style={{ backgroundColor: cs.bg }}
+                        >
+                          {cs.name}
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  {/* RIGHT — Stats + Case Studies */}
-                  <div className="flex flex-col justify-between p-10 md:p-12">
-                    <div className="space-y-7">
-                      <div>
-                        <p className="text-5xl md:text-6xl font-bold text-foreground tracking-tight leading-none">
-                          {card.yearsExp} <span className="text-ignite-orange">+</span>
-                        </p>
-                        <p className="text-grey-400 text-sm mt-2 leading-relaxed">
-                          Years of experience in the {card.industry.toLowerCase()} sectors.
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-5xl md:text-6xl font-bold text-foreground tracking-tight leading-none">
-                          {card.clients} <span className="text-ignite-orange">+</span>
-                        </p>
-                        <p className="text-grey-400 text-sm mt-2 leading-relaxed">
-                          {card.clientLabel}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-8">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-                        <span className="text-grey-400 text-sm">See Case Studies</span>
-                      </div>
-                      <div className="flex gap-3 flex-wrap">
-                        {card.caseStudies.map((cs) => (
-                          <div
-                            key={cs.name}
-                            className="h-12 px-4 min-w-[76px] rounded-xl flex items-center justify-center text-foreground/60 text-xs font-semibold border border-grey-200 bg-background hover:border-ignite-orange/60 hover:text-ignite-orange hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
-
-                          >
-                            {cs.name}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
               </div>
-            </div>
+            </article>
 
-            {/* Scroll gap between cards — gives natural scroll pacing */}
-            {index < industries.length - 1 && (
-              <div style={{ height: `${CARD_SCROLL_HEIGHT}px` }} />
-            )}
+            {index < industries.length - 1 ? (
+              <div aria-hidden className="hidden lg:block" style={{ height: `${CARD_SCROLL_HEIGHT}px` }} />
+            ) : null}
           </div>
         ))}
       </div>
-
     </section>
   )
 }

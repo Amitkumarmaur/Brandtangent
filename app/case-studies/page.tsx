@@ -6,17 +6,17 @@ import CaseStudiesHero from "@/components/case-studies/case-studies-hero"
 import CaseStudiesGrid from "@/components/case-studies/case-studies-grid"
 
 export const metadata: Metadata = {
-  title: "Case Studies & Portfolio | DigiiMark",
+  title: "Case Studies & Portfolio | Brandtangent",
   description:
-    "Explore DigiiMark case studies across AI, automation, web, and growth — filterable by the same content topics we use across the site.",
+    "Explore Brandtangent case studies across brand strategy, identity, web design, and digital marketing — filterable by industry and service.",
 }
 
 function CaseStudiesGridFallback() {
   return (
-    <section className="bg-grey-100 py-16 md:py-20">
+    <section className="bg-white py-16 md:py-20">
       <div className="mx-auto flex min-h-[360px] max-w-7xl items-center justify-center px-6 lg:px-8">
         <div
-          className="h-10 w-10 animate-spin rounded-full border-4 border-ignite-orange border-t-transparent"
+          className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"
           role="status"
           aria-label="Loading case studies"
         />
@@ -27,7 +27,7 @@ function CaseStudiesGridFallback() {
 
 export default function CaseStudiesPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-white">
       <Header />
       <CaseStudiesHero />
       <Suspense fallback={<CaseStudiesGridFallback />}>

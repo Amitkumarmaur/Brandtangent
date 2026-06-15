@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 168" role="img" aria-label="Brandtangent (animated)">
+  <title>Brandtangent — animated logo</title>
+  <desc>The mark reveals in sequence: the audience appears, the brand's trajectory draws in, contact is made at the tangent point, and the wordmark unveils.</desc>
+
+  <defs>
+    <style><![CDATA[
+      /* ─── Stage 1: Circle scales in from center ─── */
+      .mark-circle {
+        transform-origin: 110px 110px;
+        animation: scaleIn 6.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite both;
+      }
+      @keyframes scaleIn {
+        0%   { transform: scale(0); opacity: 0; }
+        3%   { transform: scale(0); opacity: 0; }
+        13%  { transform: scale(1); opacity: 1; }
+        85%  { transform: scale(1); opacity: 1; }
+        95%  { transform: scale(1); opacity: 0; }
+        100% { transform: scale(0); opacity: 0; }
+      }
+
+      /* ─── Stage 2: Tangent line draws in ───
+         Line length = sqrt(72.8² + 72.8²) ≈ 103 */
+      .tangent-line {
+        stroke-dasharray: 103;
+        stroke-dashoffset: 103;
+        animation: drawLine 6.5s cubic-bezier(0.65, 0, 0.35, 1) infinite both;
+      }
+      @keyframes drawLine {
+        0%   { stroke-dashoffset: 103; }
+        13%  { stroke-dashoffset: 103; }
+        28%  { stroke-dashoffset: 0; }
+        85%  { stroke-dashoffset: 0; opacity: 1; }
+        95%  { stroke-dashoffset: 0; opacity: 0; }
+        100% { stroke-dashoffset: 103; opacity: 0; }
+      }
+
+      /* ─── Stage 3: Tangent point pops + pulses ─── */
+      .tangent-dot {
+        transform-origin: 70.4px 70.4px;
+        animation: dotPop 6.5s ease-out infinite both;
+      }
+      @keyframes dotPop {
+        0%, 28%  { transform: scale(0); opacity: 0; }
+        33%      { transform: scale(1.6); opacity: 1; }
+        38%      { transform: scale(1); opacity: 1; }
+        50%      { transform: scale(1); }
+        55%      { transform: scale(1.25); }
+        60%      { transform: scale(1); }
+        85%      { transform: scale(1); opacity: 1; }
+        95%      { transform: scale(1); opacity: 0; }
+        100%     { transform: scale(0); opacity: 0; }
+      }
+
+      /* ─── Stage 4: Wordmark reveals left → right via clip-path ─── */
+      .wordmark-group {
+        animation: wordmarkReveal 6.5s cubic-bezier(0.65, 0, 0.35, 1) infinite both;
+        clip-path: inset(0 100% 0 0);
+      }
+      @keyframes wordmarkReveal {
+        0%, 33%   { clip-path: inset(0 100% 0 0); }
+        50%       { clip-path: inset(0 0 0 0); }
+        85%       { clip-path: inset(0 0 0 0); opacity: 1; }
+        95%       { clip-path: inset(0 0 0 0); opacity: 0; }
+        100%      { clip-path: inset(0 100% 0 0); opacity: 0; }
+      }
+
+      /* ─── Stage 5: Tagline fades in ─── */
+      .tagline {
+        opacity: 0;
+        animation: fadeTagline 6.5s ease-out infinite both;
+      }
+      @keyframes fadeTagline {
+        0%, 50%   { opacity: 0; transform: translateY(4px); }
+        58%       { opacity: 1; transform: translateY(0); }
+        85%       { opacity: 1; }
+        95%       { opacity: 0; }
+        100%      { opacity: 0; }
+      }
+    ]]></style>
+  </defs>
+
+  <!-- ─────────────── ICON MARK ─────────────── -->
+  <g transform="translate(50, 50)">
+    <!-- Circle: the audience -->
+    <circle class="mark-circle" cx="60" cy="60" r="56" fill="#0F0F10"/>
+
+    <!-- Tangent line: brand trajectory -->
+    <line class="tangent-line"
+          x1="-16" y1="56.80" x2="56.80" y2="-16"
+          stroke="#FF5A36" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Tangent point: the moment of contact -->
+    <g class="tangent-dot">
+      <circle cx="20.40" cy="20.40" r="6" fill="#FF5A36"/>
+      <circle cx="20.40" cy="20.40" r="2.4" fill="#0F0F10"/>
+    </g>
+  </g>
+
+  <!-- ─────────────── WORDMARK ─────────────── -->
+  <g class="wordmark-group" transform="translate(200, 0)">
+    <text x="0" y="138"
+          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+          font-weight="800"
+          font-size="92"
+          letter-spacing="-4"
+          fill="#0F0F10">brandtangent</text>
+  </g>
+
+  <!-- ─────────────── TAGLINE ─────────────── -->
+  <g class="tagline">
+    <text x="202" y="172"
+          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+          font-weight="500"
+          font-size="13"
+          letter-spacing="7"
+          fill="#0F0F10">DIGITAL  ·  MARKETING  ·  AGENCY</text>
+  </g>
+</svg>

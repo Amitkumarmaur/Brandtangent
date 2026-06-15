@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
 
-function Node({ position, color = "#FF5722" }: { position: [number, number, number]; color?: string }) {
+function Node({ position, color = "#FF6B00" }: { position: [number, number, number]; color?: string }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const pulseRef = useRef(0)
 
@@ -38,7 +38,7 @@ function Connection({ start, end }: { start: [number, number, number]; end: [num
 
   return (
     <line ref={lineRef} geometry={geometry}>
-      <lineBasicMaterial color="#FF5722" opacity={0.3} transparent />
+      <lineBasicMaterial color="#FF6B00" opacity={0.3} transparent />
     </line>
   )
 }
@@ -80,7 +80,7 @@ function NetworkScene() {
   return (
     <group ref={groupRef}>
       {nodes.map((pos, i) => (
-        <Node key={i} position={pos} color={i === 0 ? "#FF5722" : i % 2 === 0 ? "#10B981" : "#7D7D7D"} />
+        <Node key={i} position={pos} color={i === 0 ? "#FF6B00" : i % 2 === 0 ? "#00D722" : "#898989"} />
       ))}
       {connections.map(([start, end], i) => (
         <Connection key={i} start={start} end={end} />

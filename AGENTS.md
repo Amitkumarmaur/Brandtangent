@@ -5,7 +5,7 @@
 ## Project Overview
 
 This is the website for **DigiiMark**, an AI-first marketing automation agency.
-Built with Next.js 16 (App Router), TypeScript, Tailwind CSS v4, and Framer Motion.
+Built with Next.js 16 (App Router), TypeScript, Tailwind CSS v4, and Motion.
 
 ## Mandatory Reading
 
@@ -25,7 +25,7 @@ Every component, page, and section **must** follow the patterns documented in
 - **Layout:** Container is always `max-w-7xl mx-auto px-6 lg:px-8`. Section padding is `py-16 md:py-20`.
 - **Eyebrow labels:** `w-2 h-2` orange dot + `text-sm uppercase tracking-wider` text, with `mb-4`.
 - **Images:** Always use Next.js `<Image>`, never `<img>`.
-- **Animations:** Framer Motion with `viewport={{ once: true }}`.
+- **Animations:** Motion (`motion/react`) with `viewport={{ once: true }}`.
 
 ## Keeping References in Sync
 

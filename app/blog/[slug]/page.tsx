@@ -44,19 +44,19 @@ export async function generateMetadata({
     .maybeSingle()
 
   if (!row) {
-    return { title: "Blog | DigiiMark" }
+    return { title: "Blog | Brandtangent" }
   }
 
   const title = (row.seo_title ?? "Blog").trim() || "Blog"
   const description =
     (row.meta_description ?? "").trim() ||
-    "Read the latest insights from DigiiMark."
+    "Read the latest insights from Brandtangent."
 
   const meta: Metadata = {
-    title: `${title} | DigiiMark`,
+    title: `${title} | Brandtangent`,
     description,
     openGraph: {
-      title: `${title} | DigiiMark`,
+      title: `${title} | Brandtangent`,
       description,
       type: "article",
     },
@@ -111,7 +111,7 @@ export default async function BlogPostPage({
   )
 
   return (
-    <main className="bg-white min-h-screen text-foreground overflow-hidden font-sans">
+    <main className="bg-white min-h-screen text-foreground bg-background bg-background bg-background overflow-hidden font-sans">
       <Header />
 
       <BlogPostHero

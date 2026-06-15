@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 
 interface TechItem {
   name: string
@@ -14,7 +14,7 @@ interface CaseStudyTechStackProps {
 
 export default function CaseStudyTechStack({ techStack }: CaseStudyTechStackProps) {
   return (
-    <section className="relative w-full py-20 lg:py-28 bg-grey-100 border-t border-grey-200 overflow-hidden">
+    <section className="relative w-full py-20 lg:py-28 bg-white border-t border-border overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header row */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
@@ -25,18 +25,18 @@ export default function CaseStudyTechStack({ techStack }: CaseStudyTechStackProp
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 rounded-full bg-ignite-orange" />
-              <span className="font-heading text-ignite-orange font-medium tracking-wider text-sm uppercase">
+              <div className="w-2 h-2 rounded-full bg-[rgba(28,28,28,0.4)]" />
+              <span className="text-muted-foreground font-semibold tracking-wider text-sm uppercase">
                 Technology
               </span>
             </div>
-            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-foreground tracking-tight leading-tight">
+            <h2 className="display-xl text-foreground">
               Tools &amp; Platforms Used
             </h2>
           </motion.div>
 
-          <p className="text-sm text-grey-400 max-w-xs md:text-right">
-            Best-in-class tools selected specifically for this project's requirements.
+          <p className="text-sm text-muted-foreground max-w-xs md:text-right">
+            Best-in-class tools selected specifically for this project&apos;s requirements.
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export default function CaseStudyTechStack({ techStack }: CaseStudyTechStackProp
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.35, delay: index * 0.05 }}
-              className="flex items-center gap-3 bg-background rounded-2xl border border-grey-200 px-5 py-3.5 hover:border-ignite-orange/50 hover:shadow-md transition-all group cursor-default"
+              className="flex items-center gap-3 bg-white rounded-md border border-border px-5 py-3.5 hover:border-[rgba(28,28,28,0.3)] hover:shadow-sm transition-all group cursor-default"
             >
               {tech.logo ? (
                 <div className="w-7 h-7 flex-shrink-0">
@@ -68,13 +68,13 @@ export default function CaseStudyTechStack({ techStack }: CaseStudyTechStackProp
                 </div>
               ) : (
                 <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold"
+                  className="w-7 h-7 rounded-sm flex items-center justify-center flex-shrink-0 text-xs font-semibold"
                   style={{ backgroundColor: `${tech.color}20`, color: tech.color }}
                 >
                   {tech.name.charAt(0)}
                 </div>
               )}
-              <span className="text-sm font-heading font-semibold text-foreground group-hover:text-ignite-orange transition-colors whitespace-nowrap">
+              <span className="text-sm font-semibold text-foreground whitespace-nowrap">
                 {tech.name}
               </span>
             </motion.div>

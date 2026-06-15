@@ -33,7 +33,7 @@ outcome-driven. Systems thinking. Not a generic digital agency.
 | Language | TypeScript (strict) |
 | Styling | Tailwind CSS v4 |
 | Components | shadcn/ui (Radix primitives) |
-| Motion | Framer Motion |
+| Motion | Motion (`motion/react`) |
 | 3D | Three.js + React Three Fiber |
 | Forms | react-hook-form + zod |
 | Icons | lucide-react |
@@ -59,6 +59,8 @@ Before making any change, read these files to understand the current state:
 app/
 ├── layout.tsx            # Root layout (fonts, metadata)
 ├── page.tsx              # Homepage (composes all sections)
+├── landing/
+│   └── page.tsx          # Animated landing page (Framer Motion + 3D)
 ├── globals.css           # Design tokens, theme, utilities
 ├── blog/
 │   └── page.tsx          # Blog listing page
@@ -71,6 +73,13 @@ app/
 components/
 ├── header.tsx            # Site header/nav
 ├── footer.tsx            # Site footer
+├── landing/              # Animated landing page sections
+│   ├── landing-hero.tsx      # Hero with 3D tilt + TextRotate
+│   ├── landing-features.tsx  # 3D feature cards
+│   ├── landing-showcase.tsx  # Three.js network graph section
+│   ├── landing-process.tsx   # Animated process timeline
+│   ├── landing-cta.tsx       # Final CTA block
+│   └── elegant-shapes.tsx    # Floating geometric shapes (21st.dev)
 ├── contact-widget.tsx    # Floating "Get in touch" launcher (form + chat + voice)
 ├── contact/              # Sub-panels for the contact widget
 │   ├── contact-form.tsx  # Lead form → POSTs /api/contact
@@ -78,7 +87,8 @@ components/
 │   └── voice-panel.tsx   # Voice agent iframe (NEXT_PUBLIC_VOICE_AGENT_URL)
 ├── hero-section.tsx      # Homepage hero (H1)
 ├── trust-indicators.tsx  # Tech stack + globe + logos
-├── about-us.tsx          # Founders + achievements
+├── about-us.tsx          # Homepage founders + achievements section
+├── about/                # /about page sections (motion hero, timeline, values, CTA)
 ├── testimonial-section.tsx
 ├── services-scroll.tsx   # Service categories (dark)
 ├── projects-section.tsx  # Project portfolio
@@ -90,8 +100,10 @@ components/
 ├── tech-globe.tsx        # 3D globe (Three.js)
 ├── ui/                   # shadcn/ui primitives
 ├── blog/                 # Blog page sub-components
-│   ├── blog-hero.tsx     # Blog page hero (H1)
-│   └── blog-grid.tsx     # Blog listing grid with category filters
+│   ├── blog-hero.tsx           # Blog index hero (gradient mesh + bento showcase)
+│   ├── blog-hero-showcase.tsx  # 21st.dev-style bento preview of latest posts
+│   ├── blog-post-card.tsx      # Featured + grid article cards (motion hover)
+│   └── blog-grid.tsx           # Blog listing grid with category filters
 ├── case-studies/         # Case study detail + index
 │   ├── case-studies-hero.tsx   # Case studies index hero
 │   └── case-studies-grid.tsx   # Index grid + Supabase topic filters
@@ -176,7 +188,7 @@ Spacing variables are also in `globals.css`:
 - Eyebrow dot: always `w-2 h-2`, always `mb-4`.
 - Use `grey-*` tokens, never Tailwind's default `gray-*`.
 - Use Next.js `<Image>`, never `<img>`.
-- Framer Motion: always `viewport={{ once: true }}`.
+- Motion: import from `motion/react`; always `viewport={{ once: true }}`.
 - `"use client"` only when needed (state, motion, observers).
 
 ## When Creating a New Page
@@ -195,7 +207,7 @@ Spacing variables are also in `globals.css`:
 2. Use Server Components by default. Add `"use client"` only if needed.
 3. Follow the heading hierarchy from `STYLE_GUIDE.md`.
 4. Use design tokens from `globals.css` — no hardcoded colors.
-5. Add Framer Motion entrance animations with `viewport={{ once: true }}`.
+5. Add Motion entrance animations with `viewport={{ once: true }}`.
 
 ## When Modifying globals.css
 

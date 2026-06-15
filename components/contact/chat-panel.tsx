@@ -13,34 +13,25 @@ type ChatMessageResponse = {
   tools_used?: string[]
 }
 
-/**
- * Witty rotating phrases shown while Alex is generating a reply.
- * Tone matches the persona: warm, dry, human — never chirpy, never robotic.
- */
 const THINKING_PHRASES = [
-  "Thinking it over\u2026",
-  "One sec\u2026",
-  "Checking the playbook\u2026",
-  "Pulling that up\u2026",
-  "Cooking\u2026",
-  "Hmm, let me see\u2026",
-  "Hang on\u2026",
-  "Reading the room\u2026",
-  "Working on it\u2026",
-  "Just a moment\u2026",
+  "Thinking it over…",
+  "One sec…",
+  "Checking the playbook…",
+  "Pulling that up…",
+  "Cooking…",
+  "Hmm, let me see…",
+  "Hang on…",
+  "Reading the room…",
+  "Working on it…",
+  "Just a moment…",
 ] as const
 
-/**
- * Randomised welcome lines shown as the very first assistant message when the
- * chat panel opens. Short, in character, no second introduction needed once
- * the user replies (the system prompt handles the rest).
- */
 const WELCOME_LINES = [
-  "Hey \u2014 Alex from DigiiMark. What's on your mind?",
-  "Hi! Alex here from DigiiMark. How can I help today?",
-  "Hey there. Alex from DigiiMark \u2014 what brings you in?",
-  "Hi, Alex from DigiiMark. Ask me anything about what we do.",
-  "Hey \u2014 Alex here. Marketing automation, SEO, web build \u2014 what's the question?",
+  "Hey — Alex from Brandtangent. What's on your mind?",
+  "Hi! Alex here from Brandtangent. How can I help today?",
+  "Hey there. Alex from Brandtangent — what brings you in?",
+  "Hi, Alex from Brandtangent. Ask me anything about what we do.",
+  "Hey — Alex here. Brand strategy, identity, creative — what's the question?",
 ] as const
 
 function pickRandom<T>(items: readonly T[]): T {
@@ -78,18 +69,12 @@ export function ChatPanel() {
     })
   }, [messages])
 
-  /**
-   * While Alex is generating, rotate the loader phrase every ~1.8s so the
-   * widget feels alive instead of locked-up. The first phrase is picked at
-   * random so the same word doesn't always appear first.
-   */
   useEffect(() => {
     if (!sending) return
     setThinkingPhrase(pickRandom(THINKING_PHRASES))
     const interval = window.setInterval(() => {
       setThinkingPhrase((current) => {
         let next = current
-        // Pick a different phrase than the one currently shown.
         while (next === current && THINKING_PHRASES.length > 1) {
           next = pickRandom(THINKING_PHRASES)
         }
@@ -166,7 +151,7 @@ export function ChatPanel() {
           role: "assistant",
           content:
             ready === false
-              ? "Live chat is offline right now. Try the form on the previous screen, or email hello@digiimark.com."
+              ? "Live chat is offline right now. Try the form on the previous screen, or email hello@brandtangent.com."
               : msg,
         },
       ])
@@ -177,14 +162,14 @@ export function ChatPanel() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-grey-200 bg-white">
-        <p className="text-xs text-grey-400">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-white">
+        <p className="text-xs text-muted-foreground">
           {ready === null ? "Checking…" : ready ? "Online" : "Offline"}
         </p>
         <button
           type="button"
           onClick={() => void startNewConversation()}
-          className="inline-flex items-center gap-1 text-xs font-medium text-grey-600 hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           <RefreshCw className="w-3 h-3" />
           New chat
@@ -203,8 +188,8 @@ export function ChatPanel() {
             <div
               className={
                 m.role === "user"
-                  ? "max-w-[90%] rounded-2xl rounded-br-md bg-ignite-orange text-white px-3 py-2 text-sm leading-relaxed"
-                  : "max-w-[95%] rounded-2xl rounded-bl-md bg-grey-100 text-grey-600 px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap"
+                  ? "max-w-[90%] rounded-md rounded-br-[4px] bg-primary text-primary-foreground px-3 py-2 text-sm leading-relaxed"
+                  : "max-w-[95%] rounded-md rounded-bl-[4px] bg-muted text-muted-foreground px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap"
               }
             >
               {m.content}
@@ -214,7 +199,7 @@ export function ChatPanel() {
         {sending && (
           <div className="flex justify-start">
             <div
-              className="rounded-2xl rounded-bl-md bg-grey-100 px-3 py-2 flex items-center gap-2 text-grey-400 text-sm italic"
+              className="rounded-md rounded-bl-[4px] bg-muted px-3 py-2 flex items-center gap-2 text-muted-foreground text-sm italic"
               aria-live="polite"
             >
               <Loader2 className="w-4 h-4 animate-spin shrink-0 not-italic" />
@@ -224,7 +209,7 @@ export function ChatPanel() {
         )}
       </div>
 
-      <div className="p-3 border-t border-grey-200 bg-grey-100">
+      <div className="p-3 border-t border-border bg-white">
         <div className="flex gap-2">
           <textarea
             value={input}
@@ -237,14 +222,14 @@ export function ChatPanel() {
             }}
             placeholder="Type a message…"
             rows={2}
-            className="flex-1 resize-none rounded-xl border border-grey-200 bg-white px-3 py-2 text-sm text-foreground placeholder:text-grey-400 outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-2"
+            className="flex-1 resize-none rounded-sm border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus-visible:border-[rgba(28,28,28,0.4)] focus-visible:shadow-[rgba(0,0,0,0.1)_0px_4px_12px]"
             disabled={sending}
           />
           <button
             type="button"
             onClick={() => void send()}
             disabled={sending || !input.trim()}
-            className="self-end shrink-0 h-10 w-10 rounded-xl bg-ignite-orange text-white flex items-center justify-center disabled:opacity-40 disabled:pointer-events-none hover:bg-ignite-orange/90 transition-colors shadow-[0_4px_14px_rgba(255,87,34,0.25)]"
+            className="self-end shrink-0 h-10 w-10 rounded-sm bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40 disabled:pointer-events-none hover:opacity-90 transition-opacity shadow-[rgba(255,255,255,0.2)_0px_0.5px_0px_0px_inset,rgba(0,0,0,0.2)_0px_0px_0px_0.5px_inset,rgba(0,0,0,0.05)_0px_1px_2px_0px]"
             aria-label="Send message"
           >
             <Send className="w-4 h-4" />

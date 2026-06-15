@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import CategoryHero, { type CategoryHeroProject } from "@/components/services/category-hero"
+import WebDevelopmentHero from "@/components/services/web-development-hero"
 import ServiceFeatures from "@/components/services/service-features"
 import CategoryServicesGrid, { type CategoryService } from "@/components/services/category-services-grid"
 import ServiceProcessGrid from "@/components/services/service-process-grid"
@@ -11,6 +12,12 @@ import ServiceTechStack from "@/components/services/service-tech-stack"
 import { supabase } from "@/lib/supabase"
 import { deviconLogoForPlatformName } from "@/lib/devicon-platform-logos"
 import { normalizeRouteSlug } from "@/lib/services-urls"
+import {
+  fetchServiceAsCategoryRedirect,
+  fetchServiceCategoryBySlug,
+  fetchServicesForCategory,
+} from "@/lib/service-catalog"
+import { FALLBACK_CATEGORIES } from "@/lib/service-catalog-fallback"
 
 export const revalidate = 60
 export const dynamicParams = true
@@ -91,10 +98,14 @@ function categoryIconAsGlyph(icon: string | null | undefined): string | null {
 
 export async function generateStaticParams() {
   const { data } = await supabase.from("service_categories").select("slug")
-  return (data ?? [])
+  const dbSlugs = (data ?? [])
     .map((row: { slug: string | null }) => row.slug?.trim())
     .filter((slug): slug is string => Boolean(slug))
-    .map((slug) => ({ category: slug }))
+
+  const fallbackSlugs = FALLBACK_CATEGORIES.map((c) => c.slug)
+  const slugs = [...new Set([...dbSlugs, ...fallbackSlugs])]
+
+  return slugs.map((slug) => ({ category: slug }))
 }
 
 export async function generateMetadata({
@@ -103,17 +114,13 @@ export async function generateMetadata({
   params: Promise<{ category: string }>
 }): Promise<Metadata> {
   const category = normalizeRouteSlug((await params).category)
-  const { data } = await supabase
-    .from("service_categories")
-    .select("name, seo_title, meta_description, hero_description, created_at")
-    .eq("slug", category)
-    .maybeSingle()
+  const { category: data } = await fetchServiceCategoryBySlug(category)
 
-  if (!data) return { title: "Services | DigiiMark" }
+  if (!data) return { title: "Services | Brandtangent" }
 
-  const title = data.seo_title || `${data.name} Services | DigiiMark`
+  const title = data.seo_title || `${data.name} Services | Brandtangent`
   const description =
-    data.meta_description || data.hero_description || `Explore ${data.name} services from DigiiMark.`
+    data.meta_description || data.hero_description || `Explore ${data.name} services from Brandtangent.`
 
   return {
     title,
@@ -134,43 +141,26 @@ export default async function ServiceCategoryPage({
 }) {
   const category = normalizeRouteSlug((await params).category)
 
-  const { data: categoryRow } = await supabase
-    .from("service_categories")
-    .select(
-      "id, name, slug, icon, display_order, hero_display_title, hero_description, hero_animated_words, hero_stat_value, hero_stat_label, featured_projects, expertise_badge, expertise_title, expertise_subtitle, process_heading, process_description, process_steps, tech_stack_ids, target_industries, seo_title, meta_description, created_at",
-    )
-    .eq("slug", category)
-    .maybeSingle<ServiceCategoryRecord>()
+  const { category: categoryRow, fromFallback } = await fetchServiceCategoryBySlug(category)
 
   if (!categoryRow) {
-    // Flat links like `/services/[serviceSlug]` — resolve service then parent category (no FK embed: names
-    // differ across Supabase projects).
-    const { data: svc } = await supabase
-      .from("services")
-      .select("slug, category_id")
-      .eq("slug", category)
-      .maybeSingle<{ slug: string; category_id: string | null }>()
-
-    if (svc?.slug && svc.category_id) {
-      const { data: cat } = await supabase
-        .from("service_categories")
-        .select("slug")
-        .eq("id", svc.category_id)
-        .maybeSingle<{ slug: string | null }>()
-      const catSlug = (cat?.slug ?? "").trim()
-      if (catSlug) redirect(`/services/${catSlug}/${svc.slug}`)
+    const redirectTarget = await fetchServiceAsCategoryRedirect(category)
+    if (redirectTarget) {
+      redirect(`/services/${redirectTarget.categorySlug}/${redirectTarget.serviceSlug}`)
     }
     notFound()
   }
 
   const [{ data: servicesData }, platformsRes] = await Promise.all([
-    supabase
-      .from("services")
-      .select(
-        "id, slug, name, hero_h1, hero_description, hero_image, short_description, description, display_order",
-      )
-      .eq("category_id", categoryRow.id)
-      .order("display_order", { ascending: true, nullsFirst: false }),
+    fromFallback
+      ? Promise.resolve({ data: await fetchServicesForCategory(categoryRow.id, true) })
+      : supabase
+          .from("services")
+          .select(
+            "id, slug, name, hero_h1, hero_description, hero_image, short_description, description, display_order",
+          )
+          .eq("category_id", categoryRow.id)
+          .order("display_order", { ascending: true, nullsFirst: false }),
     categoryRow.tech_stack_ids && categoryRow.tech_stack_ids.length > 0
       ? supabase
           .from("platforms")
@@ -209,7 +199,7 @@ export default async function ServiceCategoryPage({
       title: s.name,
       description:
         (s.short_description ?? s.hero_description ?? s.description ?? "").trim() ||
-        `Learn more about ${s.name} at DigiiMark.`,
+        `Learn more about ${s.name} at Brandtangent.`,
     }))
     .slice(0, 8)
 
@@ -310,19 +300,35 @@ export default async function ServiceCategoryPage({
   return (
     <main data-service-category-slug={categoryRow.slug} data-display-order={categoryRow.display_order ?? ""}>
       <Header />
-      <div data-theme="dark">
-        <CategoryHero
-          badge={categoryRow.name}
-          badgeIconUrl={categoryIconAsUrl(categoryRow.icon)}
-          badgeIconGlyph={categoryIconAsGlyph(categoryRow.icon)}
-          displayTitle={heroDisplayTitle}
-          description={heroDescription}
-          animatedWords={categoryRow.hero_animated_words ?? undefined}
-          statValue={categoryRow.hero_stat_value}
-          statLabel={categoryRow.hero_stat_label}
-          projects={projects}
-        />
-      </div>
+      {categoryRow.slug === "web-development" ? (
+        <div data-theme="light">
+          <WebDevelopmentHero
+            badge={categoryRow.name}
+            badgeIconUrl={categoryIconAsUrl(categoryRow.icon)}
+            badgeIconGlyph={categoryIconAsGlyph(categoryRow.icon)}
+            displayTitle={heroDisplayTitle}
+            description={heroDescription}
+            animatedWords={categoryRow.hero_animated_words ?? undefined}
+            statValue={categoryRow.hero_stat_value}
+            statLabel={categoryRow.hero_stat_label}
+            projects={projects}
+          />
+        </div>
+      ) : (
+        <div data-theme="dark">
+          <CategoryHero
+            badge={categoryRow.name}
+            badgeIconUrl={categoryIconAsUrl(categoryRow.icon)}
+            badgeIconGlyph={categoryIconAsGlyph(categoryRow.icon)}
+            displayTitle={heroDisplayTitle}
+            description={heroDescription}
+            animatedWords={categoryRow.hero_animated_words ?? undefined}
+            statValue={categoryRow.hero_stat_value}
+            statLabel={categoryRow.hero_stat_label}
+            projects={projects}
+          />
+        </div>
+      )}
 
       {expertiseFeatures.length > 0 ? (
         <div data-theme="light">

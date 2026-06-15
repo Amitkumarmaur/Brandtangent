@@ -72,19 +72,19 @@ export function ContactForm() {
   if (submitState.kind === "success") {
     return (
       <div className="flex flex-col items-center justify-center text-center gap-3 px-4 py-10">
-        <div className="w-12 h-12 rounded-full bg-success/10 text-success flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-green-100 text-green-700 flex items-center justify-center">
           <CheckCircle2 className="w-6 h-6" />
         </div>
-        <p className="font-heading text-base font-semibold text-foreground">
+        <p className="text-base font-semibold text-foreground">
           Message received
         </p>
-        <p className="text-sm text-grey-400 leading-relaxed max-w-xs">
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
           Thanks — we&apos;ll get back to you within one business day.
         </p>
         <button
           type="button"
           onClick={() => setSubmitState({ kind: "idle" })}
-          className="mt-2 text-sm font-medium text-ignite-orange hover:underline underline-offset-4"
+          className="mt-2 text-sm font-medium text-foreground underline decoration-[rgba(28,28,28,0.3)] hover:decoration-primary underline-offset-4"
         >
           Send another message
         </button>
@@ -154,7 +154,7 @@ export function ContactForm() {
       {submitState.kind === "error" && (
         <p
           role="alert"
-          className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"
+          className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-sm px-3 py-2"
         >
           {submitState.message}
         </p>
@@ -163,7 +163,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="mt-1 inline-flex items-center justify-center gap-2 h-10 rounded-xl bg-ignite-orange text-white text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none hover:bg-ignite-orange/90 transition-colors shadow-[0_4px_14px_rgba(255,87,34,0.25)]"
+        className="mt-1 inline-flex items-center justify-center gap-2 h-10 rounded-sm bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none hover:opacity-90 active:opacity-80 transition-opacity shadow-[rgba(255,255,255,0.2)_0px_0.5px_0px_0px_inset,rgba(0,0,0,0.2)_0px_0px_0px_0.5px_inset,rgba(0,0,0,0.05)_0px_1px_2px_0px]"
       >
         {submitting ? (
           <>
@@ -182,7 +182,7 @@ export function ContactForm() {
 }
 
 const inputClasses =
-  "w-full rounded-xl border border-grey-200 bg-white px-3 py-2 text-sm text-foreground placeholder:text-grey-400 outline-none focus-visible:ring-2 focus-visible:ring-ignite-orange focus-visible:ring-offset-1 disabled:bg-grey-100 disabled:text-grey-400"
+  "w-full rounded-sm border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus-visible:border-[rgba(28,28,28,0.4)] focus-visible:shadow-[rgba(0,0,0,0.1)_0px_4px_12px] disabled:bg-muted disabled:text-muted-foreground"
 
 function Field({
   label,
@@ -197,10 +197,10 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs font-medium text-grey-600">
+      <span className="text-xs font-medium text-muted-foreground">
         {label}
         {optional && (
-          <span className="ml-1 font-normal text-grey-400">(optional)</span>
+          <span className="ml-1 font-normal text-muted-foreground">(optional)</span>
         )}
       </span>
       {children}

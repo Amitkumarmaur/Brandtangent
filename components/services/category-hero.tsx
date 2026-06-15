@@ -1,9 +1,21 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion"
+import {
+  LayoutGroup,
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react"
 import { ArrowDown, ArrowRight, ArrowLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
+
+import { TextRotate } from "@/components/ui/text-rotate"
+import { AboutGrain } from "@/components/about/about-grain"
+import { fadeUp, lineReveal } from "@/components/about/about-motion"
 
 export interface CategoryHeroProject {
   id: number | string
@@ -17,26 +29,18 @@ export interface CategoryHeroProject {
 }
 
 interface CategoryHeroProps {
-  /** Eyebrow badge shown above the title (e.g. the category name). */
   badge: string
-  /** Optional icon URL from `service_categories.icon` when stored as an image URL. */
   badgeIconUrl?: string | null
-  /** Optional short glyph from `service_categories.icon` (emoji / letter) when not a URL. */
   badgeIconGlyph?: string | null
-  /** The large uppercase display title. Line breaks: pass the raw string; we split on space if no <br>. */
   displayTitle: string
-  /** Description paragraph beneath the title. */
   description: string
-  /** Rotating words to animate under the title. Defaults to a short brand list. */
   animatedWords?: string[]
-  /** Large stat shown at bottom-left of the hero card. */
   statValue?: string | null
   statLabel?: string | null
-  /** Featured project slides shown on the right-hand card. */
   projects: CategoryHeroProject[]
 }
 
-const FALLBACK_WORDS = ["STRATEGIC", "SCALABLE", "CONVERTING", "MEASURABLE"]
+const FALLBACK_WORDS = ["Strategic", "Scalable", "Converting", "Measurable"]
 
 function splitTitleLines(title: string): string[] {
   const t = (title ?? "").trim()
@@ -47,50 +51,6 @@ function splitTitleLines(title: string): string[] {
   if (parts.length <= 1) return [t]
   const mid = Math.ceil(parts.length / 2)
   return [parts.slice(0, mid).join(" "), parts.slice(mid).join(" ")]
-}
-
-function FloatingUICard({ project }: { project: CategoryHeroProject }) {
-  const colors = project.uiColors ?? [
-    "#EF4444", "#F97316", "#8B5CF6", "#3B82F6", "#06B6D4", "#10B981", "#F59E0B", "#EC4899",
-  ]
-  return (
-    <motion.div
-      key={project.id}
-      initial={{ opacity: 0, y: 20, x: -10, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, x: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="absolute top-8 left-8 z-20 w-52 rounded-2xl overflow-hidden shadow-2xl"
-      style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)" }}
-    >
-      <div className="px-3 py-2.5 border-b border-gray-100 flex items-center gap-2">
-        <div
-          className="w-5 h-5 rounded-full flex items-center justify-center"
-          style={{ background: `linear-gradient(135deg, ${project.accent}, ${project.accent}88)` }}
-        >
-          <span className="text-white text-[8px] font-bold">D</span>
-        </div>
-        <span className="text-gray-700 text-xs font-semibold">Design System</span>
-      </div>
-      <div className="p-3 space-y-2.5">
-        <div>
-          <p className="text-gray-400 text-[9px] uppercase tracking-wider mb-1.5">Select Color</p>
-          <div className="flex gap-1.5 flex-wrap">
-            {colors.map((c) => (
-              <div key={c} className="w-4 h-4 rounded-full" style={{ background: c }} />
-            ))}
-          </div>
-        </div>
-        <div>
-          <p className="text-gray-400 text-[9px] uppercase tracking-wider mb-1.5">Select Shade</p>
-          <div className="h-4 rounded-full" style={{ background: `linear-gradient(to right, ${project.accent}33, ${project.accent})` }} />
-          <div className="relative -mt-3 ml-[55%]">
-            <div className="w-4 h-4 rounded-full bg-white shadow-md" style={{ border: `2px solid ${project.accent}` }} />
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  )
 }
 
 function isHttpUrl(s: string | null | undefined): boolean {
@@ -109,32 +69,42 @@ export default function CategoryHero({
   statLabel,
   projects,
 }: CategoryHeroProps) {
-  const words = (animatedWords && animatedWords.length > 0 ? animatedWords : FALLBACK_WORDS).map((w) => w.toUpperCase())
+  const words =
+    animatedWords && animatedWords.length > 0 ? animatedWords : FALLBACK_WORDS
   const hasProjects = projects.length > 0
 
-  const [wordIdx, setWordIdx] = useState(0)
   const [slideIdx, setSlideIdx] = useState(0)
   const [paused, setPaused] = useState(false)
 
+  const { scrollY, scrollYProgress } = useScroll()
+  const progressScaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 })
+  const contentY = useTransform(scrollY, [0, 600], [0, -50])
+
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [6, -6]), { stiffness: 120, damping: 18 })
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), { stiffness: 120, damping: 18 })
-
-  useEffect(() => {
-    if (words.length <= 1) return
-    const t = setInterval(() => setWordIdx((i) => (i + 1) % words.length), 2500)
-    return () => clearInterval(t)
-  }, [words.length])
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), {
+    stiffness: 120,
+    damping: 18,
+  })
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), {
+    stiffness: 120,
+    damping: 18,
+  })
 
   useEffect(() => {
     if (paused || !hasProjects || projects.length <= 1) return
-    const t = setInterval(() => setSlideIdx((i) => (i + 1) % projects.length), 4000)
+    const t = setInterval(() => setSlideIdx((i) => (i + 1) % projects.length), 4500)
     return () => clearInterval(t)
   }, [paused, projects.length, hasProjects])
 
-  const next = useCallback(() => setSlideIdx((i) => (hasProjects ? (i + 1) % projects.length : 0)), [projects.length, hasProjects])
-  const prev = useCallback(() => setSlideIdx((i) => (hasProjects ? (i - 1 + projects.length) % projects.length : 0)), [projects.length, hasProjects])
+  const next = useCallback(
+    () => setSlideIdx((i) => (hasProjects ? (i + 1) % projects.length : 0)),
+    [projects.length, hasProjects],
+  )
+  const prev = useCallback(
+    () => setSlideIdx((i) => (hasProjects ? (i - 1 + projects.length) % projects.length : 0)),
+    [projects.length, hasProjects],
+  )
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect()
@@ -155,284 +125,280 @@ export default function CategoryHero({
   const statSuffix = statNumberMatch?.[2] ?? ""
 
   return (
-    <section className="relative w-full bg-background pt-32 pb-16 lg:pt-40 lg:pb-20 flex items-center overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px]" style={{ background: "rgba(255,87,34,0.07)" }} />
-        <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: "rgba(255,87,34,0.05)" }} />
-        <div className="absolute inset-0 opacity-[0.04] grid-pattern" />
-      </div>
+    <section className="relative min-h-[88vh] overflow-hidden border-b border-white/10 bg-primary pt-28 pb-16 lg:pt-36 lg:pb-20">
+      <motion.div
+        className="absolute left-0 right-0 top-0 z-50 h-[2px] origin-left bg-accent-orange"
+        style={{ scaleX: progressScaleX }}
+      />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          {/* LEFT CARD */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative rounded-[1.5rem] overflow-hidden flex flex-col justify-between p-8 md:p-12 bg-dark-surface border border-white/10 min-h-[460px]"
-          >
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full" style={{ background: "rgba(255,87,34,0.3)" }} />
-            <div className="absolute left-0 top-1/3 w-1 h-32 bg-ignite-orange rounded-r-full opacity-80" />
-            <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full blur-[80px] pointer-events-none" style={{ background: "rgba(255,87,34,0.12)" }} />
+      <AboutGrain className="opacity-[0.06] mix-blend-screen" />
 
-            {[...Array(4)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute rounded-full pointer-events-none"
-                style={{
-                  width: 4 + i * 2,
-                  height: 4 + i * 2,
-                  background: "#FF5722",
-                  left: `${20 + i * 20}%`,
-                  top: `${15 + i * 15}%`,
-                  opacity: 0.2,
-                }}
-                animate={{ y: [0, -12, 0], opacity: [0.2, 0.5, 0.2] }}
-                transition={{ duration: 3 + i, repeat: Infinity, delay: i * 0.8, ease: "easeInOut" }}
-              />
-            ))}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        aria-hidden
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)
+          `,
+          backgroundSize: "64px 64px",
+        }}
+      />
 
+      <motion.p
+        style={{ y: contentY }}
+        className="pointer-events-none absolute right-4 top-1/3 hidden select-none font-mono text-[clamp(5rem,12vw,9rem)] font-bold leading-none tracking-tighter text-white/[0.04] lg:block"
+        aria-hidden
+      >
+        {statMain || "500"}
+      </motion.p>
+
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-8">
+        <div className="grid grid-cols-1 items-stretch gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-12">
+          <motion.div style={{ y: contentY }} className="flex flex-col justify-between">
             <div>
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="flex items-center gap-3 mb-4"
+                custom={0}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="mb-8 flex items-center gap-3"
               >
-                <div className="w-2 h-2 rounded-full bg-ignite-orange animate-pulse shrink-0" />
+                <span className="h-2 w-2 rounded-full bg-accent-orange" />
                 {badgeIconUrl && isHttpUrl(badgeIconUrl) ? (
                   <Image
                     src={badgeIconUrl.trim()}
                     alt=""
-                    width={28}
-                    height={28}
-                    className="rounded-lg object-cover border border-white/15 shrink-0"
+                    width={24}
+                    height={24}
+                    className="shrink-0 rounded-sm border border-white/10 object-cover"
                   />
                 ) : badgeIconGlyph ? (
-                  <span className="text-xl leading-none shrink-0" aria-hidden>
+                  <span className="shrink-0 text-lg leading-none" aria-hidden>
                     {badgeIconGlyph}
                   </span>
                 ) : null}
-                <span className="font-heading text-ignite-orange text-sm font-medium tracking-wider uppercase">
-                  {badge}
-                </span>
+                <span className="micro-cap text-white/50">{badge}</span>
               </motion.div>
 
-              <div className="mb-4">
-                <motion.h1
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4, duration: 0.8 }}
-                  className="font-heading text-3xl sm:text-4xl lg:text-[3.2rem] xl:text-[3.5rem] leading-[1.0] font-bold tracking-[-0.03em] uppercase text-white"
-                >
+              <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
+                <h1 className="mb-3 max-w-xl font-semibold leading-[0.92] tracking-[-0.04em] text-white [font-size:clamp(2.5rem,5.5vw,4.75rem)]">
                   {titleLines.map((line, i) => (
-                    <span key={i} className="block">{line}</span>
+                    <span key={i} className="block">
+                      {line}
+                    </span>
                   ))}
-                </motion.h1>
+                </h1>
+                <LayoutGroup>
+                  <motion.div layout className="mt-2 flex flex-wrap items-baseline gap-x-2">
+                    <TextRotate
+                      texts={words}
+                      mainClassName="font-semibold text-accent-orange [font-size:clamp(1.75rem,3.5vw,2.75rem)] leading-tight tracking-[-0.02em]"
+                      staggerDuration={0.02}
+                      staggerFrom="last"
+                      rotationInterval={2400}
+                      transition={{ type: "spring", damping: 28, stiffness: 380 }}
+                    />
+                  </motion.div>
+                </LayoutGroup>
+              </motion.div>
 
-                <div className="h-10 md:h-12 overflow-hidden mt-3">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={wordIdx}
-                      initial={{ y: 50, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -50, opacity: 0 }}
-                      transition={{ duration: 0.45, ease: "easeOut" }}
-                      className="font-heading text-2xl md:text-3xl font-bold tracking-tight text-ignite-orange"
-                    >
-                      {words[wordIdx]}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </div>
+              <motion.div
+                variants={lineReveal}
+                initial="hidden"
+                animate="visible"
+                className="my-7 h-px max-w-[120px] bg-accent-orange"
+              />
 
               <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className="font-sans text-white/60 text-base md:text-lg leading-relaxed max-w-sm mt-3"
+                custom={2}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="max-w-md text-base leading-relaxed text-white/60 md:text-lg"
               >
                 {description}
               </motion.p>
             </div>
 
-            <div className="flex items-end justify-between mt-12 flex-wrap gap-4">
+            <motion.div
+              custom={3}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="mt-12 flex flex-wrap items-end justify-between gap-6"
+            >
               {statValue ? (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
-                  <p className="font-mono text-4xl md:text-5xl font-black text-white leading-none">
+                <div>
+                  <p className="tnum font-mono text-4xl font-light text-white md:text-5xl">
                     {statMain}
-                    {statSuffix ? <span className="text-ignite-orange">{statSuffix}</span> : null}
+                    {statSuffix ? (
+                      <span className="text-white/40">{statSuffix}</span>
+                    ) : null}
                   </p>
                   {statLabel ? (
-                    <p className="font-sans text-white/40 text-xs tracking-widest uppercase mt-2">{statLabel}</p>
+                    <p className="micro-cap mt-2 text-white/40">{statLabel}</p>
                   ) : null}
-                </motion.div>
-              ) : <div />}
+                </div>
+              ) : (
+                <div />
+              )}
 
               <motion.a
-                href="#contact"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.0 }}
-                whileHover={{ scale: 1.05 }}
+                href="#capabilities"
+                whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-3 px-6 py-3 rounded-full font-sans font-medium text-white bg-ignite-orange hover:bg-ignite-orange/90 transition-colors shadow-[0_4px_24px_rgba(255,87,34,0.3)]"
+                className="inline-flex items-center gap-2 border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:border-accent-orange/50 hover:bg-white/10"
               >
-                <ArrowDown className="w-4 h-4" />
-                SEE WORK
+                <ArrowDown className="h-4 w-4" />
+                Explore capabilities
               </motion.a>
-            </div>
+            </motion.div>
           </motion.div>
 
-          {/* RIGHT CARD (SLIDER) */}
           {hasProjects && project ? (
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
+              initial={{ opacity: 0, y: 40, rotate: 1.5 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              style={{ rotateX, rotateY, perspective: 800, transformStyle: "preserve-3d" }}
-              className="relative rounded-[1.5rem] overflow-hidden h-full min-h-[500px]"
+              style={{ rotateX, rotateY, perspective: 900, transformStyle: "preserve-3d" }}
+              className="relative min-h-[420px] lg:min-h-[520px]"
             >
-              <div className="relative w-full h-full min-h-[500px] lg:min-h-full">
+              <div
+                className="pointer-events-none absolute -left-2 -top-2 h-full w-full border border-accent-orange/25"
+                aria-hidden
+              />
+
+              <div className="relative h-full min-h-[420px] overflow-hidden lg:min-h-[520px]">
                 <AnimatePresence mode="sync">
                   <motion.div
                     key={`img-${project.id}`}
-                    initial={{ opacity: 0, scale: 1.08 }}
+                    initial={{ opacity: 0, scale: 1.06 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
                     className="absolute inset-0"
                   >
                     <Image
                       src={project.image}
                       alt={project.title}
                       fill
-                      sizes="50vw"
+                      sizes="55vw"
                       className="object-cover object-center"
                       priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0d1020]/85 via-[#0d1020]/20 to-transparent" />
-                    <div className="absolute inset-0 opacity-[0.08]" style={{ background: project.accent }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/10" />
                   </motion.div>
                 </AnimatePresence>
 
-                <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none" style={{ transform: "translateZ(40px)" }}>
-                  <AnimatePresence mode="wait">
-                    <FloatingUICard key={`ui-${project.id}`} project={project} />
-                  </AnimatePresence>
-                </div>
-
-                <div className="absolute top-8 right-8 z-20" style={{ transform: "translateZ(30px)" }}>
+                <div
+                  className="absolute right-6 top-6 z-20"
+                  style={{ transform: "translateZ(24px)" }}
+                >
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={`stat-${project.id}`}
-                      initial={{ opacity: 0, scale: 0.8, y: -10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.8, y: -10 }}
-                      transition={{ duration: 0.4 }}
-                      className="rounded-2xl px-4 py-3 text-right"
-                      style={{
-                        background: "rgba(13,16,32,0.85)",
-                        backdropFilter: "blur(16px)",
-                        border: `1px solid ${project.accent}33`,
-                      }}
+                      initial={{ opacity: 0, y: -12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.35 }}
+                      className="border border-white/15 bg-black/60 px-4 py-3 backdrop-blur-md"
                     >
-                      <p className="text-2xl font-black text-white">
-                        {(() => {
-                          const value = project.stat.value ?? ""
-                          const suffixMatch = value.match(/[+%]$/)
-                          if (suffixMatch) {
-                            return (
-                              <>
-                                {value.slice(0, -1)}
-                                <span style={{ color: project.accent }}>{suffixMatch[0]}</span>
-                              </>
-                            )
-                          }
-                          return value
-                        })()}
+                      <p className="tnum text-2xl font-light text-white">
+                        {project.stat.value}
                       </p>
-                      <p className="text-white/40 text-[10px] uppercase tracking-wider">{project.stat.label}</p>
+                      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">
+                        {project.stat.label}
+                      </p>
                     </motion.div>
                   </AnimatePresence>
                 </div>
 
-                <div className="absolute bottom-0 left-0 right-0 z-20 p-8 md:p-10" style={{ transform: "translateZ(20px)" }}>
+                <div
+                  className="absolute bottom-0 left-0 right-0 z-20 p-7 md:p-9"
+                  style={{ transform: "translateZ(16px)" }}
+                >
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={`info-${project.id}`}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.5 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.45 }}
                     >
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="text-white/50 text-xs font-semibold tracking-widest uppercase">{project.category}</span>
+                      <div className="mb-3 flex items-center gap-3">
+                        <span className="micro-cap text-white/50">{project.category}</span>
                         {project.flag ? (
                           <>
-                            <span className="text-white/30">|</span>
+                            <span className="text-white/25">|</span>
                             <span className="text-sm">{project.flag}</span>
                           </>
                         ) : null}
                       </div>
-                      <div className="h-px bg-white/15 mb-4" />
+                      <div className="mb-4 h-px bg-white/15" />
                       <div className="flex items-end justify-between gap-4">
-                        <p className="text-white text-base md:text-lg font-semibold leading-snug max-w-xs">{project.title}</p>
-                        <motion.button
-                          whileHover={{ scale: 1.1, rotate: -10 }}
-                          className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
-                          style={{ background: project.accent }}
+                        <p className="max-w-xs text-base font-semibold leading-snug text-white md:text-lg">
+                          {project.title}
+                        </p>
+                        <motion.span
+                          whileHover={{ scale: 1.08 }}
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15"
                         >
-                          <ArrowRight className="w-4 h-4 text-white" />
-                        </motion.button>
+                          <ArrowRight className="h-4 w-4 text-white" />
+                        </motion.span>
                       </div>
                     </motion.div>
                   </AnimatePresence>
 
                   {projects.length > 1 ? (
-                    <div className="flex items-center gap-4 mt-6">
+                    <div className="mt-6 flex items-center gap-4">
                       <motion.button
-                        whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.92 }}
                         onClick={prev}
-                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors"
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 transition-colors hover:bg-white/20"
                         aria-label="Previous slide"
                       >
-                        <ArrowLeft className="w-4 h-4 text-white" />
+                        <ArrowLeft className="h-4 w-4 text-white" />
                       </motion.button>
 
-                      <div className="flex gap-2 flex-1">
+                      <div className="flex flex-1 gap-2">
                         {projects.map((p, i) => (
                           <button
                             key={p.id}
                             onClick={() => setSlideIdx(i)}
-                            className="relative h-1 rounded-full overflow-hidden transition-all duration-300"
-                            style={{ background: "rgba(255,255,255,0.2)", width: i === slideIdx ? 32 : 12 }}
+                            className="relative h-1 overflow-hidden rounded-full transition-all duration-300"
+                            style={{
+                              background: "rgba(255,255,255,0.2)",
+                              width: i === slideIdx ? 36 : 12,
+                            }}
                             aria-label={`Go to slide ${i + 1}`}
                           >
-                            {i === slideIdx && (
+                            {i === slideIdx ? (
                               <motion.div
-                                className="absolute inset-0 rounded-full"
-                                style={{ background: project.accent }}
-                                layoutId="active-dot"
+                                className="absolute inset-0 rounded-full bg-accent-orange"
+                                layoutId="category-hero-dot"
                               />
-                            )}
+                            ) : null}
                           </button>
                         ))}
                       </div>
 
                       <motion.button
-                        whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.92 }}
                         onClick={next}
-                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors"
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 transition-colors hover:bg-white/20"
                         aria-label="Next slide"
                       >
-                        <ChevronRight className="w-4 h-4 text-white" />
+                        <ChevronRight className="h-4 w-4 text-white" />
                       </motion.button>
 
-                      <span className="text-white/30 text-xs font-mono tabular-nums">
-                        {String(slideIdx + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
+                      <span className="font-mono text-xs tabular-nums text-white/35">
+                        {String(slideIdx + 1).padStart(2, "0")} /{" "}
+                        {String(projects.length).padStart(2, "0")}
                       </span>
                     </div>
                   ) : null}
@@ -441,12 +407,12 @@ export default function CategoryHero({
             </motion.div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, x: 32 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="relative rounded-[1.5rem] overflow-hidden h-full min-h-[460px] bg-dark-surface border border-white/10 flex items-center justify-center"
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="flex min-h-[420px] items-center justify-center border border-white/10 bg-white/5 lg:min-h-[520px]"
             >
-              <p className="text-white/40 text-sm">Case studies coming soon</p>
+              <p className="text-sm text-white/40">Case studies coming soon</p>
             </motion.div>
           )}
         </div>

@@ -32,7 +32,7 @@ const OVERVIEW_COLUMN: FooterColumnData = {
     { label: "Services", href: "/services" },
     { label: "Our Work", href: "/case-studies" },
     { label: "Blog", href: "/blog" },
-    { label: "Contact us", href: "mailto:discover@digiimark.com" },
+    { label: "Contact us", href: "mailto:hello@brandtangent.com" },
     { label: "Careers", href: "/careers" },
     { label: "Privacy Policy", href: "/privacy-policy" },
   ],
