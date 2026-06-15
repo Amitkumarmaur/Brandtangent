@@ -2,19 +2,30 @@ import { createClient } from "@supabase/supabase-js"
 
 /**
  * Browser + Server Component client (no cookies).
- * Accepts the same env names as `utils/supabase/server.ts` / middleware so `.env.local` is not tied to one key name.
+ * Lazy-initialized to avoid errors during static generation when env vars aren't set.
  */
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  ""
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Only create client if both URL and key are available (skip during build if env vars not set)
-export const supabase = (supabaseUrl && supabaseAnonKey)
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : (null as any)
+let _client: ReturnType<typeof createClient> | null = null
+
+export const supabase = {
+  from(table: string) {
+    if (!_client) {
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error(
+          "Supabase not configured. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are set."
+        )
+      }
+      _client = createClient(supabaseUrl, supabaseAnonKey)
+    }
+    return _client.from(table)
+  },
+  // Add other methods as needed
+} as ReturnType<typeof createClient>
 
 // ─── Type helpers ───────────────────────────────────────────────────────────
 
