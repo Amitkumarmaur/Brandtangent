@@ -1,38 +1,48 @@
-export const easeOut = [0.22, 1, 0.36, 1] as const
+/**
+ * Reusable motion animation variants for About and Services pages.
+ * Used by: about-hero, about-pillars, about-values, service pages
+ */
 
 export const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.8,
-      delay: 0.12 + i * 0.09,
-      ease: easeOut,
+      delay: i * 0.1,
+      duration: 0.6,
+      ease: "easeOut",
     },
   }),
 }
 
-export const staggerContainer = {
-  hidden: {},
+export const lineReveal = {
+  hidden: { scaleX: 0, transformOrigin: "left" },
   visible: {
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+    scaleX: 1,
+    transition: { duration: 1, ease: "easeOut" },
+  },
+}
+
+export const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
   },
 }
 
 export const staggerItem = {
-  hidden: { opacity: 0, y: 28 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.65, ease: easeOut },
-  },
-}
-
-export const lineReveal = {
-  hidden: { scaleX: 0, originX: 0 },
-  visible: {
-    scaleX: 1,
-    transition: { duration: 1.1, delay: 0.35, ease: easeOut },
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
   },
 }
