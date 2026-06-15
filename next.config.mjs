@@ -15,7 +15,13 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    // Enable Next.js Image Optimization for better mobile performance
+    unoptimized: false,
+    // Cache optimized images for 1 year (content-addressed)
+    minimumCacheTTL: 31536000,
+    // Responsive image sizes for mobile/tablet/desktop
+    deviceSizes: [320, 640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 }
 
