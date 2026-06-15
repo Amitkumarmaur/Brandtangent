@@ -26,7 +26,7 @@ class LeadCaptureTool(BaseTool):
 
     name = "lead_capture_tool"
     description = (
-        "Save a prospect's contact information for the DigiiMark sales team to "
+        "Save a prospect's contact information for the Brandtangent sales team to "
         "follow up. Use this when the user wants to be contacted but isn't ready "
         "to book a call right now. Collect their name and email at minimum."
     )

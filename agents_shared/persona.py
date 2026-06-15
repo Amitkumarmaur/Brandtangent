@@ -1,5 +1,5 @@
 """
-agents_shared/persona.py — single source of truth for both DigiiMark agents.
+agents_shared/persona.py — single source of truth for both Brandtangent agents.
 
 `build_system_prompt(channel, agent_name, rag_context)` assembles the system
 prompt from four markdown files under `persona/`:

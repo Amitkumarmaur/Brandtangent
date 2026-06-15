@@ -1,8 +1,8 @@
-# DigiiMark homepage design
+# Brandtangent homepage design
 
 *Automatically synced with your [v0.app](https://v0.app) deployments*
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/chetans-projects-98a56422/v0-digii-mark-homepage-design)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/chetans-projects-98a56422/v0-brandtangent-homepage-design)
 [![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/bACk7kunbWn)
 
 ## Overview
@@ -14,7 +14,7 @@ Any changes you make to your deployed app will be automatically pushed to this r
 
 Your project is live at:
 
-**[https://vercel.com/chetans-projects-98a56422/v0-digii-mark-homepage-design](https://vercel.com/chetans-projects-98a56422/v0-digii-mark-homepage-design)**
+**[https://vercel.com/chetans-projects-98a56422/v0-brandtangent-homepage-design](https://vercel.com/chetans-projects-98a56422/v0-brandtangent-homepage-design)**
 
 ## Build your app
 

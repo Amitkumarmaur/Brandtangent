@@ -1,5 +1,5 @@
 """
-server.py — FastAPI WebSocket server for the DigiiMark Voice Agent web UI.
+server.py — FastAPI WebSocket server for the Brandtangent Voice Agent web UI.
 
 Architecture:
   Browser (mic audio via Web Audio API)

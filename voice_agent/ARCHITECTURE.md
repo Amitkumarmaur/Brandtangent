@@ -1,6 +1,6 @@
 # Maya — Voice Agent Architecture
 
-> Deep-dive into how the DigiiMark voice agent works end-to-end after the
+> Deep-dive into how the Brandtangent voice agent works end-to-end after the
 > Supabase migration. For installation and usage, see [`README.md`](./README.md).
 
 ---
@@ -9,7 +9,7 @@
 
 **Maya** is a real-time, speech-to-speech voice agent that talks to website
 visitors over a browser microphone, answers their questions using a Supabase
-knowledge base (RAG via pgvector), books discovery calls on DigiiMark's
+knowledge base (RAG via pgvector), books discovery calls on Brandtangent's
 Cal.com calendar, and saves every transcript to Supabase.
 
 The core loop is:

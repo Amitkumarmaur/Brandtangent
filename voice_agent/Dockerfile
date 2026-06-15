@@ -1,4 +1,4 @@
-# DigiiMark Voice Agent — production Dockerfile (Railway / any container host).
+# Brandtangent Voice Agent — production Dockerfile (Railway / any container host).
 #
 # Builds a slim Python image that runs `server.py` (FastAPI + WebSockets).
 # PyAudio is intentionally NOT installed here — the web/server mode never
@@ -7,7 +7,7 @@
 # IMPORTANT — build context is the REPO ROOT (not voice_agent/) so that the
 # shared persona module at agents_shared/ can be copied into the image.
 # Build locally with:
-#     docker build -f voice_agent/Dockerfile -t digiimark-voice .
+#     docker build -f voice_agent/Dockerfile -t brandtangent-voice .
 # On Railway, set the service's "Root Directory" to the repo root and
 # "Dockerfile Path" to voice_agent/Dockerfile.
 

@@ -1,17 +1,17 @@
-# DigiiMark Website — Agent Instructions
+# Brandtangent Website — Agent Instructions
 
 > Read this file first before doing any work on this project.
 
 ## Project Overview
 
-This is the website for **DigiiMark**, an AI-first marketing automation agency.
+This is the website for **Brandtangent**, an AI-first marketing automation agency.
 Built with Next.js 16 (App Router), TypeScript, Tailwind CSS v4, and Motion.
 
 ## Mandatory Reading
 
 Before creating or modifying ANY file, read these in order:
 
-1. **`.agents/skills/digiimark-project/SKILL.md`** — Project context, tech stack, file structure, component patterns, and all design rules.
+1. **`.agents/skills/brandtangent-project/SKILL.md`** — Project context, tech stack, file structure, component patterns, and all design rules.
 2. **`STYLE_GUIDE.md`** — Complete design system: colors, typography, spacing, layout, buttons, borders, animation patterns, and the component checklist.
 3. **`app/globals.css`** — All CSS custom properties and Tailwind theme tokens. This is the source of truth for every color, font, and utility class.
 
@@ -34,7 +34,7 @@ When you modify `app/globals.css` (add/remove/change tokens), you **must** also 
 2. `public/style-guide.html` — the visual style guide
 
 When you add a new page or major component, update the file structure section in
-`.agents/skills/digiimark-project/SKILL.md`.
+`.agents/skills/brandtangent-project/SKILL.md`.
 
 ## AI agents — chat, voice, and shared persona
 
@@ -67,8 +67,8 @@ are stateless and survive Railway restarts.
 
 | Variable | Purpose |
 |---|---|
-| `CHAT_AGENT_URL` | URL of the deployed chat agent (e.g. `https://chat.digiimark.com`). The proxy at `app/api/chat-agent/[...path]/route.ts` forwards there. |
-| `NEXT_PUBLIC_VOICE_AGENT_URL` | URL of the deployed voice agent (e.g. `https://voice.digiimark.com`). Used as the iframe `src` in the voice panel. |
+| `CHAT_AGENT_URL` | URL of the deployed chat agent (e.g. `https://chat.brandtangent.com`). The proxy at `app/api/chat-agent/[...path]/route.ts` forwards there. |
+| `NEXT_PUBLIC_VOICE_AGENT_URL` | URL of the deployed voice agent (e.g. `https://voice.brandtangent.com`). Used as the iframe `src` in the voice panel. |
 | `CONTACT_INQUIRY_WEBHOOK_URL` | Webhook the contact form posts to (Make / n8n / Zapier). |
 
 ### Required env vars on each agent's server (Railway)
@@ -89,7 +89,7 @@ Skills are in `.agents/skills/`. Read the relevant SKILL.md before using:
 
 | Skill | Purpose |
 |-------|---------|
-| `digiimark-project` | Core project rules, patterns, and file structure |
+| `brandtangent-project` | Core project rules, patterns, and file structure |
 | `nano-banana-image-gen` | Generate images using Google Nano Banana 2 API |
 
 ## Quick Commands

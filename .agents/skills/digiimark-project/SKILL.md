@@ -1,18 +1,18 @@
 ---
-name: digiimark-project
+name: brandtangent-project
 description: >-
-  Core project skill for the DigiiMark website. Provides brand context, tech
+  Core project skill for the Brandtangent website. Provides brand context, tech
   stack, file structure, styling rules, and component patterns. Use this skill
   BEFORE creating any new page, component, section, or visual asset. Reference
-  it when working on anything related to the DigiiMark site — layout, styling,
+  it when working on anything related to the Brandtangent site — layout, styling,
   content, new pages, or modifications to existing ones.
 ---
 
-# DigiiMark Project Skill
+# Brandtangent Project Skill
 
-## What is DigiiMark?
+## What is Brandtangent?
 
-DigiiMark is an **AI-first marketing automation agency** that engineers
+Brandtangent is an **AI-first marketing automation agency** that engineers
 intelligent marketing systems for B2B companies. The website is a premium
 agency site showcasing services, projects, and brand authority.
 
@@ -113,7 +113,7 @@ components/
     └── …                 # web-dev-hero, service-features, etc.
 
 .agents/skills/
-├── digiimark-project/    # THIS SKILL — project rules
+├── brandtangent-project/    # THIS SKILL — project rules
 └── nano-banana-image-gen/# Image generation with Nano Banana 2
 
 public/
@@ -221,7 +221,7 @@ If you add, remove, or change any CSS custom property in `app/globals.css`:
 
 | Skill | Path | When to use |
 |-------|------|-------------|
-| **digiimark-project** | `.agents/skills/digiimark-project/` | Before ANY work on the site |
+| **brandtangent-project** | `.agents/skills/brandtangent-project/` | Before ANY work on the site |
 | **nano-banana-image-gen** | `.agents/skills/nano-banana-image-gen/` | When generating images, icons, illustrations, or visual assets |
 
 ## Environment Variables

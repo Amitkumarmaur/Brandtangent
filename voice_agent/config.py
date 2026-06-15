@@ -1,5 +1,5 @@
 """
-config.py — Central configuration for DigiiMark Voice AI Agent (Maya).
+config.py — Central configuration for Brandtangent Voice AI Agent (Maya).
 
 All settings are loaded from environment variables (via .env in dev, Railway's
 injected env in prod). Unused FAISS/file paths have been removed now that
@@ -95,7 +95,7 @@ LEAD_CAPTURE_WEBHOOK_URL: str = os.getenv("LEAD_CAPTURE_WEBHOOK_URL", "")
 
 # Base URL for the marketing site — used by content-lookup tools to build
 # shareable links (e.g. /services/[category]/[service]).
-SITE_BASE_URL: str = os.getenv("SITE_BASE_URL", "https://digiimark.com").rstrip("/")
+SITE_BASE_URL: str = os.getenv("SITE_BASE_URL", "https://brandtangent.com").rstrip("/")
 
 # ─── Web server / Railway ─────────────────────────────────────────────────────
 # Railway injects PORT automatically. VOICE_WEB_PORT kept as a dev-friendly override.
@@ -107,8 +107,8 @@ if _cors_env:
     CORS_ORIGINS: list[str] = [o.strip() for o in _cors_env.split(",") if o.strip()]
 else:
     CORS_ORIGINS = [
-        "https://digiimark.com",
-        "https://www.digiimark.com",
+        "https://brandtangent.com",
+        "https://www.brandtangent.com",
         "http://localhost:3000",
         "http://localhost:3009",
     ]
@@ -131,7 +131,7 @@ LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO").upper()
 # ─── Opening Trigger ──────────────────────────────────────────────────────────
 OPENING_TRIGGER: str = (
     "The call just connected. Open with a single short sentence: your name, "
-    "DigiiMark, and ask who you're speaking with. Do not explain anything, "
+    "Brandtangent, and ask who you're speaking with. Do not explain anything, "
     "do not make a joke, do not say how you are. Vary the wording — do not "
     "repeat the exact same opening you've used before."
 )

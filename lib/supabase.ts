@@ -11,7 +11,10 @@ const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   ""
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Only create client if both URL and key are available (skip during build if env vars not set)
+export const supabase = (supabaseUrl && supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : (null as any)
 
 // ─── Type helpers ───────────────────────────────────────────────────────────
 

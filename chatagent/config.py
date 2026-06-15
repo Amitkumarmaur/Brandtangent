@@ -1,5 +1,5 @@
 """
-config.py — DigiiMark Live Chat AI Agent configuration.
+config.py — Brandtangent Live Chat AI Agent configuration.
 
 Both the chat and voice agents share one knowledge base + transcript schema
 in Supabase. This file keeps env wiring + sensible defaults; system prompt

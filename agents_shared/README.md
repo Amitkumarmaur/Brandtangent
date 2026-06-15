@@ -1,6 +1,6 @@
 # `agents_shared/` — one persona, two agents
 
-Both DigiiMark AI agents derive their system prompt from this folder. Edit
+Both Brandtangent AI agents derive their system prompt from this folder. Edit
 the markdown here, and the change ships to both **chat** (`chatagent/`) and
 **voice** (`voice_agent/`) on the next deploy. No more drift.
 

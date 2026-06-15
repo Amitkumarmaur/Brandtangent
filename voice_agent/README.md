@@ -1,6 +1,6 @@
-# DigiiMark Voice AI Agent
+# Brandtangent Voice AI Agent
 
-A real-time **voice AI agent** for DigiiMark — an AI-first marketing automation agency.  
+A real-time **voice AI agent** for Brandtangent — an AI-first marketing automation agency.  
 Powered by **Gemini 2.0 Flash Live API** for speech-to-speech conversations, with a
 **RAG knowledge base**, automatic document indexing, full **call transcripts**, and
 extendable **webhook-based tools**.
@@ -43,8 +43,8 @@ voice_agent/
 │   └── lead_capture_tool.py    # Save lead info via webhook
 │
 ├── knowledge_base/             # Drop company documents here
-│   ├── digiimark_overview.md   # Company info, services, FAQs
-│   └── digiimark_pricing.md    # Pricing guide
+│   ├── brandtangent_overview.md   # Company info, services, FAQs
+│   └── brandtangent_pricing.md    # Pricing guide
 │
 ├── transcripts/                # Auto-created — one .md per call
 │   └── calls_log.json          # Master calls index
@@ -136,8 +136,8 @@ Simply drop files into the `knowledge_base/` folder:
 
 ```
 knowledge_base/
-├── digiimark_overview.md     ← Company info (pre-loaded)
-├── digiimark_pricing.md      ← Pricing guide (pre-loaded)
+├── brandtangent_overview.md     ← Company info (pre-loaded)
+├── brandtangent_pricing.md      ← Pricing guide (pre-loaded)
 ├── case_studies.pdf          ← Drop any new file here
 ├── services_brochure.docx    ← Automatically indexed!
 └── team_bios.txt             ← Works with .txt, .md, .pdf, .docx
@@ -224,7 +224,7 @@ Every call is saved automatically:
 
 **Per-call transcript** (`transcripts/2026-04-15_11-30-00_abc123.md`):
 ```markdown
-# DigiiMark Voice Agent — Call Transcript
+# Brandtangent Voice Agent — Call Transcript
 
 **Call ID:** `abc123de`
 **Date:** 2026-04-15
@@ -326,7 +326,7 @@ All settings are in `config.py` and loaded from `.env`:
 
 ## 📄 License
 
-Internal tool for DigiiMark. Not for redistribution.
+Internal tool for Brandtangent. Not for redistribution.
 
 ---
 

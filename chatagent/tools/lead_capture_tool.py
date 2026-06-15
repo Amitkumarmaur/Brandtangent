@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class LeadCaptureTool(BaseTool):
     name = "lead_capture_tool"
     description = (
-        "Capture name, email, and what they need for DigiiMark sales follow-up. "
+        "Capture name, email, and what they need for Brandtangent sales follow-up. "
         "Use when the user wants to be contacted, get a quote, or leave details without booking a call."
     )
     parameters: Dict[str, Any] = {

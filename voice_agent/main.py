@@ -1,5 +1,5 @@
 """
-main.py — Entry point for the DigiiMark Voice AI Agent (terminal mode).
+main.py — Entry point for the Brandtangent Voice AI Agent (terminal mode).
 
 On startup:
   1. Validates environment (Gemini key, Supabase credentials)
@@ -38,7 +38,7 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)-8s %(name)s — %(message)s",
     datefmt="%H:%M:%S",
 )
-logger = logging.getLogger("digiimark.main")
+logger = logging.getLogger("brandtangent.main")
 
 from rich.console import Console  # noqa: E402
 from rich.panel import Panel  # noqa: E402
