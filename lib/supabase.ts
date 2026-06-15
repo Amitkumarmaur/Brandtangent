@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js"
 
 /**
  * Browser + Server Component client (no cookies).
- * Lazy-initialized to avoid errors during static generation when env vars aren't set.
+ * Returns a stub during build/SSR if env vars aren't available.
  */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey =
@@ -12,10 +12,25 @@ const supabaseAnonKey =
 
 let _client: ReturnType<typeof createClient> | null = null
 
+// Stub query builder for build time when credentials aren't available
+const stubQuery = {
+  select: () => ({ data: [], error: null }),
+  insert: () => ({ data: [], error: null }),
+  update: () => ({ data: [], error: null }),
+  delete: () => ({ data: [], error: null }),
+  upsert: () => ({ data: [], error: null }),
+  rpc: () => ({ data: null, error: null }),
+}
+
 export const supabase = {
   from(table: string) {
     if (!_client) {
       if (!supabaseUrl || !supabaseAnonKey) {
+        // Return stub during build/SSR when env vars aren't available
+        if (typeof window === "undefined") {
+          console.warn(`[build] Supabase unavailable for table "${table}" - using stub`)
+          return stubQuery as any
+        }
         throw new Error(
           "Supabase not configured. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are set."
         )
@@ -24,7 +39,12 @@ export const supabase = {
     }
     return _client.from(table)
   },
-  // Add other methods as needed
+  auth: {
+    onAuthStateChange: () => ({
+      data: { subscription: null },
+      unsubscribe: () => {},
+    }),
+  },
 } as ReturnType<typeof createClient>
 
 // ─── Type helpers ───────────────────────────────────────────────────────────
